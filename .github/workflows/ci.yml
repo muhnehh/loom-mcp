@@ -82,6 +82,12 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        run: npm publish --access public
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view @loom-mcp/server@$VERSION --json 2>/dev/null | grep -q '"version"'; then
+            echo "Version $VERSION already published, skipping..."
+          else
+            npm publish --access public
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
