@@ -7,7 +7,7 @@ import { toTOON, estimateTokens } from './toon.js';
 import { LoomCache, SessionStateManager } from './cache.js';
 import { SecurityManager, CircuitBreaker } from './security.js';
 import { LoomWatcher } from './watcher.js';
-import { trackToolCall } from './dashboard/server.js';
+import { SessionRecorder } from './replay/recorder.js';
 
 const WORKSPACE_ROOT = process.cwd();
 const cache = new LoomCache('.loom');
@@ -15,6 +15,7 @@ const session = new SessionStateManager('.loom/session.json');
 const security = new SecurityManager(WORKSPACE_ROOT);
 const circuitBreaker = new CircuitBreaker({ focusBudget: 20, topologyCalls: 100 });
 const watcher = new LoomWatcher();
+const recorder = new SessionRecorder('.loom/sessions');
 
 let focusedFilesCount = 0;
 
@@ -163,7 +164,7 @@ function createLoomServer(): Server {
 
         watcher.watchDir(resolve(WORKSPACE_ROOT, dir));
 
-return {
+        return {
           content: [{
             type: 'text',
             text: `topology:${dir}\nfiles:${skeletons.length}\ntoken_estimate:${tokenEstimate}\ntoken_saved:${tokenEstimate}\n\n${toon}`

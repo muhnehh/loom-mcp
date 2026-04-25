@@ -8,9 +8,9 @@ const tree_sitter_1 = __importDefault(require("tree-sitter"));
 const tree_sitter_typescript_1 = __importDefault(require("tree-sitter-typescript"));
 const tree_sitter_python_1 = __importDefault(require("tree-sitter-python"));
 const fs_1 = require("fs");
+const path_1 = require("path");
 const parsers = {};
-let parserErrors = new Map();
-function initParser(ext, lang) {
+function initParser(lang) {
     const p = new tree_sitter_1.default();
     try {
         p.setLanguage(lang);
@@ -22,18 +22,17 @@ function initParser(ext, lang) {
 }
 const tsLang = tree_sitter_typescript_1.default.typescript || tree_sitter_typescript_1.default;
 const jsLang = tree_sitter_typescript_1.default.javascript || tree_sitter_typescript_1.default;
-const pyLang = tree_sitter_python_1.default;
 const langMap = {
     ts: tsLang,
     tsx: tsLang,
     js: jsLang,
     jsx: jsLang,
-    py: pyLang,
+    py: tree_sitter_python_1.default,
 };
 function skeletonizeFile(filePath) {
     const ext = filePath.split('.').pop()?.toLowerCase() || '';
     if (!parsers[ext] && langMap[ext]) {
-        parsers[ext] = initParser(ext, langMap[ext]);
+        parsers[ext] = initParser(langMap[ext]);
     }
     const parser = parsers[ext];
     if (!parser) {
@@ -50,16 +49,22 @@ function skeletonizeFile(filePath) {
         const tree = parser.parse(source);
         const nodes = [];
         walkTree(tree.rootNode, nodes, source);
-        return {
-            path: filePath,
-            nodes,
-            tokenEstimate: Math.ceil(nodes.length * 15)
-        };
+        return { path: filePath, nodes, tokenEstimate: Math.ceil(nodes.length * 15) };
     }
     catch (parseError) {
-        parserErrors.set(filePath, parseError.message);
+        const errMsg = parseError instanceof Error ? parseError.message : String(parseError);
+        logError(filePath, errMsg);
         return createFallbackSkeleton(filePath);
     }
+}
+function logError(filePath, msg) {
+    try {
+        const logDir = (0, path_1.join)(process.cwd(), '.loom');
+        if (!(0, fs_1.existsSync)(logDir))
+            (0, fs_1.mkdirSync)(logDir, { recursive: true });
+        (0, fs_1.appendFileSync)((0, path_1.join)(logDir, 'errors.log'), `${new Date().toISOString()} ${filePath}: ${msg}\n`);
+    }
+    catch { }
 }
 function createFallbackSkeleton(filePath) {
     try {
@@ -70,45 +75,21 @@ function createFallbackSkeleton(filePath) {
             const line = lines[i].trim();
             if (line.startsWith('function ') || line.startsWith('export function ')) {
                 const match = line.match(/function\s+(\w+)\s*\(([^)]*)\)(?:\s*:\s*(\w+))?/);
-                if (match) {
-                    funcs.push({
-                        name: match[1],
-                        kind: 'function',
-                        params: match[2] || '',
-                        returnType: match[3] || 'void',
-                        lineStart: i,
-                        lineEnd: i
-                    });
-                }
+                if (match)
+                    funcs.push({ name: match[1], kind: 'function', params: match[2] || '', returnType: match[3] || 'void', lineStart: i, lineEnd: i });
             }
             else if (line.startsWith('interface ') || line.startsWith('type ')) {
                 const match = line.match(/(?:interface|type)\s+(\w+)/);
-                if (match) {
-                    funcs.push({
-                        name: match[1],
-                        kind: 'type',
-                        lineStart: i,
-                        lineEnd: i
-                    });
-                }
+                if (match)
+                    funcs.push({ name: match[1], kind: 'type', lineStart: i, lineEnd: i });
             }
             else if (line.startsWith('class ')) {
                 const match = line.match(/class\s+(\w+)/);
-                if (match) {
-                    funcs.push({
-                        name: match[1],
-                        kind: 'class',
-                        lineStart: i,
-                        lineEnd: i
-                    });
-                }
+                if (match)
+                    funcs.push({ name: match[1], kind: 'class', lineStart: i, lineEnd: i });
             }
         }
-        return {
-            path: filePath,
-            nodes: funcs,
-            tokenEstimate: Math.ceil(funcs.length * 15)
-        };
+        return { path: filePath, nodes: funcs, tokenEstimate: Math.ceil(funcs.length * 15) };
     }
     catch {
         return { path: filePath, nodes: [], tokenEstimate: 0 };
@@ -122,28 +103,24 @@ function walkTree(node, results, source) {
         case 'function':
         case 'method_definition':
         case 'arrow_function':
-            extractFunction(node, results, source);
-            break;
         case 'function_item':
             extractFunction(node, results, source);
-            break;
+            return;
         case 'class_declaration':
         case 'class':
         case 'struct_definition':
             extractClass(node, results, source);
-            break;
+            return;
         case 'type_alias_declaration':
         case 'type_alias':
         case 'interface_declaration':
             extractType(node, results, source);
-            break;
+            return;
         case 'const_declaration':
         case 'const_item':
-            extractConst(node, results, source);
-            break;
         case 'variable_declaration':
             extractConst(node, results, source);
-            break;
+            return;
     }
     if (node.children) {
         for (const child of node.children) {
@@ -155,15 +132,13 @@ function extractFunction(node, results, source) {
     const nameNode = node.childForFieldName?.('name') || findChild(node, 'identifier');
     const paramsNode = node.childForFieldName?.('parameters') || findChild(node, 'parameters');
     const returnNode = node.childForFieldName?.('return_type') || findChild(node, 'return_type') || findChild(node, 'type');
-    if (nameNode && nameNode.text) {
-        const params = paramsNode ? extractParams(paramsNode) : '';
-        const returnType = returnNode ? cleanType(returnNode.text) : 'void';
+    if (nameNode?.text) {
         const isMethod = node.parent?.type?.includes('class');
         results.push({
             name: nameNode.text,
             kind: isMethod ? 'method' : 'function',
-            params,
-            returnType,
+            params: paramsNode ? extractParams(paramsNode) : '',
+            returnType: returnNode ? cleanType(returnNode.text) : 'void',
             lineStart: node.startPosition?.row || 0,
             lineEnd: node.endPosition?.row || 0
         });
@@ -171,7 +146,7 @@ function extractFunction(node, results, source) {
 }
 function extractClass(node, results, source) {
     const nameNode = node.childForFieldName?.('name') || findChild(node, 'identifier');
-    if (!nameNode || !nameNode.text)
+    if (!nameNode?.text)
         return;
     const members = [];
     const body = node.childForFieldName?.('body') || findChild(node, 'class_body');
@@ -192,38 +167,38 @@ function extractClass(node, results, source) {
 }
 function extractType(node, results, source) {
     const nameNode = node.childForFieldName?.('name') || findChild(node, 'identifier');
+    if (!nameNode?.text)
+        return;
+    const members = [];
     const typeNode = node.childForFieldName?.('type') || findChild(node, 'type');
-    if (nameNode && nameNode.text) {
-        const members = [];
-        if (typeNode?.children) {
-            for (const child of typeNode.children) {
-                if (child.type === 'field_declaration' || child.type === 'property_signature') {
-                    const fname = child.childForFieldName?.('name') || findChild(child, 'field_identifier');
-                    if (fname?.text) {
-                        members.push({
-                            name: fname.text,
-                            kind: 'const',
-                            returnType: cleanType(child.childForFieldName?.('type')?.text || 'any'),
-                            lineStart: child.startPosition?.row || 0,
-                            lineEnd: child.endPosition?.row || 0
-                        });
-                    }
+    if (typeNode?.children) {
+        for (const child of typeNode.children) {
+            if (child.type === 'field_declaration' || child.type === 'property_signature') {
+                const fname = child.childForFieldName?.('name') || findChild(child, 'field_identifier');
+                if (fname?.text) {
+                    members.push({
+                        name: fname.text,
+                        kind: 'const',
+                        returnType: cleanType(child.childForFieldName?.('type')?.text || 'any'),
+                        lineStart: child.startPosition?.row || 0,
+                        lineEnd: child.endPosition?.row || 0
+                    });
                 }
             }
         }
-        results.push({
-            name: nameNode.text,
-            kind: node.type.includes('interface') ? 'interface' : 'type',
-            members,
-            lineStart: node.startPosition?.row || 0,
-            lineEnd: node.endPosition?.row || 0
-        });
     }
+    results.push({
+        name: nameNode.text,
+        kind: node.type.includes('interface') ? 'interface' : 'type',
+        members,
+        lineStart: node.startPosition?.row || 0,
+        lineEnd: node.endPosition?.row || 0
+    });
 }
 function extractConst(node, results, source) {
     const nameNode = node.childForFieldName?.('name') || findChild(node, 'identifier');
     const typeNode = node.childForFieldName?.('type') || findChild(node, 'type');
-    if (nameNode && nameNode.text) {
+    if (nameNode?.text) {
         results.push({
             name: nameNode.text,
             kind: 'const',
@@ -250,9 +225,7 @@ function extractParams(paramsNode) {
         .map((p) => {
         const name = p.childForFieldName?.('name') || findChild(p, 'identifier');
         const type = p.childForFieldName?.('type') || findChild(p, 'type_annotation');
-        const nameText = name?.text || '';
-        const typeText = type ? cleanType(type.text) : 'any';
-        return `${nameText}:${typeText}`;
+        return `${name?.text || ''}:${type ? cleanType(type.text) : 'any'}`;
     })
         .join(',');
 }

@@ -11,6 +11,7 @@ const toon_js_1 = require("./toon.js");
 const cache_js_1 = require("./cache.js");
 const security_js_1 = require("./security.js");
 const watcher_js_1 = require("./watcher.js");
+const recorder_js_1 = require("./replay/recorder.js");
 const WORKSPACE_ROOT = process.cwd();
 const cache = new cache_js_1.LoomCache('.loom');
 exports.cache = cache;
@@ -22,6 +23,7 @@ const circuitBreaker = new security_js_1.CircuitBreaker({ focusBudget: 20, topol
 exports.circuitBreaker = circuitBreaker;
 const watcher = new watcher_js_1.LoomWatcher();
 exports.watcher = watcher;
+const recorder = new recorder_js_1.SessionRecorder('.loom/sessions');
 let focusedFilesCount = 0;
 function globFiles(dir, patterns, ignore) {
     const results = [];
@@ -160,7 +162,7 @@ function createLoomServer() {
                 return {
                     content: [{
                             type: 'text',
-                            text: `topology:${dir}\nfiles:${skeletons.length}\ntoken_estimate:${tokenEstimate}\ncache_hits:${cacheHits}\n\n${toon}`
+                            text: `topology:${dir}\nfiles:${skeletons.length}\ntoken_estimate:${tokenEstimate}\ntoken_saved:${tokenEstimate}\n\n${toon}`
                         }]
                 };
             }

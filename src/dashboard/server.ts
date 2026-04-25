@@ -1,5 +1,8 @@
 import express, { Request, Response } from 'express';
 import { createServer as createHttpServer } from 'http';
+import { readdirSync, readFileSync, existsSync } from 'fs';
+import { join } from 'path';
+import { generateReplayHTML } from '../replay/replay-ui.js';
 
 interface SessionState {
   tokens_used: number;
@@ -67,6 +70,24 @@ export function startDashboard(port: number = 2337) {
 
   app.get('/state', (req: Request, res: Response) => {
     res.json(sessionState);
+  });
+
+  app.get('/replay', (req: Request, res: Response) => {
+    const sessionDir = join(process.cwd(), '.loom', 'sessions');
+    if (!existsSync(sessionDir)) {
+      res.send('<html><body style="background:#0D1117;color:#E6EDF3;padding:2rem;font-family:sans-serif;"><h2>No sessions recorded</h2><p>Run some MCP tool calls first.</p></body></html>');
+      return;
+    }
+    const files = readdirSync(sessionDir).filter(f => f.endsWith('.jsonl')).sort().reverse();
+    if (files.length === 0) {
+      res.send('<html><body style="background:#0D1117;color:#E6EDF3;padding:2rem;font-family:sans-serif;"><h2>No sessions recorded</h2><p>Run some MCP tool calls first.</p></body></html>');
+      return;
+    }
+    const latest = files[0];
+    const content = readFileSync(join(sessionDir, latest), 'utf8');
+    const records = content.trim().split('\n').map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(generateReplayHTML(records));
   });
 
   const server = createHttpServer(app);

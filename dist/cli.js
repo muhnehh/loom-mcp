@@ -50,25 +50,38 @@ function parseArgs() {
             opts.dir = args[++i];
         else if (a === '--port' && args[i + 1])
             opts.port = parseInt(args[++i]);
+        else if (a === '--json')
+            opts.json = true;
         else if (a === '--help' || a === '-h')
             opts.help = true;
     }
     return opts;
 }
-async function runInit(dir) {
-    console.log('\n⚡ LoomMCP — initializing...\n');
+async function runInit(dir, asJson = false) {
     const target = (0, path_1.resolve)(process.cwd(), dir);
     const langs = detectLanguages(target);
-    console.log(`  detected: ${langs.join(', ')}`);
     const rawTokens = countRawTokens(target, langs);
-    console.log(`  repo size: ~${format(rawTokens)} tokens`);
     const reduction = 85 + Math.floor(Math.random() * 10);
     const skeleton = Math.round(rawTokens * (100 - reduction) / 100);
-    console.log(`  skeleton: ~${format(skeleton)} tokens`);
-    console.log(`  reduction: ${reduction}%`);
     const daily = (rawTokens * 200 * 15) / 1_000_000;
     const loomCost = (skeleton * 1.4 * 200 * 15) / 1_000_000;
-    console.log(`  est. monthly savings: $${Math.round((daily - loomCost) * 22)}\n`);
+    const monthlySavings = Math.round((daily - loomCost) * 22);
+    if (asJson) {
+        process.stdout.write(JSON.stringify({
+            languages: langs,
+            rawTokens,
+            skeletonTokens: skeleton,
+            reduction,
+            monthlySavingsDollars: monthlySavings
+        }) + '\n');
+        return;
+    }
+    console.log('\n⚡ LoomMCP — initializing...\n');
+    console.log(`  detected: ${langs.join(', ')}`);
+    console.log(`  repo size: ~${format(rawTokens)} tokens`);
+    console.log(`  skeleton: ~${format(skeleton)} tokens`);
+    console.log(`  reduction: ${reduction}%`);
+    console.log(`  est. monthly savings: $${monthlySavings}\n`);
     const settings = (0, path_1.join)(target, '.claude', 'settings.json');
     if (!(0, fs_1.existsSync)((0, path_1.dirname)(settings))) {
         (0, fs_1.mkdirSync)((0, path_1.dirname)(settings), { recursive: true });
@@ -86,13 +99,10 @@ async function runInit(dir) {
     console.log(`Dashboard: http://localhost:2337\n`);
 }
 async function runStart() {
-    console.log('⚡ LoomMCP server starting...');
     const { createServer } = await Promise.resolve().then(() => __importStar(require('./tools.js')));
     const { StdioServerTransport } = await Promise.resolve().then(() => __importStar(require('@modelcontextprotocol/sdk/server/stdio.js')));
     const server = createServer();
     const transport = new StdioServerTransport();
-    console.log('MCP server running on stdio');
-    console.log('Dashboard: http://localhost:2337');
     server.connect(transport);
 }
 function detectLanguages(dir) {
@@ -157,17 +167,18 @@ COMMANDS:
 OPTIONS:
   --dir PATH    Working directory
   --port PORT    Dashboard port (2337)
+  --json         JSON output (for scripting)
   --help         Show help
 
 EXAMPLES:
-  loom init
+  loom init --json
   loom start --dir ./project
 `);
     process.exit(0);
 }
 switch (opts.command || 'start') {
     case 'init':
-        runInit(opts.dir || '.');
+        runInit(opts.dir || '.', opts.json);
         break;
     case 'start':
         runStart();

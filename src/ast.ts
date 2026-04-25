@@ -1,7 +1,8 @@
 import Parser from 'tree-sitter';
 import TypeScript from 'tree-sitter-typescript';
 import Python from 'tree-sitter-python';
-import { readFileSync } from 'fs';
+import { readFileSync, appendFileSync, existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 import { ASTNode, FileSkeleton } from './toon.js';
 
 const parsers: Record<string, Parser> = {};
@@ -51,9 +52,19 @@ export function skeletonizeFile(filePath: string): FileSkeleton {
     const nodes: ASTNode[] = [];
     walkTree(tree.rootNode, nodes, source);
     return { path: filePath, nodes, tokenEstimate: Math.ceil(nodes.length * 15) };
-  } catch {
+  } catch (parseError: unknown) {
+    const errMsg = parseError instanceof Error ? parseError.message : String(parseError);
+    logError(filePath, errMsg);
     return createFallbackSkeleton(filePath);
   }
+}
+
+function logError(filePath: string, msg: string) {
+  try {
+    const logDir = join(process.cwd(), '.loom');
+    if (!existsSync(logDir)) mkdirSync(logDir, { recursive: true });
+    appendFileSync(join(logDir, 'errors.log'), `${new Date().toISOString()} ${filePath}: ${msg}\n`);
+  } catch {}
 }
 
 function createFallbackSkeleton(filePath: string): FileSkeleton {

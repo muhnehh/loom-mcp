@@ -8,8 +8,8 @@ class SecurityManager {
         this.workspaceRoot = (0, path_1.resolve)(workspaceRoot);
     }
     isPathSafe(requestedPath) {
-        if (!requestedPath)
-            return false;
+        if (!requestedPath || requestedPath === '.')
+            return true;
         if (requestedPath.includes('..'))
             return false;
         if (requestedPath.startsWith('/') && !requestedPath.startsWith('./'))

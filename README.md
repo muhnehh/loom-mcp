@@ -12,12 +12,19 @@ Running an autonomous agent on a large repo costs $20/day because it reads 50k t
 
 Loom compresses a 50k token codebase into a 4k token structural map. Claude only pages in the functions it actually needs to edit.
 
-## Benchmark
+## Token Reduction Benchmark
 
-| Setup | Avg Tokens / Task | Latency | Cost / Task |
-|:------|:------------------:|:-------:|:-----------:|
-| Raw Claude Code | 245,000 | 18s | $3.67 |
-| **Claude Code + LoomMCP** | **32,000** | **4s** | **$0.48** |
+Measured with `char/4` token estimation (tiktoken fallback) on real TypeScript codebases:
+
+| Repository | Files | Raw Tokens | TOON Tokens | Reduction | Latency |
+|:-----------|------:|----------:|------------:|:---------:|:-------:|
+| `loommcp` (self) | 23 | 26,055 | 3,629 | **86%** | 655ms |
+| `test-project` (small) | 1 | 134 | 62 | **54%** | ~50ms |
+
+Run your own benchmark:
+```bash
+node eval/benchmark.js . --json
+```
 
 ## Quickstart
 

@@ -8,7 +8,7 @@ export class SecurityManager {
   }
 
   isPathSafe(requestedPath: string): boolean {
-    if (!requestedPath) return false;
+    if (!requestedPath || requestedPath === '.') return true;
     
     if (requestedPath.includes('..')) return false;
     if (requestedPath.startsWith('/') && !requestedPath.startsWith('./')) return false;
