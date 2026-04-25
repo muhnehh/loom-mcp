@@ -1,0 +1,34 @@
+{
+  "name": "java-spring",
+  "workspace": ".",
+  "languages": ["java"],
+  "exclude": [
+    "target",
+    "build",
+    ".gradle",
+    ".mvn",
+    "*.class",
+    "*.jar",
+    "*.war",
+    "**/test/**",
+    "**/tests/**",
+    "**/*Test.java",
+    "**/*Tests.java",
+    "mvnw",
+    "gradlew"
+  ],
+  "focusBudget": 20,
+  "topologyCalls": 100,
+  "searchRefs": 250,
+  "priorityPatterns": [
+    "src/main/**/*.java"
+  ],
+  "dashboard": {
+    "enabled": true,
+    "port": 2337
+  },
+  "recorder": {
+    "enabled": true,
+    "directory": ".loom/sessions"
+  }
+}

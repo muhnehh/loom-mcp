@@ -1,0 +1,28 @@
+{
+  "name": "golang",
+  "workspace": ".",
+  "languages": ["go"],
+  "exclude": [
+    "vendor",
+    "test-project",
+    "*_test.go",
+    "**/*_test.go",
+    ".git",
+    "dist",
+    "build"
+  ],
+  "focusBudget": 20,
+  "topologyCalls": 100,
+  "searchRefs": 250,
+  "priorityPatterns": [
+    "**/*.go"
+  ],
+  "dashboard": {
+    "enabled": true,
+    "port": 2337
+  },
+  "recorder": {
+    "enabled": true,
+    "directory": ".loom/sessions"
+  }
+}

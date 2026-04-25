@@ -1,5 +1,5 @@
-import { readFileSync, existsSync, readdirSync, statSync, readFileSync as readFile } from 'fs';
-import { resolve, relative, join, dirname } from 'path';
+import { readFileSync, existsSync } from 'fs';
+import { resolve, relative } from 'path';
 
 export interface DependencyNode {
   name: string;

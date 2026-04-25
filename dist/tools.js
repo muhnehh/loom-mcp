@@ -6,6 +6,7 @@ const index_js_1 = require("@modelcontextprotocol/sdk/server/index.js");
 const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
 const fs_1 = require("fs");
 const path_1 = require("path");
+const child_process_1 = require("child_process");
 const ast_js_1 = require("./ast.js");
 const toon_js_1 = require("./toon.js");
 const cache_js_1 = require("./cache.js");
@@ -28,6 +29,7 @@ exports.watcher = watcher;
 const recorder = new recorder_js_1.SessionRecorder('.loom/sessions');
 const metrics = new metrics_js_1.MetricsCollector('.loom/metrics');
 let focusedFilesCount = 0;
+let focusedFiles = [];
 let symbolIndex = new Map();
 let memoryStore = new Map();
 function buildSymbolIndex(files) {
@@ -600,8 +602,7 @@ function createLoomServer() {
             if (name === 'loom_diff_compress') {
                 const since = args.since || 'HEAD~5';
                 try {
-                    const { execSync } = require('child_process');
-                    const diff = execSync(`git diff ${since} --stat`, { cwd: WORKSPACE_ROOT, encoding: 'utf8', timeout: 5000 });
+                    const diff = (0, child_process_1.execSync)(`git diff ${since} --stat`, { cwd: WORKSPACE_ROOT, encoding: 'utf8', timeout: 5000 });
                     const stats = diff.split('\n').filter(l => l.trim());
                     return { content: [{
                                 type: 'text',
@@ -631,14 +632,11 @@ function createLoomServer() {
             }
             // New: changed symbols (git diff)
             if (name === 'loom_get_changed_symbols') {
-                const { execSync } = require('child_process');
-                let changes = '';
+                let changes = 'unavailable';
                 try {
-                    changes = execSync('git status --porcelain', { cwd: WORKSPACE_ROOT, encoding: 'utf8' });
+                    changes = (0, child_process_1.execSync)('git status --porcelain', { cwd: WORKSPACE_ROOT, encoding: 'utf8' });
                 }
-                catch {
-                    changes = 'unavailable';
-                }
+                catch { }
                 const latency_ms = Date.now() - startTime;
                 recorder.record({
                     tool: 'loom_get_changed_symbols',

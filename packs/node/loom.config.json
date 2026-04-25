@@ -1,0 +1,42 @@
+{
+  "name": "node",
+  "workspace": ".",
+  "languages": ["ts", "js", "tsx", "jsx"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    ".nyc_output",
+    "*.test.ts",
+    "*.test.js",
+    "*.spec.ts",
+    "*.spec.js",
+    "__tests__",
+    "test",
+    "tests"
+  ],
+  "focusBudget": 20,
+  "topologyCalls": 150,
+  "searchRefs": 250,
+  "priorityPatterns": [
+    "src/routes/**",
+    "src/middleware/**",
+    "src/models/**",
+    "src/services/**",
+    "src/controllers/**",
+    "src/lib/**",
+    "src/utils/**",
+    "src/config/**",
+    "src/types/**",
+    "src/validators/**"
+  ],
+  "dashboard": {
+    "enabled": true,
+    "port": 2337
+  },
+  "recorder": {
+    "enabled": true,
+    "directory": ".loom/sessions"
+  }
+}

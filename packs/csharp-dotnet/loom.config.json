@@ -1,0 +1,30 @@
+{
+  "name": "csharp-dotnet",
+  "workspace": ".",
+  "languages": ["cs"],
+  "exclude": [
+    "bin",
+    "obj",
+    ".vs",
+    "*.user",
+    "*.csproj.user",
+    "**/test*/**/*.cs",
+    "**/*Tests.cs",
+    "**/*Test.cs",
+    "packages"
+  ],
+  "focusBudget": 20,
+  "topologyCalls": 100,
+  "searchRefs": 250,
+  "priorityPatterns": [
+    "**/*.cs"
+  ],
+  "dashboard": {
+    "enabled": true,
+    "port": 2337
+  },
+  "recorder": {
+    "enabled": true,
+    "directory": ".loom/sessions"
+  }
+}

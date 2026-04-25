@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 export interface ToolMetrics {
@@ -132,9 +132,8 @@ export class MetricsCollector {
 
   getHistorical(limit = 10): SessionMetrics[] {
     try {
-      const files = (readFileSync(this.metricsDir, 'utf8') as any)
-        .split('\n')
-        .filter((f: string) => f.startsWith('session_'))
+      const files = readdirSync(this.metricsDir)
+        .filter(f => f.startsWith('session_') && f.endsWith('.json'))
         .sort()
         .reverse()
         .slice(0, limit);

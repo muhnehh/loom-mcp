@@ -1,0 +1,43 @@
+{
+  "name": "react",
+  "workspace": ".",
+  "languages": ["ts", "tsx", "js", "jsx"],
+  "exclude": [
+    "node_modules",
+    ".next",
+    ".nuxt",
+    "dist",
+    "build",
+    "coverage",
+    ".cache",
+    "*.test.ts",
+    "*.test.tsx",
+    "*.spec.ts",
+    "*.spec.tsx",
+    "__tests__",
+    "*.stories.tsx"
+  ],
+  "focusBudget": 25,
+  "topologyCalls": 100,
+  "searchRefs": 300,
+  "priorityPatterns": [
+    "src/components/**",
+    "src/pages/**",
+    "src/app/**",
+    "src/hooks/**",
+    "src/context/**",
+    "src/lib/**",
+    "src/utils/**",
+    "src/types/**",
+    "src/api/**",
+    "src/store/**"
+  ],
+  "dashboard": {
+    "enabled": true,
+    "port": 2337
+  },
+  "recorder": {
+    "enabled": true,
+    "directory": ".loom/sessions"
+  }
+}

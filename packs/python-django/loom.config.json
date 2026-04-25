@@ -1,0 +1,49 @@
+{
+  "name": "python-django",
+  "workspace": ".",
+  "languages": ["py"],
+  "exclude": [
+    "__pycache__",
+    ".venv",
+    "venv",
+    "env",
+    ".env",
+    "*.pyc",
+    "*.pyo",
+    "*.pyd",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "htmlcov",
+    "*.egg-info",
+    "migrations/",
+    "dist/",
+    "build/",
+    "tests/",
+    "test_*.py",
+    "*_test.py"
+  ],
+  "focusBudget": 15,
+  "topologyCalls": 80,
+  "searchRefs": 200,
+  "priorityPatterns": [
+    "**/models.py",
+    "**/views.py",
+    "**/urls.py",
+    "**/admin.py",
+    "**/serializers.py",
+    "**/forms.py",
+    "**/middleware.py",
+    "**/signals.py",
+    "**/apps.py",
+    "**/management/commands/**"
+  ],
+  "dashboard": {
+    "enabled": true,
+    "port": 2337
+  },
+  "recorder": {
+    "enabled": true,
+    "directory": ".loom/sessions"
+  }
+}

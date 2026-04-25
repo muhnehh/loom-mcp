@@ -1,0 +1,27 @@
+{
+  "name": "rust-crates",
+  "workspace": ".",
+  "languages": ["rs"],
+  "exclude": [
+    "target",
+    "**/*.toml",
+    "**/tests/**",
+    "examples/",
+    "benches/",
+    "*.lock"
+  ],
+  "focusBudget": 15,
+  "topologyCalls": 80,
+  "searchRefs": 200,
+  "priorityPatterns": [
+    "src/**/*.rs"
+  ],
+  "dashboard": {
+    "enabled": true,
+    "port": 2337
+  },
+  "recorder": {
+    "enabled": true,
+    "directory": ".loom/sessions"
+  }
+}

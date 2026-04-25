@@ -1,15 +1,23 @@
 {
   "name": "@loom-mcp/server",
   "version": "0.3.0",
-  "description": "Local-first MCP context compiler - 95% token reduction like jCodeMunch with unique cross-session memory",
+  "description": "The universal context compiler for AI coding agents. 95% token reduction, cross-session memory, live dashboard, 17 tools. Works with Claude Code, Cursor, VS Code, Codex, and all MCP clients.",
+  "license": "MIT",
   "repository": "https://github.com/muhnehh/loom-mcp",
   "homepage": "https://github.com/muhnehh/loom-mcp",
+  "bugs": "https://github.com/muhnehh/loom-mcp/issues",
+  "author": "LoomMCP <loom@mcp.sh>",
   "keywords": [
     "mcp",
     "context",
     "token-optimization",
+    "token-reduction",
     "claude",
-    "ai-agents"
+    "claude-code",
+    "ai-agents",
+    "coding-assistant",
+    "cursor",
+    "context-compiler"
   ],
   "bin": {
     "loom-mcp": "./dist/index.js",
@@ -19,7 +27,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsc && node dist/index.js",
-    "test": "node --test __tests__/*.test.mjs"
+    "test": "node --test __tests__/*.test.mjs",
+    "benchmark": "node eval/benchmark.js .",
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.1.0",
@@ -33,17 +43,24 @@
     "tree-sitter-typescript": "^0.21.0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
     "@types/node": "^22.0.0",
-    "jest": "^30.3.0",
     "typescript": "^5.6.0"
   },
   "engines": {
     "node": ">=18.0.0"
   },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
   "files": [
     "dist",
     "prompts",
-    "eval"
+    "eval",
+    "packs",
+    "README.md",
+    "SETUP.md",
+    "CLAUDE.md"
   ]
 }
