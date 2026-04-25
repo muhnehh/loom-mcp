@@ -6,6 +6,7 @@ interface Args {
   dir?: string;
   port?: number;
   help?: boolean;
+  json?: boolean;
 }
 
 function parseArgs(): Args {
@@ -19,36 +20,45 @@ function parseArgs(): Args {
     else if (a === 'replay') opts.command = 'replay';
     else if (a === '--dir' && args[i + 1]) opts.dir = args[++i];
     else if (a === '--port' && args[i + 1]) opts.port = parseInt(args[++i]);
+    else if (a === '--json') opts.json = true;
     else if (a === '--help' || a === '-h') opts.help = true;
   }
   return opts;
 }
 
-async function runInit(dir: string) {
-  console.log('\n⚡ LoomMCP — initializing...\n');
-  
+async function runInit(dir: string, asJson = false) {
   const target = resolve(process.cwd(), dir);
   const langs = detectLanguages(target);
-  console.log(`  detected: ${langs.join(', ')}`);
-  
   const rawTokens = countRawTokens(target, langs);
-  console.log(`  repo size: ~${format(rawTokens)} tokens`);
-  
   const reduction = 85 + Math.floor(Math.random() * 10);
   const skeleton = Math.round(rawTokens * (100 - reduction) / 100);
-  
-  console.log(`  skeleton: ~${format(skeleton)} tokens`);
-  console.log(`  reduction: ${reduction}%`);
-  
   const daily = (rawTokens * 200 * 15) / 1_000_000;
   const loomCost = (skeleton * 1.4 * 200 * 15) / 1_000_000;
-  console.log(`  est. monthly savings: $${Math.round((daily - loomCost) * 22)}\n`);
-  
+  const monthlySavings = Math.round((daily - loomCost) * 22);
+
+  if (asJson) {
+    process.stdout.write(JSON.stringify({
+      languages: langs,
+      rawTokens,
+      skeletonTokens: skeleton,
+      reduction,
+      monthlySavingsDollars: monthlySavings
+    }) + '\n');
+    return;
+  }
+
+  console.log('\n⚡ LoomMCP — initializing...\n');
+  console.log(`  detected: ${langs.join(', ')}`);
+  console.log(`  repo size: ~${format(rawTokens)} tokens`);
+  console.log(`  skeleton: ~${format(skeleton)} tokens`);
+  console.log(`  reduction: ${reduction}%`);
+  console.log(`  est. monthly savings: $${monthlySavings}\n`);
+
   const settings = join(target, '.claude', 'settings.json');
   if (!existsSync(dirname(settings))) {
     mkdirSync(dirname(settings), { recursive: true });
   }
-  
+
   try {
     writeFileSync(settings, JSON.stringify({
       mcpServers: {
@@ -57,23 +67,17 @@ async function runInit(dir: string) {
     }, null, 2));
     console.log(`  configured: .claude/settings.json`);
   } catch {}
-  
+
   console.log(`\nRun: npx @loom-mcp/server start`);
   console.log(`Dashboard: http://localhost:2337\n`);
 }
 
 async function runStart() {
-  console.log('⚡ LoomMCP server starting...');
-  
   const { createServer } = await import('./tools.js');
   const { StdioServerTransport } = await import('@modelcontextprotocol/sdk/server/stdio.js');
   
   const server = createServer();
   const transport = new StdioServerTransport();
-  
-  console.log('MCP server running on stdio');
-  console.log('Dashboard: http://localhost:2337');
-  
   server.connect(transport);
 }
 
@@ -134,17 +138,18 @@ COMMANDS:
 OPTIONS:
   --dir PATH    Working directory
   --port PORT    Dashboard port (2337)
+  --json         JSON output (for scripting)
   --help         Show help
 
 EXAMPLES:
-  loom init
+  loom init --json
   loom start --dir ./project
 `);
   process.exit(0);
 }
 
 switch (opts.command || 'start') {
-  case 'init': runInit(opts.dir || '.'); break;
+  case 'init': runInit(opts.dir || '.', opts.json); break;
   case 'start': runStart(); break;
   default: runStart();
 }

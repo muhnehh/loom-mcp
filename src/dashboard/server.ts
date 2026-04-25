@@ -1,7 +1,5 @@
 import express, { Request, Response } from 'express';
 import { createServer as createHttpServer } from 'http';
-import { readFileSync, existsSync, mkdirSync } from 'fs';
-import { join, dirname } from 'path';
 
 interface SessionState {
   tokens_used: number;
@@ -19,18 +17,17 @@ let sessionState: SessionState = {
   start_time: Date.now()
 };
 
-const clients: Set<Response> = new Set();
+const clients: Set<() => void> = new Set();
 
-function emitEvent(data: any) {
+function emitEvent(data: Record<string, unknown>) {
   const payload = JSON.stringify({ ...sessionState, ...data });
-  clients.forEach(client => {
-    client.write(`data: ${payload}\n\n`);
+  clients.forEach(resume => {
+    try { resume(); } catch { clients.delete(resume); }
   });
 }
 
 export function startDashboard(port: number = 2337) {
   const app = express();
-  
   app.use(express.json());
 
   app.get('/', (req: Request, res: Response) => {
@@ -43,27 +40,28 @@ export function startDashboard(port: number = 2337) {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    clients.add(res);
-    
+    res.setHeader('Access-Control-Allow-Headers', 'Cache-Control');
+
+    let closed = false;
+    const cleanup = () => { if (!closed) { closed = true; clients.delete(cleanup); } };
+    clients.add(cleanup);
+
     res.write(`data: ${JSON.stringify(sessionState)}\n\n`);
-    
-    req.on('close', () => {
-      clients.delete(res);
-    });
+
+    const interval = setInterval(() => {
+      if (closed) { clearInterval(interval); return; }
+      try { res.write(`data: ${JSON.stringify(sessionState)}\n\n`); } catch { clearInterval(interval); cleanup(); }
+    }, 30_000);
+
+    req.on('close', () => { clearInterval(interval); cleanup(); });
   });
 
   app.post('/emit', (req: Request, res: Response) => {
-    const { tool, target, tokens_in, tokens_saved, latency_ms, focused } = req.body;
-    
+    const { tokens_in, tokens_saved, turns } = req.body;
     sessionState.tokens_used += tokens_in || 0;
     sessionState.tokens_saved += tokens_saved || 0;
-    sessionState.turns++;
-    
-    if (focused && Array.isArray(focused)) {
-      sessionState.focused_files = focused;
-    }
-
-    emitEvent({ last_call: { tool, target, tokens_in, tokens_saved, latency_ms } });
+    if (turns) sessionState.turns = turns;
+    emitEvent({ last_call: req.body });
     res.json({ ok: true });
   });
 
@@ -72,22 +70,16 @@ export function startDashboard(port: number = 2337) {
   });
 
   const server = createHttpServer(app);
-  server.listen(port, () => {
-    console.log(`Dashboard: http://localhost:${port}`);
-  });
+  server.listen(port, () => {});
 
-  return { app, server };
+  return server;
 }
 
-export function trackToolCall(tool: string, target: string, tokens_in: number, tokens_saved: number, latency_ms: number) {
-  emitEvent({ 
-    tool, 
-    target, 
-    tokens_in, 
-    tokens_saved, 
-    latency_ms,
-    timestamp: Date.now()
-  });
+export function trackToolCall(tool: string, target: string, tokens_in: number, tokens_saved: number) {
+  sessionState.tokens_used += tokens_in;
+  sessionState.tokens_saved += tokens_saved;
+  sessionState.turns++;
+  emitEvent({ tool, target, tokens_in, tokens_saved, timestamp: Date.now() });
 }
 
 function getDashboardHTML(): string {

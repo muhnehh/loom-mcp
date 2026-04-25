@@ -7,6 +7,7 @@ import { toTOON, estimateTokens } from './toon.js';
 import { LoomCache, SessionStateManager } from './cache.js';
 import { SecurityManager, CircuitBreaker } from './security.js';
 import { LoomWatcher } from './watcher.js';
+import { trackToolCall } from './dashboard/server.js';
 
 const WORKSPACE_ROOT = process.cwd();
 const cache = new LoomCache('.loom');
@@ -162,10 +163,10 @@ function createLoomServer(): Server {
 
         watcher.watchDir(resolve(WORKSPACE_ROOT, dir));
 
-        return {
+return {
           content: [{
             type: 'text',
-            text: `topology:${dir}\nfiles:${skeletons.length}\ntoken_estimate:${tokenEstimate}\ncache_hits:${cacheHits}\n\n${toon}`
+            text: `topology:${dir}\nfiles:${skeletons.length}\ntoken_estimate:${tokenEstimate}\ntoken_saved:${tokenEstimate}\n\n${toon}`
           }]
         };
       }
