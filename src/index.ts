@@ -36,7 +36,7 @@ process.on('SIGINT', () => { log('info', 'Shutting down'); process.exit(0); });
 process.on('SIGTERM', () => { log('info', 'Shutting down'); process.exit(0); });
 
 async function main() {
-  log('info', 'LoomMCP starting', { version: '2.0.0', logLevel: LOG_LEVEL });
+  log('info', 'LoomMCP starting', { version: '0.5.0', logLevel: LOG_LEVEL });
   
   const port = parseInt(process.env.LOOM_DASHBOARD_PORT || '2337');
   let dashboardActive = false;

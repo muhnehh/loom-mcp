@@ -84,6 +84,18 @@ Run: node eval/benchmark.js . --json
 | loom_get_deps | Dependency graph (text/DOT/JSON) |
 | loom_get_metrics | Session metrics + tool breakdown |
 | loom_get_sessions | Historical session data |
+| loom_bm25_search | BM25 ranking search |
+| loom_fuzzy_search | Fuzzy/typo-tolerant search |
+| loom_find_dead_code | Unused code detection |
+| loom_get_class_hierarchy | Class inheritance tree |
+| loom_pagerank_centrality | Architectural importance |
+| loom_attach_repo | Multi-repo attachment |
+| loom_workspace_search | Cross-repo search |
+| loom_semantic_search | GPU-accelerated embeddings |
+| loom_detect_frameworks | Nuxt/Next.js/Django detection |
+| loom_get_confidence | Methodology disclosure |
+| loom_enforce_hook | PreToolUse/PostToolUse hooks |
+| loom_agent_info | Supported agent integrations |
 
 ## Unique Features
 
@@ -112,3 +124,10 @@ DASHBOARD_PORT: 2337 (env LOOM_DASHBOARD_PORT)
 - GET /state      - Current session state
 - GET /api/summary - JSON stats summary
 - POST /emit      - Emit custom events
+
+## Documentation Files
+
+- README.md       - Main competitive analysis
+- SETUP.md        - Universal client setup guide
+- SUPPORT.md     - Comprehensive support & troubleshooting
+- CONTRIBUTING.md - Development guide

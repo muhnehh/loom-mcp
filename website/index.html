@@ -13,7 +13,8 @@
     <meta name="twitter:card" content="summary">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   <style>
     :root {
       --bg: #f8f9fc;
@@ -43,25 +44,26 @@
     }
 
     body {
-      font-family: "Manrope", "Segoe UI", sans-serif;
+      font-family: "Segoe UI", sans-serif;
       color: var(--ink);
       background:
         radial-gradient(circle at 85% 8%, #edf0ff 0%, transparent 35%),
         radial-gradient(circle at 7% 88%, #e9fff4 0%, transparent 33%),
         var(--bg);
-      line-height: 1.55;
+      line-height: 1.7;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
 
     .container {
-      width: min(1180px, calc(100% - 48px));
+      width: min(1200px, calc(100% - 46px));
       margin: 0 auto;
     }
 
     .serif {
-      font-family: "Fraunces", Georgia, serif;
-      letter-spacing: -0.02em;
+      font-family: "Instrument Serif", Georgia, serif;
+      font-weight: 400;
+      letter-spacing: -0.01em;
     }
 
     .pill {
@@ -74,7 +76,7 @@
       padding: 7px 12px;
       font-size: 12px;
       color: #606b86;
-      font-weight: 700;
+      font-weight: 600;
     }
 
     .dot {
@@ -127,7 +129,7 @@
 
     .brand {
       font-size: 22px;
-      font-weight: 800;
+      font-weight: 700;
       text-decoration: none;
       color: var(--ink);
       display: inline-flex;
@@ -150,7 +152,7 @@
     .menu a {
       text-decoration: none;
       color: #3f4761;
-      font-weight: 600;
+      font-weight: 500;
       transition: color 0.2s ease;
     }
 
@@ -164,23 +166,24 @@
       background: #f0eeff;
       color: #5f55d9;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 600;
       border: 1px solid #e6e2ff;
       text-decoration: none;
     }
 
     .hero {
-      padding: 54px 0 24px;
+      padding: 72px 0 46px;
       display: grid;
       grid-template-columns: 1.05fr 0.95fr;
-      gap: 30px;
+      gap: 40px;
       align-items: start;
     }
 
     .hero h1 {
-      font-size: clamp(38px, 6vw, 72px);
-      line-height: 0.98;
+      font-size: clamp(37px, 5.9vw, 70px);
+      line-height: 1.08;
       max-width: 620px;
+      margin-top: 14px;
     }
 
     .hero h1 span {
@@ -188,19 +191,21 @@
     }
 
     .hero p {
-      margin-top: 20px;
+      margin-top: 26px;
       max-width: 580px;
       color: var(--ink-soft);
       font-size: 18px;
+      line-height: 1.86;
+      font-weight: 400;
     }
 
     .hero p strong {
       color: var(--brand);
-      font-weight: 800;
+      font-weight: 700;
     }
 
     .cta-row {
-      margin-top: 28px;
+      margin-top: 30px;
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
@@ -210,7 +215,7 @@
       border: 0;
       border-radius: 12px;
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 700;
       text-decoration: none;
       min-height: 48px;
       padding: 0 22px;
@@ -245,7 +250,7 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 14px;
-      margin-top: 34px;
+      margin-top: 36px;
       max-width: 670px;
     }
 
@@ -253,13 +258,13 @@
       border: 1px solid var(--line);
       background: #fff;
       border-radius: 12px;
-      padding: 14px 12px;
+      padding: 15px 12px;
       text-align: center;
     }
 
     .stat-value {
-      font-size: 28px;
-      font-weight: 800;
+      font-size: 27px;
+      font-weight: 700;
       color: var(--brand);
       line-height: 1;
       margin-bottom: 4px;
@@ -268,7 +273,7 @@
     .stat-label {
       font-size: 12px;
       color: #78819b;
-      font-weight: 700;
+      font-weight: 600;
     }
 
     .steps-card {
@@ -285,10 +290,10 @@
       border: 1px solid var(--line);
       border-radius: 14px;
       background: #fff;
-      padding: 12px;
+      padding: 13px;
       display: grid;
       grid-template-columns: auto 1fr auto;
-      gap: 10px;
+      gap: 11px;
       align-items: start;
     }
 
@@ -299,7 +304,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
+      font-weight: 700;
       color: #fff;
       font-size: 14px;
     }
@@ -311,7 +316,7 @@
 
     .step-title {
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 700;
       line-height: 1.2;
     }
 
@@ -319,12 +324,12 @@
       color: #75809d;
       font-size: 12px;
       margin-top: 4px;
-      font-weight: 600;
+      font-weight: 500;
     }
 
     .step code {
       display: block;
-      margin-top: 9px;
+      margin-top: 11px;
       background: #f7f8fc;
       border: 1px solid #eceff8;
       border-radius: 8px;
@@ -333,28 +338,29 @@
       color: #4f5a7a;
       overflow-x: auto;
       white-space: nowrap;
-      font-family: "Courier New", monospace;
+      font-family: "Segoe UI", sans-serif;
+      font-weight: 500;
     }
 
     .tool-icon {
-      color: #95a0bd;
-      font-size: 18px;
+      color: #8d98b4;
+      font-size: 17px;
       margin-top: 2px;
-      font-weight: 700;
     }
 
     .logos {
-      margin-top: 22px;
+      margin-top: 24px;
       border-top: 1px solid var(--line);
-      padding-top: 26px;
+      padding-top: 30px;
       text-align: center;
     }
 
     .logos p {
       color: #697390;
-      font-weight: 700;
-      margin-bottom: 14px;
-      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      font-size: 15px;
+      line-height: 1.55;
     }
 
     .logo-grid {
@@ -367,94 +373,88 @@
     .logo-chip {
       border: 1px solid var(--line);
       border-radius: 10px;
-      padding: 8px 14px;
+      padding: 10px 15px;
       background: #fff;
       color: #4a546d;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .demo-wrap {
-      margin-top: 28px;
-      display: flex;
+      font-size: 14px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 150px;
       justify-content: center;
     }
 
-    .demo-terminal {
-      background: #1a1a2e;
-      border-radius: 14px;
-      width: min(700px, 100%);
-      box-shadow: 0 24px 60px rgba(21, 30, 55, 0.18);
-      overflow: hidden;
-      border: 1px solid #2a2a4a;
+    .logo-chip img {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+      display: inline-block;
+      border-radius: 2px;
     }
 
-    .demo-header {
-      background: #16162a;
-      padding: 12px 16px;
-      display: flex;
+    .logo-svg {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      flex: 0 0 16px;
+    }
+
+    .logo-fallback {
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid #2a2a4a;
+      justify-content: center;
+      border-radius: 3px;
+      background: #eef1ff;
+      color: #4f5dff;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1;
     }
-
-    .demo-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .demo-title {
-      margin-left: 8px;
-      color: #6a7a9a;
-      font-size: 13px;
-      font-family: "Courier New", monospace;
-    }
-
-    .demo-body {
-      padding: 20px 24px;
-      font-family: "Courier New", monospace;
-      font-size: 14px;
-      line-height: 1.8;
-      color: #c8d0e7;
-    }
-
-    .demo-line { color: #c8d0e7; }
-    .demo-out { color: #7a8ab8; padding-left: 4px; }
-    .demo-prompt { color: var(--brand); margin-right: 8px; font-weight: bold; }
-    .demo-spacer { opacity: 0.3; }
 
     section {
-      padding: 58px 0;
+      padding: 74px 0;
     }
 
     .section-title {
       text-align: center;
-      font-size: clamp(30px, 5vw, 48px);
-      line-height: 1;
-      margin-bottom: 8px;
+      font-size: clamp(28px, 4.6vw, 44px);
+      line-height: 1.08;
+      margin-bottom: 12px;
     }
 
     .section-sub {
       text-align: center;
       color: #697390;
-      font-size: 19px;
-      margin-bottom: 24px;
-      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 32px;
+      font-weight: 500;
+      line-height: 1.72;
     }
 
     .feature-grid {
       display: grid;
+      gap: 14px;
+    }
+
+    .feature-grid-top {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 14px;
+    }
+
+    .feature-grid-bottom {
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 12px;
     }
 
     .feature-card {
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 12px;
       background: #fff;
-      padding: 16px 14px;
+      padding: 18px 14px 17px;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-align: center;
     }
 
     .feature-card:hover {
@@ -463,29 +463,149 @@
     }
 
     .feature-icon {
-      font-size: 20px;
-      margin-bottom: 10px;
+      width: 34px;
+      height: 34px;
+      margin: 0 auto 9px;
       display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 99px;
+      font-size: 15px;
+      border: 1px solid;
     }
 
     .feature-card h3 {
-      font-size: 16px;
-      margin-bottom: 7px;
-      line-height: 1.2;
+      font-size: 15px;
+      margin-bottom: 10px;
+      line-height: 1.28;
+      font-weight: 600;
     }
 
     .feature-card p {
       color: #5f6a86;
-      font-size: 13px;
-      line-height: 1.55;
-      font-weight: 600;
+      font-size: 12.5px;
+      line-height: 1.8;
+      font-weight: 500;
     }
 
-    .compare-wrap {
+    .capabilities {
+      margin-top: 20px;
       display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 18px;
-      margin-top: 22px;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .caps-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(35, 44, 74, 0.05);
+      padding: 18px;
+    }
+
+    .caps-card h3 {
+      font-size: 18px;
+      margin-bottom: 6px;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .caps-note {
+      color: #5f6a86;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .tool-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      list-style: none;
+    }
+
+    .tool-list li {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fbfcff;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #465170;
+      font-weight: 500;
+      font-family: "Segoe UI", sans-serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .caps-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-features {
+      list-style: none;
+      display: grid;
+      gap: 7px;
+      color: #55607d;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .mini-features li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-sub,
+    .caps-note,
+    .decision-text,
+    .price-note,
+    .mini-list,
+    .price-list,
+    .mini-features {
+      line-height: 1.58;
+    }
+
+    .ico-purple { color: #7a57f8; border-color: #ddd5ff; background: #f7f4ff; }
+    .ico-green { color: #27a866; border-color: #d0f2df; background: #f2fbf6; }
+    .ico-blue { color: #3d7cff; border-color: #d6e4ff; background: #f2f7ff; }
+    .ico-orange { color: #f2911b; border-color: #ffe5c7; background: #fff7ed; }
+    .ico-gold { color: #eab308; border-color: #fbe9a7; background: #fffbeb; }
+    .ico-red { color: #ef4444; border-color: #ffd8d8; background: #fff5f5; }
+    .ico-pink { color: #ef3c7b; border-color: #ffd8e8; background: #fff4f9; }
+
+    .txt-purple { color: #6f4ef6; }
+    .txt-green { color: #25a35f; }
+    .txt-blue { color: #2e73f6; }
+    .txt-orange { color: #ef8e16; }
+    .txt-gold { color: #d89b09; }
+    .txt-red { color: #ea4444; }
+    .txt-pink { color: #ef3c7b; }
+
+    .benchmark-wrap {
+      max-width: 980px;
+      margin: 30px auto 0;
+    }
+
+    .money-wrap {
+      max-width: 980px;
+      margin: 24px auto 0;
+    }
+
+    .money-note {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 14px 16px;
+      color: #586280;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.65;
     }
 
     .panel {
@@ -507,7 +627,7 @@
       padding: 12px;
       font-size: 14px;
       text-align: center;
-      font-weight: 700;
+      font-weight: 500;
     }
 
     th:first-child,
@@ -521,6 +641,7 @@
       color: #6a7593;
       background: #f9faff;
       font-size: 13px;
+      font-weight: 600;
     }
 
     tr:last-child td {
@@ -533,19 +654,19 @@
 
     .ok {
       color: var(--good);
-      font-weight: 800;
+      font-weight: 700;
     }
 
     .no {
       color: var(--bad);
-      font-weight: 800;
+      font-weight: 700;
     }
 
     .price-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      padding: 12px;
+      gap: 14px;
+      padding: 14px;
       background: #f9faff;
     }
 
@@ -553,25 +674,26 @@
       border: 1px solid var(--line);
       border-radius: 12px;
       background: #fff;
-      padding: 16px;
+      padding: 18px;
       display: grid;
-      gap: 8px;
+      gap: 10px;
     }
 
     .price-card h4 {
       font-size: 18px;
       line-height: 1.2;
+      font-weight: 700;
     }
 
     .price-value {
       font-size: 36px;
-      font-weight: 900;
+      font-weight: 800;
       line-height: 1;
     }
 
     .price-note {
       color: #6e7894;
-      font-weight: 700;
+      font-weight: 500;
       font-size: 12px;
     }
 
@@ -581,7 +703,7 @@
       gap: 6px;
       color: #4f5a7a;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 500;
     }
 
     .price-list li {
@@ -601,7 +723,7 @@
     }
 
     .journey {
-      margin-top: 22px;
+      margin-top: 30px;
       border: 1px solid var(--line);
       border-radius: 16px;
       background: #fff;
@@ -611,8 +733,8 @@
     .journey-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      padding: 14px;
+      gap: 14px;
+      padding: 16px;
       background: #f9faff;
       border-bottom: 1px solid var(--line);
     }
@@ -633,14 +755,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-weight: 900;
+      font-weight: 700;
       font-size: 13px;
       margin-bottom: 8px;
     }
 
     .journey-title {
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 700;
       margin-bottom: 5px;
     }
 
@@ -650,24 +772,21 @@
       background: #f8f9ff;
       font-size: 11px;
       color: #59637f;
-      font-family: "Courier New", monospace;
-      font-weight: 700;
+      font-family: "Segoe UI", sans-serif;
+      font-weight: 500;
       padding: 7px;
       overflow-x: auto;
       white-space: nowrap;
     }
 
     .decision {
-      padding: 14px;
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 12px;
-      align-items: center;
+      padding: 16px;
+      display: block;
     }
 
     .decision-text {
       color: #4b556f;
-      font-weight: 700;
+      font-weight: 500;
       font-size: 14px;
       line-height: 1.45;
     }
@@ -682,12 +801,13 @@
     .mini-card h5 {
       font-size: 13px;
       margin-bottom: 4px;
+      font-weight: 600;
     }
 
     .mini-price {
       font-size: 30px;
       line-height: 1;
-      font-weight: 900;
+      font-weight: 800;
       margin-bottom: 6px;
     }
 
@@ -697,19 +817,19 @@
       gap: 4px;
       color: #5e6883;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 500;
     }
 
     .cta-band {
-      margin-top: 20px;
+      margin-top: 30px;
       border: 1px solid var(--line);
       border-radius: 16px;
       background: linear-gradient(90deg, #eef2ff 0%, #f5f0ff 100%);
-      padding: 20px;
+      padding: 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
+      gap: 16px;
     }
 
     .cta-band h3 {
@@ -720,7 +840,7 @@
 
     .cta-band p {
       color: #5f6a87;
-      font-weight: 700;
+      font-weight: 500;
     }
 
     footer {
@@ -728,7 +848,7 @@
       border-top: 1px solid var(--line);
       color: #74809f;
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 500;
     }
 
     .foot {
@@ -754,7 +874,8 @@
     }
 
     @media (max-width: 1120px) {
-      .feature-grid {
+      .feature-grid-top,
+      .feature-grid-bottom {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
@@ -766,7 +887,7 @@
         max-width: 100%;
       }
 
-      .compare-wrap {
+      .capabilities {
         grid-template-columns: 1fr;
       }
 
@@ -785,11 +906,11 @@
       }
 
       .container {
-        width: min(1180px, calc(100% - 30px));
+        width: min(1200px, calc(100% - 28px));
       }
 
       .hero {
-        padding-top: 34px;
+        padding-top: 32px;
       }
 
       .hero h1 {
@@ -798,13 +919,15 @@
 
       .hero p {
         font-size: 16px;
+        line-height: 1.62;
       }
 
       .hero-stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .feature-grid {
+      .feature-grid-top,
+      .feature-grid-bottom {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
@@ -816,6 +939,10 @@
         grid-template-columns: 1fr;
       }
 
+      .tool-list {
+        grid-template-columns: 1fr;
+      }
+
       .cta-band {
         flex-direction: column;
         align-items: flex-start;
@@ -823,7 +950,8 @@
     }
 
     @media (max-width: 520px) {
-      .feature-grid {
+      .feature-grid-top,
+      .feature-grid-bottom {
         grid-template-columns: 1fr;
       }
 
@@ -883,7 +1011,7 @@
             <div class="stat-label">Token Reduction</div>
           </div>
           <div class="stat">
-            <div class="stat-value">14</div>
+            <div class="stat-value">17</div>
             <div class="stat-label">MCP Tools</div>
           </div>
           <div class="stat">
@@ -905,7 +1033,7 @@
             <p class="step-sub">Globally via npm.</p>
             <code>npm install -g @loom-mcp/server</code>
           </div>
-          <span class="tool-icon">[]</span>
+          <span class="tool-icon"><i class="fa-regular fa-cube"></i></span>
         </article>
 
         <article class="step step-configure">
@@ -915,7 +1043,7 @@
             <p class="step-sub">Add to your AI tool.</p>
             <code>/mcp add loom localhost:8080</code>
           </div>
-          <span class="tool-icon">{}</span>
+          <span class="tool-icon"><i class="fa-solid fa-plug-circle-bolt"></i></span>
         </article>
 
         <article class="step step-save">
@@ -924,7 +1052,7 @@
             <h2 class="step-title">Save $840/month</h2>
             <p class="step-sub">Start saving immediately.</p>
           </div>
-          <span class="tool-icon">$</span>
+          <span class="tool-icon"><i class="fa-regular fa-circle-dollar-to-slot"></i></span>
         </article>
 
         <article class="step step-dashboard">
@@ -934,56 +1062,20 @@
             <p class="step-sub">Real-time dashboard at localhost:2337.</p>
             <code>curl localhost:2337</code>
           </div>
-          <span class="tool-icon">&gt;</span>
+          <span class="tool-icon"><i class="fa-solid fa-chart-line"></i></span>
         </article>
       </aside>
-    </section>
-
-    <section id="demo">
-      <h2 class="section-title serif fade-up">See it in action.</h2>
-      <p class="section-sub fade-up fade-delay-1">Watch LoomMCP cut token costs in real time.</p>
-      <div class="demo-wrap fade-up fade-delay-2">
-        <div class="demo-terminal">
-          <div class="demo-header">
-            <span class="demo-dot" style="background:#ff5f57"></span>
-            <span class="demo-dot" style="background:#ffbd2e"></span>
-            <span class="demo-dot" style="background:#28c840"></span>
-            <span class="demo-title">loom — 17 tools</span>
-          </div>
-          <div class="demo-body">
-            <div class="demo-line"><span class="demo-prompt">$</span> loom init</div>
-            <div class="demo-line demo-out">Detecting 39 TypeScript files...</div>
-            <div class="demo-line demo-out">Raw tokens: <strong>55,813</strong></div>
-            <div class="demo-line demo-out">TOON tokens: <strong>2,729</strong></div>
-            <div class="demo-line demo-out" style="color:var(--good)">Token reduction: <strong>95%</strong></div>
-            <div class="demo-line demo-out">Est. monthly savings: <strong>$847</strong></div>
-            <div class="demo-line demo-spacer">&nbsp;</div>
-            <div class="demo-line"><span class="demo-prompt">$</span> loom start</div>
-            <div class="demo-line demo-out">MCP server ready on stdio</div>
-            <div class="demo-line demo-out">Dashboard: <a href="#" style="color:var(--brand)">http://localhost:2337</a></div>
-            <div class="demo-line demo-spacer">&nbsp;</div>
-            <div class="demo-line"><span class="demo-prompt">$</span> loom_search_symbols("login")</div>
-            <div class="demo-line demo-out">1. loginUser (function) src/auth.ts:12</div>
-            <div class="demo-line demo-out">2. loginAttempt (class) src/auth.ts:45</div>
-            <div class="demo-line demo-out">3. LoginService (class) src/services/auth.ts:8</div>
-            <div class="demo-line demo-spacer">&nbsp;</div>
-            <div class="demo-line"><span class="demo-prompt">$</span> loom_focus("src/auth.ts::loginUser")</div>
-            <div class="demo-line demo-out" style="color:var(--good)">focused:src/auth.ts::loginUser</div>
-            <div class="demo-line demo-out">lines:23 | token_estimate:187</div>
-          </div>
-        </div>
-      </div>
     </section>
 
     <div class="logos fade-up fade-delay-2">
       <p>Works with every AI coding tool</p>
       <div class="logo-grid">
-        <div class="logo-chip">Claude Code</div>
-        <div class="logo-chip">Cursor</div>
-        <div class="logo-chip">VS Code</div>
-        <div class="logo-chip">Codex</div>
-        <div class="logo-chip">OpenCode</div>
-        <div class="logo-chip">Aider</div>
+        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="#F97316"/><g stroke="#F97316" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.8" y2="7.8"/><line x1="16.2" y1="16.2" x2="19.1" y2="19.1"/><line x1="16.2" y1="7.8" x2="19.1" y2="4.9"/><line x1="4.9" y1="19.1" x2="7.8" y2="16.2"/></g></svg>Claude Code</div>
+        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 20,7 12,12 4,7" fill="#9CA3AF"/><polygon points="4,7 12,12 12,22 4,17" fill="#6B7280"/><polygon points="20,7 12,12 12,22 20,17" fill="#4B5563"/></svg>Cursor</div>
+        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 2.4 8.4 8.7v6.6l9.4 6.3 2.2-1.3V3.7z" fill="#007ACC"/><path d="M8.4 8.7 3 6.1v11.8l5.4-2.6z" fill="#1A9FFF"/></svg>VS Code</div>
+        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.8" fill="none" stroke="#111827" stroke-width="2"/><path d="M7.7 9.5c1.7-2.8 6-3.3 8.3-.8M8 14.5c1.8 2.6 6.1 2.9 8.3.4" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>Codex</div>
+        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" transform="rotate(45 12 12)" fill="none" stroke="#2563EB" stroke-width="2"/></svg>OpenCode</div>
+        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 20 18H4z" fill="none" stroke="#7C3AED" stroke-width="2"/><circle cx="12" cy="13.2" r="1.3" fill="#7C3AED"/></svg>Antigravity</div>
       </div>
     </div>
 
@@ -991,57 +1083,101 @@
       <h2 class="section-title serif fade-up">Everything you need.</h2>
       <p class="section-sub fade-up fade-delay-1">Built by developers, for developers.</p>
 
-      <div class="feature-grid fade-up fade-delay-2">
+      <div class="feature-grid feature-grid-top fade-up fade-delay-2">
         <article class="feature-card">
-          <div class="feature-icon">* </div>
-          <h3>Cross-Session Memory</h3>
-          <p>Remembers what your AI learned across sessions so answers improve over time.</p>
+          <div class="feature-icon ico-purple"><i class="fa-solid fa-brain"></i></div>
+          <h3 class="txt-purple">Cross-Session Memory</h3>
+          <p>Remembers what the AI learned across sessions. Ask "what did we learn?" and get an answer.</p>
         </article>
         <article class="feature-card">
-          <div class="feature-icon"># </div>
-          <h3>Task-Aware Compression</h3>
-          <p>Debug mode keeps stack traces. Explore mode stays minimal and fast.</p>
+          <div class="feature-icon ico-green"><i class="fa-solid fa-bullseye"></i></div>
+          <h3 class="txt-green">Task-Aware Compression</h3>
+          <p>Debug mode keeps stack traces while explore mode stays compact and test-focused.</p>
         </article>
         <article class="feature-card">
-          <div class="feature-icon">= </div>
-          <h3>Live Dashboard</h3>
-          <p>See token savings in real time via SSE at localhost:2337.</p>
+          <div class="feature-icon ico-blue"><i class="fa-solid fa-chart-column"></i></div>
+          <h3 class="txt-blue">Live Dashboard</h3>
+          <p>Real-time SSE dashboard at localhost:2337. Watch your token savings live.</p>
         </article>
         <article class="feature-card">
-          <div class="feature-icon">@ </div>
-          <h3>Session Replay</h3>
-          <p>JSONL-based replay with an animated player for debugging agent behavior.</p>
+          <div class="feature-icon ico-orange"><i class="fa-solid fa-arrow-rotate-left"></i></div>
+          <h3 class="txt-orange">Session Replay</h3>
+          <p>JSONL replay with timeline playback so you can debug full agent behavior clearly.</p>
+        </article>
+      </div>
+
+      <div class="feature-grid feature-grid-bottom fade-up fade-delay-3">
+        <article class="feature-card">
+          <div class="feature-icon ico-gold"><i class="fa-solid fa-globe"></i></div>
+          <h3 class="txt-gold">7 Languages</h3>
+          <p>TypeScript, Python, Rust, Go, Java, C#, and JavaScript out of the box.</p>
         </article>
         <article class="feature-card">
-          <div class="feature-icon">+ </div>
-          <h3>7 Languages</h3>
-          <p>TypeScript, Python, Rust, Go, Java, C#, and JavaScript support.</p>
+          <div class="feature-icon ico-red"><i class="fa-solid fa-gear"></i></div>
+          <h3 class="txt-red">Production Ready</h3>
+          <p>Config files, env vars, health checks, and practical confidence hints for teams.</p>
         </article>
         <article class="feature-card">
-          <div class="feature-icon">! </div>
-          <h3>Production Ready</h3>
-          <p>Health checks, confidence hints, and fast CI-friendly behavior.</p>
+          <div class="feature-icon ico-purple"><i class="fa-solid fa-wrench"></i></div>
+          <h3 class="txt-purple">17 MCP Tools</h3>
+          <p>Search symbols, get refs, blast radius, hybrid search, remember, and recall.</p>
         </article>
         <article class="feature-card">
-          <div class="feature-icon">[]</div>
-          <h3>17 MCP Tools</h3>
-          <p>Search symbols, blast radius, refs, memory recall, diff compress, deps graph, and more.</p>
+          <div class="feature-icon ico-green"><i class="fa-regular fa-trophy"></i></div>
+          <h3 class="txt-green">Open Source</h3>
+          <p>MIT licensed. No enterprise sales motion. Use it anywhere and self-host freely.</p>
         </article>
         <article class="feature-card">
-          <div class="feature-icon">^ </div>
-          <h3>Open Source</h3>
-          <p>MIT licensed and easy to self-host with no lock-in or hidden fees.</p>
+          <div class="feature-icon ico-pink"><i class="fa-regular fa-heart"></i></div>
+          <h3 class="txt-pink">Free Forever</h3>
+          <p>jCodeMunch: $79-1,999/year. LoomMCP: $0. We win on price and capability.</p>
         </article>
-        <article class="feature-card">
-          <div class="feature-icon">$ </div>
-          <h3>Free Forever</h3>
-          <p>Cost should never block quality coding workflows.</p>
+      </div>
+
+      <div class="capabilities fade-up fade-delay-3">
+        <article class="caps-card">
+          <h3><i class="fa-solid fa-toolbox txt-purple"></i> Full MCP Toolkit (17)</h3>
+          <p class="caps-note">Complete tools list from the current server implementation.</p>
+          <ul class="tool-list">
+            <li>loom_get_topology</li>
+            <li>loom_focus</li>
+            <li>loom_search_symbols</li>
+            <li>loom_get_symbol</li>
+            <li>loom_find_importers</li>
+            <li>loom_blast_radius</li>
+            <li>loom_search_refs</li>
+            <li>loom_get_active_diff</li>
+            <li>loom_blur</li>
+            <li>loom_hybrid_search</li>
+            <li>loom_remember</li>
+            <li>loom_recall</li>
+            <li>loom_session_compress</li>
+            <li>loom_diff_compress</li>
+            <li>loom_get_deps</li>
+            <li>loom_get_metrics</li>
+            <li>loom_get_sessions</li>
+          </ul>
         </article>
-        <article class="feature-card">
-          <div class="feature-icon">~ </div>
-          <h3>Fast Start</h3>
-          <p>Install, initialize, configure, and launch in under 30 seconds.</p>
-        </article>
+
+        <div class="caps-grid">
+          <article class="caps-card">
+            <h3><i class="fa-solid fa-box-open txt-blue"></i> LoomPacks and Language Support</h3>
+            <ul class="mini-features">
+              <li><i class="fa-solid fa-check check"></i> 7 LoomPacks: React, Node, Django, Rust, Go, Java Spring, C# .NET</li>
+              <li><i class="fa-solid fa-check check"></i> 7 language support claim across TypeScript/JavaScript, Python, Rust, Go, Java, C#</li>
+              <li><i class="fa-solid fa-check check"></i> Task modes for debug, feature, review, and explore workflows</li>
+            </ul>
+          </article>
+
+          <article class="caps-card">
+            <h3><i class="fa-solid fa-shield-halved txt-green"></i> Production and Dashboard</h3>
+            <ul class="mini-features">
+              <li><i class="fa-solid fa-check check"></i> Circuit breaker and path traversal protection</li>
+              <li><i class="fa-solid fa-check check"></i> Session recorder with JSONL replay in .loom/sessions</li>
+              <li><i class="fa-solid fa-check check"></i> Dashboard endpoints: /health, /badge.svg, /replay, /api/summary</li>
+            </ul>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -1099,7 +1235,7 @@
               </tr>
               <tr>
                 <td>MCP Tools</td>
-                <td class="brand-col">14</td>
+                <td class="brand-col">17</td>
                 <td>11</td>
                 <td>42</td>
               </tr>
@@ -1134,7 +1270,7 @@
               <div class="price-note">forever</div>
               <ul class="price-list">
                 <li><span class="check">+</span> 95% token reduction</li>
-                <li><span class="check">+</span> 14 tools</li>
+                <li><span class="check">+</span> 17 tools</li>
                 <li><span class="check">+</span> Cross-session memory</li>
                 <li><span class="check">+</span> Live dashboard</li>
                 <li><span class="check">+</span> Session replay</li>
@@ -1186,7 +1322,7 @@
             <h5 class="brand-col">LoomMCP</h5>
             <div class="mini-price" style="color:var(--brand);">$0</div>
             <ul class="mini-list">
-              <li><span class="check">+</span> 14 tools</li>
+              <li><span class="check">+</span> 17 tools</li>
               <li><span class="check">+</span> Cross-session memory</li>
               <li><span class="check">+</span> Open source MIT</li>
             </ul>

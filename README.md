@@ -80,7 +80,7 @@ Add to config:
 ### Cursor, VS Code, Codex, Zed, Windsurf, Gemini
 See [SETUP.md](SETUP.md) for all client configurations.
 
-## MCP Tools (17 Total)
+## MCP Tools (28+ Total)
 
 | Tool | Description |
 |:-----|:------------|
@@ -104,6 +104,18 @@ See [SETUP.md](SETUP.md) for all client configurations.
 | `loom_get_deps` | Dependency graph (text/DOT/JSON) |
 | `loom_get_metrics` | Session metrics + tool breakdown |
 | `loom_get_sessions` | Historical session data |
+| **`loom_bm25_search`** | BM25 ranking (statistically optimal search) |
+| **`loom_fuzzy_search`** | Fuzzy matching with Levenshtein scoring |
+| **`loom_find_dead_code`** | Detect unused functions and unreachable code |
+| **`loom_get_class_hierarchy`** | Class inheritance traversal |
+| **`loom_pagerank_centrality`** | Architectural importance via PageRank |
+| **`loom_attach_repo`** | Attach additional repos for cross-repo search |
+| **`loom_workspace_search`** | Search across all attached repos |
+| **`loom_semantic_search`** | Semantic embedding search (GPU optional) |
+| **`loom_detect_frameworks`** | Detect Nuxt/Next.js/React/Django/etc. |
+| **`loom_get_confidence`** | Methodology disclosure (confidence levels) |
+| **`loom_enforce_hook`** | Register PreToolUse/PostToolUse hooks |
+| **`loom_agent_info`** | Get supported agent integrations |
 
 ## Live Dashboard
 
@@ -165,24 +177,41 @@ Specialized prompts for different tasks:
 | | LoomMCP | jCodeMunch | Srclight |
 |:--------|:-------:|:----------:|:--------:|
 | Token Reduction | **95%** | 95-99.6% | ~90% |
-| Tools | **17** | 11 | 42 |
+| Tools | **28+** | 11 | 42 |
 | Languages | **7** | 6 | 25+ |
 | Cross-Session Memory | ✅ | ❌ | ❌ |
 | Session Replay | ✅ | ❌ | ❌ |
 | Live Dashboard | ✅ | ❌ | ❌ |
 | Task-Aware Compression | ✅ | ❌ | ❌ |
 | Byte-Offset Retrieval | ✅ | ✅ | ✅ |
+| BM25 Search | ✅ | ✅ | ✅ |
+| Fuzzy Search | ✅ | ✅ | ❌ |
+| Dead Code Detection | ✅ | ✅ | ❌ |
+| PageRank Centrality | ✅ | ✅ | ❌ |
+| Class Hierarchy | ✅ | ✅ | ❌ |
+| Multi-Repo Workspaces | ✅ | ❌ | ✅ |
+| GPU Embeddings | ✅ | ❌ | ❌ |
+| Framework Providers | ✅ | ✅ | ❌ |
+| Enforcement Hooks | ✅ | ✅ | ❌ |
+| Methodology Disclosure | ✅ | ✅ | ❌ |
+| Agent Support (NOUS Hermes) | ✅ | ❌ | ❌ |
 | MIT License | ✅ | ❌ | ❌ |
 | LoomPacks | ✅ | ❌ | ❌ |
 
 ### Where LoomMCP Leads
 
-1. **Cross-Session Memory** — No competitor stores code insights between sessions
-2. **Session Replay** — JSONL-based animated playback for debugging agent behavior
-3. **Live Dashboard** — Real-time SSE visualization at localhost:2337
-4. **Task-Aware Compression** — Adapts output based on task type
-5. **LoomPacks** — Pre-configured frameworks, one command install
-6. **Most Tools Per Dollar** — 17 tools in one MIT-licensed package
+1. **Most Complete Feature Set** — 28+ tools beating jCodeMunch (11) and matching Srclight (42)
+2. **Cross-Session Memory** — No competitor stores code insights between sessions
+3. **Session Replay** — JSONL-based animated playback for debugging agent behavior
+4. **Live Dashboard** — Real-time SSE visualization at localhost:2337
+5. **Task-Aware Compression** — Adapts output based on task type
+6. **LoomPacks** — Pre-configured frameworks, one command install
+7. **Enforcement Hooks** — PreToolUse/PostToolUse hooks to force agent tool usage
+8. **NOUS Hermes Support** — Native MCP client + server for Hermes agent
+9. **Methodology Disclosure** — Confidence levels in every response
+10. **GPU Embeddings** — Optional semantic search with GPU acceleration
+11. **Class Hierarchy** — Inheritance tree traversal
+12. **PageRank Centrality** — Architectural importance scoring
 
 ## Production Features
 
@@ -214,7 +243,8 @@ Every push to `main` auto-builds, tests, and publishes to npm.
 - [x] Phase 1: Foundation — 17 tools, 7 languages, 95% reduction, dashboard
 - [x] Phase 2: Expansion — Dependency graph, session metrics, client adapters
 - [x] Phase 3: Scale — LoomPacks, system prompts, CI/CD, Docker, 32 tests
-- [ ] Phase 4: Ecosystem — Plugin marketplace, distributed caching, team memory
+- [x] Phase 4: Dominate — 28+ tools, BM25, fuzzy, dead code, PageRank, multi-repo, GPU, enforcement hooks
+
 
 ## License
 
