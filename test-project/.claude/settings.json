@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "loom": {
+      "command": "npx",
+      "args": [
+        "@loom-mcp/server",
+        "start"
+      ]
+    }
+  }
+}
