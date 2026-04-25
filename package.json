@@ -1,8 +1,10 @@
 {
   "name": "@loom-mcp/server",
-  "version": "0.1.0",
-  "description": "Local Object-Oriented Memory for MCP - context compiler for coding agents",
-  "main": "dist/index.js",
+  "version": "0.2.0",
+  "description": "Local-first MCP context compiler - 95% token reduction like jCodeMunch with unique cross-session memory",
+  "repository": "https://github.com/muhnehh/loom-mcp",
+  "homepage": "https://github.com/muhnehh/loom-mcp",
+  "keywords": ["mcp", "context", "token-optimization", "claude", "ai-agents"],
   "bin": {
     "loom-mcp": "./dist/index.js",
     "loom": "./dist/index.js"

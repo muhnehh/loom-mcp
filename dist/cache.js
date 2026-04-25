@@ -96,17 +96,20 @@ class SessionStateManager {
     focusedFiles;
     changedFiles;
     turns;
+    meta;
     constructor(sessionFile = '.loom/session.json') {
         this.sessionFile = sessionFile;
         this.focusedFiles = new Map();
         this.changedFiles = new Set();
         this.turns = 0;
+        this.meta = {};
         this.state = {
             id: Date.now().toString(36),
             focusedFiles: this.focusedFiles,
             changedFiles: this.changedFiles,
             startTime: Date.now(),
-            turns: 0
+            turns: 0,
+            meta: {}
         };
         this.load();
     }
@@ -139,7 +142,8 @@ class SessionStateManager {
             startTime: this.state.startTime,
             turns: this.turns,
             focusedFiles: Object.fromEntries(this.focusedFiles),
-            changedFiles: Array.from(this.changedFiles)
+            changedFiles: Array.from(this.changedFiles),
+            meta: this.state.meta
         }, null, 2));
     }
     incrementTurn() {
@@ -173,6 +177,14 @@ class SessionStateManager {
             changed: this.changedFiles.size,
             elapsed: Date.now() - this.state.startTime
         };
+    }
+    setMeta(key, value) {
+        this.state.meta = this.state.meta || {};
+        this.state.meta[key] = value;
+        this.persist();
+    }
+    getMeta(key) {
+        return this.state.meta?.[key];
     }
     reset() {
         this.focusedFiles.clear();

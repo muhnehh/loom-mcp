@@ -15,6 +15,7 @@ export interface SessionState {
   changedFiles: Set<string>;
   startTime: number;
   turns: number;
+  meta: Record<string, any>;
 }
 
 export class LoomCache {
@@ -117,19 +118,22 @@ export class SessionStateManager {
   private state: SessionState;
   private focusedFiles: Map<string, string>;
   private changedFiles: Set<string>;
-  private turns: number;
+private turns: number;
+  private meta: Record<string, any>;
 
   constructor(sessionFile: string = '.loom/session.json') {
     this.sessionFile = sessionFile;
     this.focusedFiles = new Map();
     this.changedFiles = new Set();
     this.turns = 0;
+    this.meta = {};
     this.state = {
       id: Date.now().toString(36),
       focusedFiles: this.focusedFiles,
       changedFiles: this.changedFiles,
       startTime: Date.now(),
-      turns: 0
+      turns: 0,
+      meta: {}
     };
     this.load();
   }
@@ -163,7 +167,8 @@ export class SessionStateManager {
       startTime: this.state.startTime,
       turns: this.turns,
       focusedFiles: Object.fromEntries(this.focusedFiles),
-      changedFiles: Array.from(this.changedFiles)
+      changedFiles: Array.from(this.changedFiles),
+      meta: this.state.meta
     }, null, 2));
   }
 
@@ -204,6 +209,16 @@ export class SessionStateManager {
       changed: this.changedFiles.size,
       elapsed: Date.now() - this.state.startTime
     };
+  }
+
+  setMeta(key: string, value: any): void {
+    this.state.meta = this.state.meta || {};
+    this.state.meta[key] = value;
+    this.persist();
+  }
+
+  getMeta(key: string): any {
+    return this.state.meta?.[key];
   }
 
   reset(): void {

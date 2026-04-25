@@ -72,6 +72,35 @@ export function startDashboard(port: number = 2337) {
     res.json(sessionState);
   });
 
+  app.get('/badge.svg', (req: Request, res: Response) => {
+    const reduction = sessionState.tokens_used > 0 
+      ? Math.round((sessionState.tokens_saved / sessionState.tokens_used) * 100)
+      : 0;
+    const label = encodeURIComponent('tokens saved');
+    const value = encodeURIComponent(reduction + '%');
+    const color = reduction >= 80 ? '3FB950' : reduction >= 50 ? 'D29922' : '8B949E';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="106" height="20">
+  <linearGradient id="s" x2="0" y2="100%" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#eee" stop-opacity=".1"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+  <clipPath id="r"><rect width="106" height="20" rx="3" fill="#fff"/></clipPath>
+  <g clip-path="url(#r)">
+    <rect width="46" height="20" fill="#333" rx="3"/>
+    <rect x="46" width="60" height="20" fill="#${color}" rx="3"/>
+    <rect width="106" height="20" fill="url(#s)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,geneva,sans-serif" font-size="11">
+    <text x="23" y="15" fill="#010101" fill-opacity=".3">${label}</text>
+    <text x="23" y="14">${label}</text>
+    <text x="76" y="15" fill="#010101" fill-opacity=".3">${value}</text>
+    <text x="76" y="14">${value}</text>
+  </g>
+</svg>`;
+    res.setHeader('Content-Type', 'image/svg+xml');
+    res.send(svg);
+  });
+
   app.get('/replay', (req: Request, res: Response) => {
     const sessionDir = join(process.cwd(), '.loom', 'sessions');
     if (!existsSync(sessionDir)) {
@@ -124,6 +153,8 @@ function getDashboardHTML(): string {
     .stat { text-align: center; padding: 1rem; background: var(--surface); border-top: 1px solid var(--border); }
     .stat-value { font-family: monospace; font-size: 1.25rem; }
     .stat-label { font-size: 0.625rem; color: var(--muted); text-transform: uppercase; }
+    .badge-link { font-size: 0.75rem; color: var(--muted); margin-top: 0.5rem; }
+    .badge-link code { background: var(--bg); padding: 0.25rem 0.5rem; border-radius: 0.25rem; }
   </style>
 </head>
 <body>
@@ -134,6 +165,7 @@ function getDashboardHTML(): string {
     <div class="panel">
       <div class="panel-label">Tokens Saved</div>
       <div class="big-number" id="tokens">0</div>
+      <div class="badge-link">Badge: <code>![Tokens Saved](http://localhost:2337/badge.svg)</code></div>
     </div>
     <div class="panel">
       <div class="panel-label">Session Stats</div>
