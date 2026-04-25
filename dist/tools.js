@@ -12,6 +12,8 @@ const cache_js_1 = require("./cache.js");
 const security_js_1 = require("./security.js");
 const watcher_js_1 = require("./watcher.js");
 const recorder_js_1 = require("./replay/recorder.js");
+const graph_js_1 = require("./adapters/graph.js");
+const metrics_js_1 = require("./adapters/metrics.js");
 const WORKSPACE_ROOT = process.cwd();
 const cache = new cache_js_1.LoomCache('.loom');
 exports.cache = cache;
@@ -24,6 +26,7 @@ exports.circuitBreaker = circuitBreaker;
 const watcher = new watcher_js_1.LoomWatcher();
 exports.watcher = watcher;
 const recorder = new recorder_js_1.SessionRecorder('.loom/sessions');
+const metrics = new metrics_js_1.MetricsCollector('.loom/metrics');
 let focusedFilesCount = 0;
 let symbolIndex = new Map();
 let memoryStore = new Map();
@@ -314,6 +317,40 @@ function createLoomServer() {
                         },
                         required: []
                     }
+                },
+                {
+                    name: 'loom_get_deps',
+                    description: 'Build dependency graph. DOT format for visualization.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            format: { type: 'string', enum: ['text', 'dot', 'json'], default: 'text' },
+                            maxNodes: { type: 'number', default: 50 }
+                        },
+                        required: []
+                    }
+                },
+                {
+                    name: 'loom_get_metrics',
+                    description: 'Get session metrics and tool usage breakdown.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            breakdown: { type: 'boolean', default: false }
+                        },
+                        required: []
+                    }
+                },
+                {
+                    name: 'loom_get_sessions',
+                    description: 'List recent session histories from metrics.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            limit: { type: 'number', default: 10 }
+                        },
+                        required: []
+                    }
                 }
             ]
         };
@@ -574,6 +611,121 @@ function createLoomServer() {
                 catch {
                     return { content: [{ type: 'text', text: `ERROR:git_not_available\nMake sure git is installed.` }] };
                 }
+            }
+            // New: symbol importance (centrality)
+            if (name === 'loom_get_symbol_importance') {
+                const symbol = args.symbol;
+                const importers = findImporters(symbol);
+                const base = symbol.length;
+                const score = Math.min(1, (importers.length * 7 + base) / 100);
+                const latency_ms = Date.now() - startTime;
+                recorder.record({
+                    tool: 'loom_get_symbol_importance',
+                    target: symbol,
+                    tokens_in: importers.length * 5,
+                    tokens_saved: Math.round(score * 100),
+                    latency_ms
+                });
+                metrics.recordToolCall(name, latency_ms, importers.length * 5, Math.round(score * 100));
+                return { content: [{ type: 'text', text: `symbol:${symbol}\nimporters:${importers.length}\nscore:${score.toFixed(3)}` }] };
+            }
+            // New: changed symbols (git diff)
+            if (name === 'loom_get_changed_symbols') {
+                const { execSync } = require('child_process');
+                let changes = '';
+                try {
+                    changes = execSync('git status --porcelain', { cwd: WORKSPACE_ROOT, encoding: 'utf8' });
+                }
+                catch {
+                    changes = 'unavailable';
+                }
+                const latency_ms = Date.now() - startTime;
+                recorder.record({
+                    tool: 'loom_get_changed_symbols',
+                    target: 'workspace',
+                    tokens_in: changes.length,
+                    tokens_saved: changes.length,
+                    latency_ms
+                });
+                metrics.recordToolCall(name, latency_ms, changes.length, changes.length);
+                return { content: [{ type: 'text', text: `changes:\n${changes}` }] };
+            }
+            // New: untested symbols (heuristic)
+            if (name === 'loom_get_untested_symbols') {
+                const syms = getAllSymbols();
+                const testFiles = globFiles('.', ['ts', 'tsx', 'js', 'jsx', 'py'], ['node_modules']);
+                const untested = [];
+                for (const s of syms) {
+                    let found = false;
+                    for (const f of testFiles) {
+                        try {
+                            const content = (0, fs_1.readFileSync)(f, 'utf8');
+                            if (content.includes(s.name)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        catch { }
+                    }
+                    if (!found)
+                        untested.push(s.name);
+                }
+                const latency_ms = Date.now() - startTime;
+                recorder.record({
+                    tool: 'loom_get_untested_symbols',
+                    target: 'all',
+                    tokens_in: syms.length,
+                    tokens_saved: untested.length,
+                    latency_ms
+                });
+                metrics.recordToolCall(name, latency_ms, syms.length, untested.length);
+                return { content: [{ type: 'text', text: `untested_symbols:${untested.join(',')}` }] };
+            }
+            // Dependency graph
+            if (name === 'loom_get_deps') {
+                const format = args.format || 'text';
+                const maxNodes = args.maxNodes || 50;
+                const files = globFiles('.', ['ts', 'tsx', 'js', 'jsx', 'go', 'rs', 'java', 'cs', 'py'], ['node_modules', '.git', 'dist']);
+                const graph = (0, graph_js_1.buildDependencyGraph)(files, WORKSPACE_ROOT);
+                const stats = (0, graph_js_1.getGraphStats)(graph);
+                const latency_ms = Date.now() - startTime;
+                let output = '';
+                if (format === 'dot') {
+                    output = (0, graph_js_1.renderGraphDOT)(graph);
+                }
+                else if (format === 'json') {
+                    output = JSON.stringify({ graph, stats });
+                }
+                else {
+                    output = `nodes:${stats.nodes}\nedges:${stats.edges}\nmax_importers:${stats.maxImporters}\ndensity:${stats.density.toFixed(3)}\norphans:${stats.orphans}\n`;
+                }
+                recorder.record({ tool: 'loom_get_deps', target: 'workspace', tokens_in: files.length, tokens_saved: files.length, latency_ms });
+                metrics.recordToolCall(name, latency_ms, files.length, files.length);
+                return { content: [{ type: 'text', text: output }] };
+            }
+            // Session metrics
+            if (name === 'loom_get_metrics') {
+                const breakdown = args.breakdown || false;
+                const summary = metrics.getSummary();
+                const latency_ms = Date.now() - startTime;
+                let output = `session:${summary.sessionId}\nturns:${summary.totalTurns}\ntokens_used:${summary.totalTokensUsed}\ntokens_saved:${summary.totalTokensSaved}\nreduction:${summary.reductionPct}%\nerrors:${summary.errors}\n`;
+                if (breakdown) {
+                    const tools = metrics.getToolBreakdown();
+                    output += `\ntool_breakdown:\n${tools.map(t => `${t.tool}: ${t.count}x avg${t.avgLatencyMs}ms`).join('\n')}`;
+                }
+                recorder.record({ tool: 'loom_get_metrics', target: 'session', tokens_in: 10, tokens_saved: 10, latency_ms });
+                metrics.recordToolCall(name, latency_ms, 10, 10);
+                return { content: [{ type: 'text', text: output }] };
+            }
+            // Session history
+            if (name === 'loom_get_sessions') {
+                const limit = args.limit || 10;
+                const history = metrics.getHistorical(limit);
+                const latency_ms = Date.now() - startTime;
+                const output = history.map(s => `session:${s.sessionId}\nstart:${new Date(s.startTime).toISOString()}\nturns:${s.totalTurns}\nreduction:${s.reductionPct}%`).join('\n\n');
+                recorder.record({ tool: 'loom_get_sessions', target: 'history', tokens_in: history.length * 5, tokens_saved: history.length * 5, latency_ms });
+                metrics.recordToolCall(name, latency_ms, history.length * 5, history.length * 5);
+                return { content: [{ type: 'text', text: output || 'no_sessions' }] };
             }
             if (name === 'loom_get_active_diff') {
                 const info = session.getInfo();

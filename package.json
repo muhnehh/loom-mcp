@@ -1,6 +1,6 @@
 {
   "name": "@loom-mcp/server",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Local-first MCP context compiler - 95% token reduction like jCodeMunch with unique cross-session memory",
   "repository": "https://github.com/muhnehh/loom-mcp",
   "homepage": "https://github.com/muhnehh/loom-mcp",

@@ -119,6 +119,31 @@ export function startDashboard(port: number = 2337) {
     res.send(generateReplayHTML(records));
   });
 
+  app.get('/health', (req: Request, res: Response) => {
+    res.json({
+      status: 'ok',
+      uptime_ms: Date.now() - sessionState.start_time,
+      tokens_used: sessionState.tokens_used,
+      tokens_saved: sessionState.tokens_saved,
+      turns: sessionState.turns,
+      dashboard: 'running'
+    });
+  });
+
+  app.get('/api/summary', (req: Request, res: Response) => {
+    const reduction = sessionState.tokens_used > 0
+      ? Math.round((sessionState.tokens_saved / sessionState.tokens_used) * 100)
+      : 0;
+    res.json({
+      tokens_used: sessionState.tokens_used,
+      tokens_saved: sessionState.tokens_saved,
+      reduction_pct: reduction,
+      turns: sessionState.turns,
+      uptime_ms: Date.now() - sessionState.start_time,
+      focused_files: sessionState.focused_files
+    });
+  });
+
   const server = createHttpServer(app);
   server.listen(port, () => {});
 
