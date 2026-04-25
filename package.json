@@ -1,6 +1,6 @@
 {
   "name": "@loom-mcp/server",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "The universal context compiler for AI coding agents. 95% token reduction, cross-session memory, live dashboard, 17 tools. Works with Claude Code, Cursor, VS Code, Codex, and all MCP clients.",
   "license": "MIT",
   "repository": {
