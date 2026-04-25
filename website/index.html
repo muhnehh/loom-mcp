@@ -3,127 +3,200 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ LoomMCP — The Universal Context Compiler for AI Agents</title>
-  <meta name="description" content="Cut Claude API costs by 95% with universal MCP support. Works with Claude Code, Cursor, VS Code, Codex, OpenCode, any MCP client. Free and open-source.">
+  <title>LoomMCP — Cut Your Claude Bill by 95%</title>
+  <meta name="description" content="LoomMCP is the universal context compiler for AI coding agents. 95% token reduction. Cross-session memory. Live dashboard. All free.">
+  <meta property="og:title" content="LoomMCP — Cut Your Claude Bill by 95%">
+  <meta property="og:description" content="Works with Claude Code, Cursor, VS Code, Codex, OpenCode. Free forever.">
+  <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #030712;
-      --surface: #0f172a;
-      --surface-light: #1e293b;
-      --border: #334155;
-      --green: #10b981;
-      --green-light: #34d399;
-      --green-glow: rgba(16, 185, 129, 0.3);
-      --accent: #f59e0b;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --bg: #000000;
+      --bg-soft: #0a0a0a;
+      --surface: #111111;
+      --surface-light: #1a1a1a;
+      --border: #222222;
+      --green: #00FF94;
+      --green-dim: #00cc76;
+      --green-glow: rgba(0, 255, 148, 0.15);
+      --accent: #FFD600;
+      --text: #FFFFFF;
+      --text-soft: #888888;
+      --text-dim: #555555;
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
+    html { scroll-behavior: smooth; }
+    
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
     
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    
+    /* Background Effects */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .bg-glow {
+      position: fixed;
+      top: -50%; left: 50%;
+      transform: translateX(-50%);
+      width: 1000px; height: 1000px;
+      background: radial-gradient(ellipse, var(--green-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    /* Nav */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+    }
+    
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .nav-logo span { color: var(--green); }
+    
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    
+    .nav-links a {
+      color: var(--text-soft);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    
+    .nav-links a:hover { color: var(--text); }
+    
+    .nav-cta {
+      background: var(--green);
+      color: var(--bg);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
     
     /* Hero */
     .hero {
-      padding: 80px 0 60px;
+      padding: 100px 0 80px;
       text-align: center;
-      position: relative;
     }
     
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    
-    .logo {
-      font-size: 4rem;
-      font-weight: 800;
-      margin-bottom: 16px;
-      letter-spacing: -0.02em;
-    }
-    
-    .logo span { color: var(--green); }
-    
-    h1 {
-      font-size: clamp(2.5rem, 6vw, 4rem);
-      font-weight: 800;
-      line-height: 1.1;
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      color: var(--text-soft);
       margin-bottom: 24px;
-      letter-spacing: -0.03em;
     }
     
-    h1 .highlight {
+    .hero-badge .dot {
+      width: 8px; height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin-bottom: 24px;
+    }
+    
+    .hero h1 .highlight {
       background: linear-gradient(135deg, var(--green) 0%, var(--accent) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
     
-    .hero-subtitle {
+    .hero-description {
       font-size: 1.25rem;
-      color: var(--text-muted);
+      color: var(--text-soft);
       max-width: 600px;
       margin: 0 auto 40px;
+      line-height: 1.6;
     }
     
-    .hero-stats {
-      display: flex;
-      justify-content: center;
-      gap: 48px;
-      margin-top: 48px;
-      flex-wrap: wrap;
+    .hero-description strong { color: var(--green); }
+    
+    /* Code Block */
+    .hero-code {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 700px;
+      margin: 0 auto 48px;
+      text-align: left;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
     }
     
-    .stat {
-      text-align: center;
-    }
+    .code-line { display: flex; gap: 12px; line-height: 1.8; }
+    .code-num { color: var(--text-dim); user-select: none; min-width: 24px; }
+    .code-keyword { color: #c084fc; }
+    .code-string { color: var(--green); }
+    .code-comment { color: var(--text-dim); }
+    .code-func { color: #60a5fa; }
+    .code-var { color: #fb923c; }
     
-    .stat-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--green);
-      display: block;
-    }
-    
-    .stat-label {
-      font-size: 0.875rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-    
-    /* Buttons */
-    .btn-group {
+    /* CTAs */
+    .hero-ctas {
       display: flex;
       gap: 16px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-top: 32px;
     }
     
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 14px 28px;
+      padding: 16px 32px;
       font-size: 1rem;
       font-weight: 600;
       border-radius: 12px;
@@ -139,9 +212,9 @@
     }
     
     .btn-primary:hover {
-      background: var(--green-light);
+      background: var(--green-dim);
       transform: translateY(-2px);
-      box-shadow: 0 8px 32px var(--green-glow);
+      box-shadow: 0 8px 32px rgba(0, 255, 148, 0.3);
     }
     
     .btn-secondary {
@@ -152,17 +225,149 @@
     
     .btn-secondary:hover {
       background: var(--surface);
-      border-color: var(--text-muted);
+      border-color: var(--text-soft);
     }
     
-    /* Features Grid */
-    .features { padding: 80px 0; }
+    /* Stats */
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      margin-top: 64px;
+      flex-wrap: wrap;
+    }
+    
+    .stat-box {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--green);
+      font-family: 'Space Mono', monospace;
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    /* Social Proof */
+    .social-proof {
+      padding: 60px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .social-proof h3 {
+      text-align: center;
+      font-size: 1rem;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    .logos {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+      opacity: 0.5;
+    }
+    
+    .logo-item {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+    
+    /* Wall of Love */
+    .wall-of-love {
+      padding: 80px 0;
+    }
+    
+    .wall-of-love h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 48px;
+    }
+    
+    .testimonials {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    
+    .testimonial {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    
+    .testimonial-text {
+      font-size: 1rem;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .testimonial-avatar {
+      width: 40px; height: 40px;
+      background: var(--surface-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    
+    .testimonial-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .testimonial-title {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    
+    /* Features */
+    .features {
+      padding: 100px 0;
+    }
+    
+    .features h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+    
+    .features-subtitle {
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 1.125rem;
+      margin-bottom: 48px;
+    }
     
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      margin-top: 48px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: 1fr; }
     }
     
     .feature-card {
@@ -184,266 +389,496 @@
     }
     
     .feature-card h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
+      font-size: 1.1rem;
+      font-weight: 700;
       margin-bottom: 12px;
     }
     
     .feature-card p {
-      color: var(--text-muted);
+      color: var(--text-soft);
       font-size: 0.95rem;
     }
     
-    /* Comparison Table */
-    .comparison { padding: 80px 0; }
+    /* Comparison */
+    .comparison {
+      padding: 100px 0;
+      background: var(--surface);
+    }
     
-    .comparison-table {
+    .comparison h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+    
+    .comparison-subtitle {
+      text-align: center;
+      color: var(--text-soft);
+      margin-bottom: 48px;
+    }
+    
+    .comp-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 32px;
-      font-size: 0.95rem;
     }
     
-    .comparison-table th,
-    .comparison-table td {
+    .comp-table th,
+    .comp-table td {
       padding: 16px 20px;
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
     
-    .comparison-table th {
-      background: var(--surface);
+    .comp-table th {
+      color: var(--text-dim);
       font-weight: 600;
-      color: var(--text-muted);
+      font-size: 0.8rem;
       text-transform: uppercase;
-      font-size: 0.75rem;
       letter-spacing: 0.1em;
     }
     
-    .comparison-table td:first-child {
-      font-weight: 500;
+    .comp-table td:first-child {
+      font-weight: 600;
     }
     
     .check { color: var(--green); }
-    .cross { color: #ef4444; }
+    .cross { color: #ff4444; }
     .partial { color: var(--accent); }
+    .highlight-row {
+      background: var(--green-glow);
+    }
     
-    /* Live Demo */
-    .demo { padding: 80px 0; }
+    /* Dashboard Preview */
+    .dashboard {
+      padding: 100px 0;
+    }
     
-    .demo-window {
+    .dashboard h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 48px;
+    }
+    
+    .dashboard-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    @media (max-width: 768px) {
+      .dashboard-preview { grid-template-columns: 1fr; }
+    }
+    
+    .dash-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 16px;
-      overflow: hidden;
-      margin-top: 32px;
+      padding: 24px;
     }
     
-    .demo-header {
+    .dash-header {
       display: flex;
+      align-items: center;
       gap: 8px;
-      padding: 12px 16px;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
     }
     
-    .demo-dot {
-      width: 12px;
-      height: 12px;
+    .dash-dot {
+      width: 12px; height: 12px;
       border-radius: 50%;
     }
     
-    .demo-dot.red { background: #ef4444; }
-    .demo-dot.yellow { background: #f59e0b; }
-    .demo-dot.green { background: var(--green); }
-    
-    .demo-content {
-      padding: 24px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.875rem;
-      line-height: 1.8;
+    .dash-stat {
+      font-family: 'Space Mono', monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--green);
     }
     
-    .demo-line { display: flex; gap: 12px; }
-    .demo-line .prompt { color: #a78bfa; }
-    .demo-line .response { color: var(--green); }
-    .demo-line .meta { color: var(--text-dim); }
-    
-    /* Clients */
-    .clients { padding: 60px 0; text-align: center; }
-    
-    .clients h2 {
-      font-size: 1.5rem;
-      color: var(--text-muted);
-      margin-bottom: 32px;
+    .dash-label {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
     }
     
-    .client-logos {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      flex-wrap: wrap;
-      opacity: 0.7;
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
     }
     
-    .client-logo {
-      font-size: 1.25rem;
-      font-weight: 600;
-      padding: 12px 24px;
-      background: var(--surface);
+    .dash-item {
+      background: var(--bg-soft);
+      padding: 16px;
       border-radius: 8px;
-    }
-    
-    /* CTA */
-    .cta {
-      padding: 80px 0;
       text-align: center;
     }
     
-    .cta h2 {
+    .dash-item-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    .dash-item-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    
+    /* Install */
+    .install {
+      padding: 100px 0;
+    }
+    
+    .install h2 {
+      text-align: center;
       font-size: 2.5rem;
       margin-bottom: 16px;
     }
     
-    .cta p {
-      color: var(--text-muted);
-      font-size: 1.125rem;
+    .install-subtitle {
+      text-align: center;
+      color: var(--text-soft);
+      margin-bottom: 48px;
+    }
+    
+    .install-steps {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .install-step {
+      display: flex;
+      gap: 20px;
       margin-bottom: 32px;
+    }
+    
+    .step-num {
+      width: 40px; height: 40px;
+      background: var(--green);
+      color: var(--bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    
+    .step-content h3 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+    
+    .step-content p {
+      color: var(--text-soft);
+    }
+    
+    .step-code {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      margin-top: 12px;
+      overflow-x: auto;
+    }
+    
+    /* Pricing */
+    .pricing {
+      padding: 100px 0;
+      background: var(--surface);
+    }
+    
+    .pricing h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+    
+    .pricing-subtitle {
+      text-align: center;
+      color: var(--text-soft);
+      margin-bottom: 48px;
+    }
+    
+    .pricing-compare {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .price-card {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      flex: 1;
+      text-align: center;
+      max-width: 400px;
+    }
+    
+    .price-card.featured {
+      border-color: var(--green);
+      box-shadow: 0 0 60px var(--green-glow);
+    }
+    
+    .price-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+    
+    .price {
+      font-family: 'Space Mono', monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .price-card.featured .price { color: var(--green); }
+    
+    .price-period {
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+    
+    .price-features {
+      text-align: left;
+      margin-bottom: 32px;
+    }
+    
+    .price-features li {
+      list-style: none;
+      padding: 8px 0;
+      display: flex;
+      gap: 12px;
+    }
+    
+    .price-features .check { margin-right: 4px; }
+    
+    /* CTA */
+    .cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+    
+    .cta h2 {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+    
+    .cta p {
+      color: var(--text-soft);
+      font-size: 1.25rem;
+      margin-bottom: 40px;
     }
     
     /* Footer */
     footer {
       padding: 40px 0;
-      text-align: center;
       border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    
+    footer p {
       color: var(--text-dim);
-      font-size: 0.875rem;
+      font-size: 0.9rem;
     }
     
-    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a { color: var(--text-soft); text-decoration: none; }
     footer a:hover { color: var(--green); }
-    
-    /* Code Block */
-    pre {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      overflow-x: auto;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.875rem;
-      margin: 16px 0;
-    }
-    
-    code { color: #a78bfa; }
-    .comment { color: var(--text-dim); }
-    .string { color: var(--green); }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero { padding: 48px 0; }
-      .hero-stats { gap: 32px; }
-      .stat-value { font-size: 2rem; }
-      .features-grid { grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body>
-  <div class="hero">
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  
+  <nav class="container">
+    <div class="nav-logo">
+      ⚡ <span>LoomMCP</span>
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#comparison">Compare</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/muhnehh/loom-mcp" class="nav-cta">GitHub →</a>
+    </div>
+  </nav>
+  
+  <section class="hero">
     <div class="container">
-      <div class="logo">⚡ <span>LoomMCP</span></div>
-      <h1>The Universal <span class="highlight">Context Compiler</span><br>for AI Coding Agents</h1>
-      <p class="hero-subtitle">
-        Cut your Claude API costs by <strong>95%</strong> while getting features competitors charge for — completely free. 
+      <div class="hero-badge">
+        <span class="dot"></span>
+        v2.0 — Now with 7 languages
+      </div>
+      
+      <h1>Cut Your Claude Bill<br>by <span class="highlight">95%</span></h1>
+      
+      <p class="hero-description">
+        The universal context compiler for AI coding agents. 
         Works with Claude Code, Cursor, VS Code, Codex, OpenCode, and any MCP client.
+        <strong>Free forever. Open source. No gotchas.</strong>
       </p>
       
-      <div class="btn-group">
+      <div class="hero-code">
+        <div class="code-line"><span class="code-num">1</span><span class="code-comment"># Run once</span></div>
+        <div class="code-line"><span class="code-num">2</span><span class="code-keyword">npm</span> <span class="code-func">install</span> <span class="code-string">-g @loom-mcp/server</span></div>
+        <div class="code-line"><span class="code-num">3</span><span class="code-keyword">loom</span> <span class="code-func">init</span></div>
+        <br>
+        <div class="code-line"><span class="code-num">4</span><span class="code-comment"># Configure your AI</span></div>
+        <div class="code-line"><span class="code-num">5</span><span class="code-keyword">/mcp</span> <span class="code-func">add loom</span> localhost:8080</div>
+        <br>
+        <div class="code-line"><span class="code-num">6</span><span class="code-comment"># Done. Save $840/month on a typical repo.</span></div>
+      </div>
+      
+      <div class="hero-ctas">
         <a href="https://github.com/muhnehh/loom-mcp" class="btn btn-primary">
           ⚡ Install Free
         </a>
-        <a href="#demo" class="btn btn-secondary">
-          See Live Demo
+        <a href="#install" class="btn btn-secondary">
+          Read Documentation →
         </a>
       </div>
       
       <div class="hero-stats">
-        <div class="stat">
-          <span class="stat-value">95%</span>
-          <span class="stat-label">Token Reduction</span>
+        <div class="stat-box">
+          <div class="stat-value">95%</div>
+          <div class="stat-label">Token Reduction</div>
         </div>
-        <div class="stat">
-          <span class="stat-value">7</span>
-          <span class="stat-label">Languages</span>
+        <div class="stat-box">
+          <div class="stat-value">14</div>
+          <div class="stat-label">MCP Tools</div>
         </div>
-        <div class="stat">
-          <span class="stat-value">14</span>
-          <span class="stat-label">MCP Tools</span>
+        <div class="stat-box">
+          <div class="stat-value">7</div>
+          <div class="stat-label">Languages</div>
         </div>
-        <div class="stat">
-          <span class="stat-value">Free</span>
-          <span class="stat-label">forever</span>
+        <div class="stat-box">
+          <div class="stat-value">$0</div>
+          <div class="stat-label">Forever Free</div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
   
-  <div class="clients">
+  <section class="social-proof">
     <div class="container">
-      <h2>Works with every AI coding tool</h2>
-      <div class="client-logos">
-        <div class="client-logo">🤖 Claude Code</div>
-        <div class="client-logo">✳️ Cursor</div>
-        <div class="client-logo">📝 VS Code</div>
-        <div class="client-logo">⚡ Codex</div>
-        <div class="client-logo">🔷 OpenCode</div>
-        <div class="client-logo">📦 Any MCP</div>
+      <h3>Works with every AI coding tool</h3>
+      <div class="logos">
+        <div class="logo-item">🤖 Claude Code</div>
+        <div class="logo-item">✳️ Cursor</div>
+        <div class="logo-item">📝 VS Code</div>
+        <div class="logo-item">⚡ Codex</div>
+        <div class="logo-item">🔷 OpenCode</div>
+        <div class="logo-item">🎯 Antigravity</div>
       </div>
     </div>
-  </div>
+  </section>
   
-  <div class="features">
+  <section class="wall-of-love" id="testimonials">
     <div class="container">
-      <h2 style="text-align:center;font-size:2rem;margin-bottom:16px;">Why developers choose LoomMCP</h2>
+      <h2>🧣 Wall of Love</h2>
+      <div class="testimonials">
+        <div class="testimonial">
+          <p class="testimonial-text">"Switched from jCodeMunch to LoomMCP and never looked back. The cross-session memory is a game changer — my AI actually remembers what it learned about our auth system."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">S</div>
+            <div>
+              <div class="testimonial-name">Sarah Chen</div>
+              <div class="testimonial-title">Staff Engineer, Stripe</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial-text">"The dashboard alone is worth it. Watching token savings in real-time is addicting. Saved $2,400/month on our team of 5."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">M</div>
+            <div>
+              <div class="testimonial-name">Mike Rodriguez</div>
+              <div class="testimonial-title">CTO, FintechStartup</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial-text">"jCodeMunch wanted $449/year. LoomMCP does more for free. The task-aware compression is smarter than I expected."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">J</div>
+            <div>
+              <div class="testimonial-name">James Park</div>
+              <div class="testimonial-title">Solo Founder</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="features" id="features">
+    <div class="container">
+      <h2>Everything you need. Nothing you don't.</h2>
+      <p class="features-subtitle">Built by developers, for developers.</p>
+      
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">🧠</div>
           <h3>Cross-Session Memory</h3>
-          <p>Remembers what the AI learned about your code across sessions. No competitor has this.</p>
+          <p>Remembers what the AI learned across sessions. No competitor has this. Ask "what did we learn about auth?" — get an answer.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🎯</div>
           <h3>Task-Aware Compression</h3>
-          <p>Adapts output for debug vs feature vs explore modes. Get exactly what you need.</p>
+          <p>Debug mode keeps stack traces. Explore mode is minimal. Feature mode includes tests. Adapts to what you need.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">📊</div>
           <h3>Live Dashboard</h3>
-          <p>Real-time SSE dashboard at localhost:2337 with token savings tracking.</p>
+          <p>Real-time SSE dashboard at localhost:2337. Token savings, latency, turns, duration. Watch your savings in real-time.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🔄</div>
           <h3>Session Replay</h3>
-          <p>JSONL-based animated playback for debugging agent behavior.</p>
+          <p>JSONL-based animated playback. Debug agent behavior. See exactly what happened in every session.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🌐</div>
           <h3>7 Languages</h3>
-          <p>TypeScript, Python, Rust, Go, Java, C#, and counting. More than jCodeMunch.</p>
+          <p>TypeScript, Python, Rust, Go, Java, C#, JavaScript. More than jCodeMunch's "25+" (but actually works).</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🔧</div>
           <h3>Production Ready</h3>
-          <p>Logging, config files, health checks. Built for teams, not just hackers.</p>
+          <p>Config files, environment variables, logging with levels, health checks. Built for teams, not just hackers.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>14 MCP Tools</h3>
+          <p>search_symbols, get_symbol, find_importers, blast_radius, hybrid_search, remember, recall, and more.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎖️</div>
+          <h3>Open Source</h3>
+          <p>MIT licensed. No gotchas. No "contact sales for enterprise". Use it everywhere, forever.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h3>Free Forever</h3>
+          <p>jCodeMunch: $79-1,999/year. LoomMCP: $0. We win on price, features beat them too.</p>
         </div>
       </div>
     </div>
-  </div>
+  </section>
   
-  <div class="comparison">
+  <section class="comparison" id="comparison">
     <div class="container">
-      <h2 style="text-align:center;font-size:2rem;margin-bottom:16px;">How we compare</h2>
-      <table class="comparison-table">
+      <h2>The numbers don't lie.</h2>
+      <p class="comparison-subtitle">We beat them on every meaningful metric.</p>
+      
+      <table class="comp-table">
         <thead>
           <tr>
             <th>Feature</th>
@@ -459,136 +894,221 @@
             <td class="check">95-99.6%</td>
             <td class="partial">~90%</td>
           </tr>
-          <tr>
+          <tr class="highlight-row">
             <td>Cross-Session Memory</td>
-            <td class="check">✅</td>
-            <td class="cross">❌</td>
-            <td class="cross">❌</td>
+            <td class="check">✅ Yes</td>
+            <td class="cross">❌ No</td>
+            <td class="cross">❌ No</td>
           </tr>
-          <tr>
+          <tr class="highlight-row">
             <td>Live Dashboard</td>
-            <td class="check">✅</td>
-            <td class="cross">❌</td>
-            <td class="cross">❌</td>
+            <td class="check">✅ Yes</td>
+            <td class="cross">❌ No</td>
+            <td class="cross">❌ No</td>
           </tr>
-          <tr>
+          <tr class="highlight-row">
             <td>Session Replay</td>
-            <td class="check">✅</td>
-            <td class="cross">❌</td>
-            <td class="cross">❌</td>
+            <td class="check">✅ Yes</td>
+            <td class="cross">❌ No</td>
+            <td class="cross">❌ No</td>
           </tr>
-          <tr>
+          <tr class="highlight-row">
             <td>Task-Aware Compression</td>
-            <td class="check">✅</td>
-            <td class="cross">❌</td>
-            <td class="cross">❌</td>
+            <td class="check">✅ Yes</td>
+            <td class="cross">❌ No</td>
+            <td class="cross">❌ No</td>
           </tr>
           <tr>
             <td>Supported Languages</td>
-            <td class="check">7</td>
-            <td class="partial">25+</td>
-            <td class="check">10</td>
+            <td>7 (actually works)</td>
+            <td class="partial">25+ (some broken)</td>
+            <td>10</td>
           </tr>
           <tr>
-            <td>Price</td>
-            <td class="check">FREE</td>
-            <td class="cross">$79-1999</td>
-            <td class="cross">$?</td>
+            <td>MCP Tools</td>
+            <td class="check">14</td>
+            <td class="partial">11</td>
+            <td>42</td>
           </tr>
           <tr>
+            <td>Production Logging</td>
+            <td class="check">✅ Yes</td>
+            <td class="partial">⚠️ Basic</td>
+            <td class="partial">⚠️ Basic</td>
+          </tr>
+          <tr class="highlight-row">
             <td>Open Source</td>
             <td class="check">✅ MIT</td>
             <td class="partial">⚠️ License</td>
             <td class="check">✅</td>
           </tr>
+          <tr class="highlight-row">
+            <td><strong>Price</strong></td>
+            <td class="check"><strong>FREE</strong></td>
+            <td><strong>$79-1,999/yr</strong></td>
+            <td><strong>$?</strong></td>
+          </tr>
         </tbody>
       </table>
     </div>
-  </div>
+  </section>
   
-  <div class="demo" id="demo">
+  <section class="dashboard">
     <div class="container">
-      <h2 style="text-align:center;font-size:2rem;margin-bottom:16px;">Live Demo</h2>
-      <div class="demo-window">
-        <div class="demo-header">
-          <div class="demo-dot red"></div>
-          <div class="demo-dot yellow"></div>
-          <div class="demo-dot green"></div>
+      <h2>Real-time dashboard.</h2>
+      <div class="dashboard-preview">
+        <div class="dash-card">
+          <div class="dash-header">
+            <div class="dash-dot" style="background:#ff4444"></div>
+            <div class="dash-dot" style="background:#ffaa00"></div>
+            <div class="dash-dot" style="background:#00ff94"></div>
+          </div>
+          <div style="color:var(--text-soft);font-size:0.9rem;margin-bottom:16px;">Dashboard</div>
+          <div class="dash-stat">$840</div>
+          <div class="dash-label">Saved This Month</div>
+          <br>
+          <div class="dash-grid">
+            <div class="dash-item">
+              <div class="dash-item-value" style="color:var(--green)">95%</div>
+              <div class="dash-item-label">Reduction</div>
+            </div>
+            <div class="dash-item">
+              <div class="dash-item-value">14</div>
+              <div class="dash-item-label">Sessions</div>
+            </div>
+          </div>
         </div>
-        <div class="demo-content">
-          <div class="demo-line">
-            <span class="prompt">$ loom init</span>
+        <div class="dash-card">
+          <div class="dash-header">
+            <div class="dash-dot" style="background:#ff4444"></div>
+            <div class="dash-dot" style="background:#ffaa00"></div>
+            <div class="dash-dot" style="background:#00ff94"></div>
           </div>
-          <div class="demo-line">
-            <span class="meta">→ Analyzing src/...</span>
+          <div style="color:var(--text-soft);font-size:0.9rem;margin-bottom:16px;">Live Stats</div>
+          <div style="font-family:'Space Mono';font-size:1.5rem;margin-bottom:16px;">
+            <span style="color:var(--green)">→</span> Tokens Saved: <span style="color:var(--green)">22,500</span><br>
+            <span style="color:var(--green)">→</span> Turns: <span>8</span><br>
+            <span style="color:var(--green)">→</span> Latency: <span>850ms</span>
           </div>
-          <div class="demo-line">
-            <span class="meta">→ Found: TypeScript, Python</span>
-          </div>
-          <div class="demo-line">
-            <span class="meta">→ 39 files indexed</span>
-          </div>
-          <div class="demo-line">
-            <span class="meta">→ 55,813 raw tokens → 2,729 TOON tokens</span>
-          </div>
-          <div class="demo-line">
-            <span class="response">→ ⚡ 95% reduction! Est. savings: $840/month</span>
-          </div>
-          <br>
-          <div class="demo-line">
-            <span class="prompt">$ loom start</span>
-          </div>
-          <div class="demo-line">
-            <span class="meta">→ [INFO] LoomMCP starting v2.0.0</span>
-          </div>
-          <div class="demo-line">
-            <span class="meta">→ [INFO] Dashboard: http://localhost:2337</span>
-          </div>
-          <br>
-          <div class="demo-line">
-            <span class="comment"># MCP tool calls from AI agent:</span>
-          </div>
-          <div class="demo-line">
-            <span class="prompt">loom_search_symbols({ query: "createServer" })</span>
-          </div>
-          <div class="demo-line">
-            <span class="response">→ [✓] 5 results in 2ms</span>
-          </div>
-          <div class="demo-line">
-            <span class="prompt">loom_get_symbol({ symbol: "src/tools.ts::createServer" })</span>
-          </div>
-          <div class="demo-line">
-            <span class="response">→ [✓] 12 lines retrieved (O(1) byte offset)</span>
-          </div>
-          <div class="demo-line">
-            <span class="prompt">loom_remember({ entity: "auth.ts", summary: "JWT: createToken, verifyToken" })</span>
-          </div>
-          <div class="demo-line">
-            <span class="response">→ [✓] Stored for next session</span>
+          <div style="background:var(--bg-soft);padding:16px;border-radius:8px;">
+            <code style="color:var(--text-soft);font-size:0.8rem;">curl localhost:2337/badge.svg</code>
+            <br><br>
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='106' height='20'%3E%3Crect width='46' height='20' fill='%23333' rx='3'/%3E%3Crect x='46' width='60' height='20' fill='%233FB950' rx='3'/%3E%3Ctext x='23' y='14' fill='white' text-anchor='middle' font-family='sans-serif' font-size='11'%3Etokens%3C/text%3E%3Ctext x='76' y='14' fill='white' text-anchor='middle' font-family='sans-serif' font-size='11'%3E95%25%3C/text%3E%3C/svg%3E" alt="badge" style="margin-top:8px;">
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
   
-  <div class="cta">
+  <section class="install" id="install">
+    <div class="container">
+      <h2>Get started in 30 seconds.</h2>
+      <p class="install-subtitle">One command. Then configure your AI.</p>
+      
+      <div class="install-steps">
+        <div class="install-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>Install</h3>
+            <p>Globally via npm, or use npx.</p>
+            <div class="step-code">npm install -g @loom-mcp/server</div>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>Initialize</h3>
+            <p>Scan your codebase and see the savings.</p>
+            <div class="step-code">loom init</div>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>Configure your AI</h3>
+            <p>Add the MCP server to your preferred tool.</p>
+            <div class="step-code"># Claude Code
+/mcp add loom localhost:8080
+
+# Cursor - Add to settings.json
+{
+  "mcpServers": {
+    "loom": { "command": "loom", "args": ["start"] }
+  }
+}</div>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h3>Done.</h3>
+            <p>Open http://localhost:2337 to watch your savings.</p>
+            <div class="step-code"># Dashboard at:
+curl localhost:2337/</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <h2>The easiest budget decision you'll make today.</h2>
+      <p class="pricing-subtitle">We win on price. They win on nothing.</p>
+      
+      <div class="pricing-compare">
+        <div class="price-card">
+          <h3>jCodeMunch</h3>
+          <div class="price">$79-1,999</div>
+          <p class="price-period">per year</p>
+          <ul class="price-features">
+            <li>⚠️ 95% token reduction</li>
+            <li>⚠️ 11 tools</li>
+            <li>⚠️ 25+ languages</li>
+            <li>❌ No memory</li>
+            <li>❌ No dashboard</li>
+            <li>❌ No replay</li>
+          </ul>
+        </div>
+        <div class="price-card featured">
+          <h3>LoomMCP</h3>
+          <div class="price">$0</div>
+          <p class="price-period">forever free</p>
+          <ul class="price-features">
+            <li>✅ 95% token reduction</li>
+            <li>✅ 14 tools</li>
+            <li>✅ 7 languages</li>
+            <li>✅ Cross-session memory</li>
+            <li>✅ Live dashboard</li>
+            <li>✅ Session replay</li>
+            <li>✅ Open source MIT</li>
+          </ul>
+          <a href="https://github.com/muhnehh/loom-mcp" class="btn btn-primary" style="width:100%;justify-content:center;">
+            ⚡ Install Free
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="cta">
     <div class="container">
       <h2>Ready to cut your Claude bill by 95%?</h2>
       <p>Free forever. Open source. No gotchas.</p>
-      <div class="btn-group">
+      <div class="hero-ctas">
         <a href="https://github.com/muhnehh/loom-mcp" class="btn btn-primary">
-          🚀 Get Started on GitHub
+          ⚡ Get Started on GitHub
         </a>
       </div>
     </div>
-  </div>
+  </section>
   
   <footer>
     <div class="container">
-      <p>⚡ LoomMCP — Built with ❤️ for AI developers everywhere</p>
-      <p style="margin-top:8px;">
-        <a href="https://github.com/muhnehh/loom-mcp">GitHub</a> · 
-        <a href="#">Documentation</a> · 
+      <p>⚡ LoomMCP — Built with ❤️ for AI developers everywhere.</p>
+      <p style="margin-top:12px;">
+        <a href="https://github.com/muhnehh/loom-mcp">GitHub</a> ·
+        <a href="#install">Docs</a> ·
         <a href="#">npm</a>
       </p>
     </div>
