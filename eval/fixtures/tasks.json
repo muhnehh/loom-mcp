@@ -1,0 +1,37 @@
+[
+  {
+    "id": "small_api_add_refresh",
+    "repo": "small_api",
+    "prompt": "Add JWT token refresh functionality to the auth module",
+    "expected": "refreshToken function implemented",
+    "difficulty": "easy"
+  },
+  {
+    "id": "small_api_cart_total",
+    "repo": "small_api",
+    "prompt": "Fix the cart total calculation to include quantity",
+    "expected": "Cart totals multiplied by quantity",
+    "difficulty": "easy"
+  },
+  {
+    "id": "medium_auth_password_hash",
+    "repo": "medium_webapp",
+    "prompt": "Add password hashing to the registration flow",
+    "expected": "Password hashed before storage",
+    "difficulty": "medium"
+  },
+  {
+    "id": "medium_cart_storage",
+    "repo": "medium_webapp",
+    "prompt": "Persist cart to localStorage instead of sessionStorage",
+    "expected": "Cart persists across page refresh",
+    "difficulty": "medium"
+  },
+  {
+    "id": "medium_route_guard",
+    "repo": "medium_webapp",
+    "prompt": "Implement the withAuth guard function correctly",
+    "expected": "Guard checks authentication before navigation",
+    "difficulty": "hard"
+  }
+]
