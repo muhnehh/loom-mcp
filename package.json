@@ -8,7 +8,9 @@
     "url": "git+https://github.com/muhnehh/loom-mcp.git"
   },
   "homepage": "https://github.com/muhnehh/loom-mcp",
-  "bugs": "https://github.com/muhnehh/loom-mcp/issues",
+  "bugs": {
+    "url": "https://github.com/muhnehh/loom-mcp/issues"
+  },
   "author": "LoomMCP <loom@mcp.sh>",
   "keywords": [
     "mcp",
