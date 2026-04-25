@@ -7,6 +7,9 @@ exports.skeletonizeFile = skeletonizeFile;
 const tree_sitter_1 = __importDefault(require("tree-sitter"));
 const tree_sitter_typescript_1 = __importDefault(require("tree-sitter-typescript"));
 const tree_sitter_python_1 = __importDefault(require("tree-sitter-python"));
+const tree_sitter_go_1 = __importDefault(require("tree-sitter-go"));
+const tree_sitter_rust_1 = __importDefault(require("tree-sitter-rust"));
+const tree_sitter_java_1 = __importDefault(require("tree-sitter-java"));
 const fs_1 = require("fs");
 const path_1 = require("path");
 const parsers = {};
@@ -22,12 +25,19 @@ function initParser(lang) {
 }
 const tsLang = tree_sitter_typescript_1.default.typescript || tree_sitter_typescript_1.default;
 const jsLang = tree_sitter_typescript_1.default.javascript || tree_sitter_typescript_1.default;
+const goLang = tree_sitter_go_1.default.go || tree_sitter_go_1.default;
+const rustLang = tree_sitter_rust_1.default.rust || tree_sitter_rust_1.default;
+const javaLang = tree_sitter_java_1.default.java || tree_sitter_java_1.default;
 const langMap = {
     ts: tsLang,
     tsx: tsLang,
     js: jsLang,
     jsx: jsLang,
     py: tree_sitter_python_1.default,
+    go: goLang,
+    rs: rustLang,
+    java: javaLang,
+    cs: javaLang,
 };
 function skeletonizeFile(filePath) {
     const ext = filePath.split('.').pop()?.toLowerCase() || '';

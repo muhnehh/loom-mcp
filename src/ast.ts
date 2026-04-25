@@ -1,6 +1,9 @@
 import Parser from 'tree-sitter';
 import TypeScript from 'tree-sitter-typescript';
 import Python from 'tree-sitter-python';
+import Go from 'tree-sitter-go';
+import Rust from 'tree-sitter-rust';
+import Java from 'tree-sitter-java';
 import { readFileSync, appendFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { ASTNode, FileSkeleton } from './toon.js';
@@ -19,6 +22,9 @@ function initParser(lang: any): Parser | null {
 
 const tsLang = (TypeScript as any).typescript || TypeScript;
 const jsLang = (TypeScript as any).javascript || TypeScript;
+const goLang = (Go as any).go || Go;
+const rustLang = (Rust as any).rust || Rust;
+const javaLang = (Java as any).java || Java;
 
 const langMap: Record<string, any> = {
   ts: tsLang,
@@ -26,6 +32,10 @@ const langMap: Record<string, any> = {
   js: jsLang,
   jsx: jsLang,
   py: Python,
+  go: goLang,
+  rs: rustLang,
+  java: javaLang,
+  cs: javaLang,
 };
 
 export function skeletonizeFile(filePath: string): FileSkeleton {

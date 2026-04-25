@@ -157,9 +157,13 @@ Features:
 ## Supported Languages
 
 - TypeScript / JavaScript
-- Python (experimental)
+- Python
+- **Rust** (NEW)
+- **Go** (NEW)
+- **Java** (NEW)
+- C# (experimental)
 
-(Rust, Go, Java coming in V2)
+> 7 languages supported — more than jCodeMunch!
 
 ## Requirements
 
