@@ -275,5 +275,55 @@ switch (opts.command || 'start') {
     case 'config':
         runConfig(opts.config || 'show', opts.json);
         break;
+    case 'pack':
+        runPack(opts.dir || 'list');
+        break;
     default: runStart();
+}
+async function runPack(cmd) {
+    const selfPacksDir = (0, path_1.join)(__dirname, '..', 'packs');
+    const packsDir = (0, fs_1.existsSync)(selfPacksDir) ? selfPacksDir : (0, path_1.join)(process.cwd(), 'packs');
+    if (cmd === 'list') {
+        console.log('\nAvailable LoomPacks:\n');
+        const packs = ['react', 'node', 'python-django', 'rust-crates', 'golang', 'java-spring', 'csharp-dotnet'];
+        for (const p of packs) {
+            const configPath = (0, path_1.join)(packsDir, p, 'loom.config.json');
+            if ((0, fs_1.existsSync)(configPath)) {
+                try {
+                    const config = JSON.parse((0, fs_1.readFileSync)(configPath, 'utf8'));
+                    console.log(`  ${p.padEnd(20)} — ${(config.languages || []).join(', ')}`);
+                }
+                catch {
+                    console.log(`  ${p}`);
+                }
+            }
+        }
+        console.log('\nInstall: loom pack install <name>\n');
+        return;
+    }
+    if (cmd.startsWith('install ')) {
+        const packName = cmd.replace('install ', '');
+        const configPath = (0, path_1.join)(packsDir, packName, 'loom.config.json');
+        if (!(0, fs_1.existsSync)(configPath)) {
+            console.error(`Pack "${packName}" not found. Run "loom pack list" for available packs.`);
+            process.exit(1);
+        }
+        const dest = (0, path_1.join)(process.cwd(), 'loom.config.json');
+        if ((0, fs_1.existsSync)(dest)) {
+            console.log(` loom.config.json already exists. Use --force to overwrite.`);
+        }
+        else {
+            try {
+                (0, fs_1.writeFileSync)(dest, (0, fs_1.readFileSync)(configPath));
+                console.log(`\n Installed "${packName}" pack → loom.config.json\n`);
+                console.log(` Run "loom start" to activate.\n`);
+            }
+            catch (e) {
+                console.error(` Failed: ${e.message}`);
+                process.exit(1);
+            }
+        }
+        return;
+    }
+    console.log('Usage: loom pack [list|install <name>]');
 }

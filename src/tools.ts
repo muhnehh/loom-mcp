@@ -401,15 +401,17 @@ function createLoomServer(): Server {
         
         buildSymbolIndex(files);
 
-        for (const file of files.slice(0, 500)) {
-          const { skeleton, cacheHit } = cache.getOrCompute(file, () => {
-            const skel = skeletonizeFile(file);
-            return toTOON([skel]);
+        const toProcess = files.slice(0, 500);
+        const batchSize = 20;
+        for (let i = 0; i < toProcess.length; i += batchSize) {
+          const batch = toProcess.slice(i, i + batchSize);
+          const results = batch.map(file => {
+            try { return skeletonizeFile(file); } catch { return null; }
           });
-          
-          const skel = skeletonizeFile(file);
-          if (skel.nodes.length > 0) {
-            skeletons.push(skel);
+          for (const skel of results) {
+            if (skel?.nodes?.length > 0) {
+              skeletons.push(skel);
+            }
           }
         }
 

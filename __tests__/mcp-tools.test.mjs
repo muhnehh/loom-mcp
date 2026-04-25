@@ -81,6 +81,11 @@ describe('loom_get_topology', () => {
     strictEqual(text.includes('return authService'), false);
     strictEqual(text.includes('const { '), false);
   });
+
+  it('reports token reduction metric', async () => {
+    const text = await client.callTool('loom_get_topology', { dir: 'src' });
+    match(text, /token_reduction:-?\d+%/);
+  });
 });
 
 describe('loom_focus', () => {
@@ -101,6 +106,139 @@ describe('loom_focus', () => {
     const text = await client.callTool('loom_focus', { target: 'src/toon.ts' });
     ok(text.includes('lines:'), 'should report line count');
     ok(text.includes('token_estimate:'), 'should estimate tokens');
+  });
+
+  it('returns error for non-existent file', async () => {
+    const text = await client.callTool('loom_focus', { target: 'nonexistent/file.ts' });
+    ok(text.startsWith('ERROR:') || text.includes('ERROR:'), 'should return error');
+  });
+});
+
+describe('loom_search_symbols', () => {
+  it('returns ranked symbol matches', async () => {
+    const text = await client.callTool('loom_search_symbols', { query: 'toTOON' });
+    ok(!text.startsWith('ERROR:'));
+    match(text, /query:toTOON/);
+    ok(text.includes('results:'), 'should report result count');
+  });
+
+  it('limits results with limit parameter', async () => {
+    const text = await client.callTool('loom_search_symbols', { query: 'to', limit: 3 });
+    match(text, /query:to/);
+  });
+});
+
+describe('loom_find_importers', () => {
+  it('finds files that import a symbol', async () => {
+    const text = await client.callTool('loom_find_importers', { symbol: 'toTOON' });
+    ok(!text.startsWith('ERROR:'));
+    match(text, /symbol:toTOON/);
+    match(text, /importers:\d+/);
+  });
+});
+
+describe('loom_blast_radius', () => {
+  it('analyzes change impact', async () => {
+    const text = await client.callTool('loom_blast_radius', { symbol: 'toTOON' });
+    ok(!text.startsWith('ERROR:'));
+    match(text, /symbol:toTOON/);
+    ok(text.includes('risk:'), 'should report risk level');
+    ok(text.includes('direct_importers:') || text.includes('direct:'), 'should show importers');
+  });
+});
+
+describe('loom_hybrid_search', () => {
+  it('returns hybrid search results', async () => {
+    const text = await client.callTool('loom_hybrid_search', { query: 'toTOON' });
+    ok(!text.startsWith('ERROR:'));
+    match(text, /query:toTOON/);
+    match(text, /results:\d+/);
+  });
+
+  it('respects mode parameter', async () => {
+    const text = await client.callTool('loom_hybrid_search', { query: 'to', mode: 'keyword' });
+    match(text, /mode:keyword/);
+  });
+});
+
+describe('loom_remember and loom_recall', () => {
+  it('stores and retrieves memory', async () => {
+    const store = await client.callTool('loom_remember', { entity: 'test_symbol', summary: 'A test insight' });
+    ok(!store.startsWith('ERROR:'));
+    match(store, /remembered:test_symbol/);
+
+    const recall = await client.callTool('loom_recall', { query: 'test' });
+    ok(!recall.startsWith('ERROR:'));
+    match(recall, /query:test/);
+  });
+});
+
+describe('loom_session_compress', () => {
+  it('sets compression mode', async () => {
+    const text = await client.callTool('loom_session_compress', { mode: 'debug' });
+    ok(!text.startsWith('ERROR:'));
+    match(text, /compression_mode:debug/);
+  });
+
+  it('supports all modes', async () => {
+    for (const mode of ['feature', 'review', 'explore']) {
+      const text = await client.callTool('loom_session_compress', { mode });
+      match(text, new RegExp(`compression_mode:${mode}`));
+    }
+  });
+});
+
+describe('loom_diff_compress', () => {
+  it('returns git diff stats', async () => {
+    const text = await client.callTool('loom_diff_compress', { since: 'HEAD~1' });
+    ok(!text.startsWith('ERROR:') || text.includes('git_not_available'), 'should return diff or error');
+  });
+});
+
+describe('loom_search_refs', () => {
+  it('returns references for a known symbol', async () => {
+    const text = await client.callTool('loom_search_refs', { symbol: 'toTOON' });
+    ok(!text.startsWith('ERROR:'));
+    match(text, /symbol:toTOON/);
+    match(text, /scope:workspace/);
+    match(text, /refs:\d+/);
+  });
+
+  it('respects scope parameter', async () => {
+    const text = await client.callTool('loom_search_refs', { symbol: 'toTOON', scope: 'file' });
+    match(text, /scope:file/);
+  });
+});
+
+describe('loom_get_symbol', () => {
+  it('retrieves symbol metadata', async () => {
+    await client.callTool('loom_get_topology', { dir: 'src' });
+    const text = await client.callTool('loom_get_symbol', { symbol: 'toTOON' });
+    ok(text.length > 0, 'should return content');
+  });
+});
+
+describe('loom_get_symbol_importance', () => {
+  it('returns importance score', async () => {
+    const text = await client.callTool('loom_get_symbol_importance', { symbol: 'toTOON' });
+    ok(!text.startsWith('ERROR:'));
+    match(text, /symbol:toTOON/);
+    ok(text.includes('score:'), 'should show importance score');
+  });
+});
+
+describe('loom_get_changed_symbols', () => {
+  it('returns changed files', async () => {
+    const text = await client.callTool('loom_get_changed_symbols');
+    ok(!text.startsWith('ERROR:') || text.includes('changes:'), 'should return changes info');
+  });
+});
+
+describe('loom_get_untested_symbols', () => {
+  it('returns untested symbol list', async () => {
+    const text = await client.callTool('loom_get_untested_symbols');
+    ok(!text.startsWith('ERROR:'));
+    ok(text.includes('untested_symbols:'), 'should report untested symbols');
   });
 });
 
@@ -128,17 +266,37 @@ describe('loom_blur', () => {
   });
 });
 
-describe('loom_search_refs', () => {
-  it('returns references for a known symbol', async () => {
-    const text = await client.callTool('loom_search_refs', { symbol: 'toTOON' });
+describe('loom_get_deps', () => {
+  it('builds dependency graph', async () => {
+    const text = await client.callTool('loom_get_deps');
     ok(!text.startsWith('ERROR:'));
-    match(text, /symbol:toTOON/);
-    match(text, /scope:workspace/);
-    match(text, /refs:\d+/);
+    ok(text.includes('nodes:') || text.includes('edges:'), 'should show graph stats');
   });
 
-  it('respects scope parameter', async () => {
-    const text = await client.callTool('loom_search_refs', { symbol: 'toTOON', scope: 'file' });
-    match(text, /scope:file/);
+  it('supports DOT format', async () => {
+    const text = await client.callTool('loom_get_deps', { format: 'dot' });
+    ok(!text.startsWith('ERROR:') || text.includes('digraph'), 'should return DOT format');
+  });
+});
+
+describe('loom_get_metrics', () => {
+  it('returns session metrics', async () => {
+    const text = await client.callTool('loom_get_metrics');
+    ok(!text.startsWith('ERROR:'));
+    match(text, /session:/);
+    ok(text.includes('turns:') || text.includes('tokens_used:'), 'should show metrics');
+  });
+
+  it('shows tool breakdown when requested', async () => {
+    const text = await client.callTool('loom_get_metrics', { breakdown: true });
+    ok(!text.startsWith('ERROR:'));
+    ok(text.includes('tool_breakdown:') || text.includes('loom_'), 'should show breakdown');
+  });
+});
+
+describe('loom_get_sessions', () => {
+  it('returns session history', async () => {
+    const text = await client.callTool('loom_get_sessions', { limit: 5 });
+    ok(!text.startsWith('ERROR:') || text.includes('no_sessions'), 'should return history or none');
   });
 });

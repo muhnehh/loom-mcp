@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LoomMCP - Cut Your Claude Bill by 95%</title>
-  <meta name="description" content="LoomMCP is the universal context compiler for AI coding agents. Cut token costs by 95%, keep context quality, and stay free forever.">
+<title>LoomMCP — 95% Token Reduction for AI Coding Agents</title>
+    <meta name="description" content="LoomMCP is the universal context compiler for AI coding agents. Cut Claude API costs by 95%, with 17 tools, cross-session memory, live dashboard, and session replay. Free forever.">
+    <meta name="keywords" content="MCP, context compiler, token reduction, Claude, Claude Code, AI coding, Cursor, Codex, coding agent, token optimization">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="LoomMCP — Cut Claude Bills by 95%">
+    <meta property="og:description" content="Universal MCP context compiler. 17 tools, 7 languages, cross-session memory, live dashboard. Free & open source.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -367,6 +373,56 @@
       font-size: 13px;
       font-weight: 700;
     }
+
+    .demo-wrap {
+      margin-top: 28px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .demo-terminal {
+      background: #1a1a2e;
+      border-radius: 14px;
+      width: min(700px, 100%);
+      box-shadow: 0 24px 60px rgba(21, 30, 55, 0.18);
+      overflow: hidden;
+      border: 1px solid #2a2a4a;
+    }
+
+    .demo-header {
+      background: #16162a;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #2a2a4a;
+    }
+
+    .demo-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .demo-title {
+      margin-left: 8px;
+      color: #6a7a9a;
+      font-size: 13px;
+      font-family: "Courier New", monospace;
+    }
+
+    .demo-body {
+      padding: 20px 24px;
+      font-family: "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #c8d0e7;
+    }
+
+    .demo-line { color: #c8d0e7; }
+    .demo-out { color: #7a8ab8; padding-left: 4px; }
+    .demo-prompt { color: var(--brand); margin-right: 8px; font-weight: bold; }
+    .demo-spacer { opacity: 0.3; }
 
     section {
       padding: 58px 0;
@@ -800,7 +856,9 @@
         <a href="#install">Install</a>
         <a href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer">GitHub</a>
       </nav>
-      <a class="top-badge" href="#features">v2.0 - Now with 7 languages</a>
+      <a class="top-badge" href="https://www.npmjs.com/package/@loom-mcp/server" target="_blank" rel="noreferrer">
+          <img src="https://img.shields.io/npm/v/@loom-mcp/server?style=flat-square" alt="npm version" style="height:20px;border-radius:4px;">
+        </a>
     </div>
   </header>
 
@@ -881,6 +939,42 @@
       </aside>
     </section>
 
+    <section id="demo">
+      <h2 class="section-title serif fade-up">See it in action.</h2>
+      <p class="section-sub fade-up fade-delay-1">Watch LoomMCP cut token costs in real time.</p>
+      <div class="demo-wrap fade-up fade-delay-2">
+        <div class="demo-terminal">
+          <div class="demo-header">
+            <span class="demo-dot" style="background:#ff5f57"></span>
+            <span class="demo-dot" style="background:#ffbd2e"></span>
+            <span class="demo-dot" style="background:#28c840"></span>
+            <span class="demo-title">loom — 17 tools</span>
+          </div>
+          <div class="demo-body">
+            <div class="demo-line"><span class="demo-prompt">$</span> loom init</div>
+            <div class="demo-line demo-out">Detecting 39 TypeScript files...</div>
+            <div class="demo-line demo-out">Raw tokens: <strong>55,813</strong></div>
+            <div class="demo-line demo-out">TOON tokens: <strong>2,729</strong></div>
+            <div class="demo-line demo-out" style="color:var(--good)">Token reduction: <strong>95%</strong></div>
+            <div class="demo-line demo-out">Est. monthly savings: <strong>$847</strong></div>
+            <div class="demo-line demo-spacer">&nbsp;</div>
+            <div class="demo-line"><span class="demo-prompt">$</span> loom start</div>
+            <div class="demo-line demo-out">MCP server ready on stdio</div>
+            <div class="demo-line demo-out">Dashboard: <a href="#" style="color:var(--brand)">http://localhost:2337</a></div>
+            <div class="demo-line demo-spacer">&nbsp;</div>
+            <div class="demo-line"><span class="demo-prompt">$</span> loom_search_symbols("login")</div>
+            <div class="demo-line demo-out">1. loginUser (function) src/auth.ts:12</div>
+            <div class="demo-line demo-out">2. loginAttempt (class) src/auth.ts:45</div>
+            <div class="demo-line demo-out">3. LoginService (class) src/services/auth.ts:8</div>
+            <div class="demo-line demo-spacer">&nbsp;</div>
+            <div class="demo-line"><span class="demo-prompt">$</span> loom_focus("src/auth.ts::loginUser")</div>
+            <div class="demo-line demo-out" style="color:var(--good)">focused:src/auth.ts::loginUser</div>
+            <div class="demo-line demo-out">lines:23 | token_estimate:187</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <div class="logos fade-up fade-delay-2">
       <p>Works with every AI coding tool</p>
       <div class="logo-grid">
@@ -930,8 +1024,8 @@
         </article>
         <article class="feature-card">
           <div class="feature-icon">[]</div>
-          <h3>14 MCP Tools</h3>
-          <p>Search symbols, blast radius, refs, memory recall, diff compress, and more.</p>
+          <h3>17 MCP Tools</h3>
+          <p>Search symbols, blast radius, refs, memory recall, diff compress, deps graph, and more.</p>
         </article>
         <article class="feature-card">
           <div class="feature-icon">^ </div>

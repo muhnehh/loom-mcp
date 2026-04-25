@@ -375,14 +375,22 @@ function createLoomServer() {
                 const files = globFiles(dir, languages, ['node_modules', '.git', 'dist', 'build', 'target']);
                 const skeletons = [];
                 buildSymbolIndex(files);
-                for (const file of files.slice(0, 500)) {
-                    const { skeleton, cacheHit } = cache.getOrCompute(file, () => {
-                        const skel = (0, ast_js_1.skeletonizeFile)(file);
-                        return (0, toon_js_1.toTOON)([skel]);
+                const toProcess = files.slice(0, 500);
+                const batchSize = 20;
+                for (let i = 0; i < toProcess.length; i += batchSize) {
+                    const batch = toProcess.slice(i, i + batchSize);
+                    const results = batch.map(file => {
+                        try {
+                            return (0, ast_js_1.skeletonizeFile)(file);
+                        }
+                        catch {
+                            return null;
+                        }
                     });
-                    const skel = (0, ast_js_1.skeletonizeFile)(file);
-                    if (skel.nodes.length > 0) {
-                        skeletons.push(skel);
+                    for (const skel of results) {
+                        if (skel?.nodes?.length > 0) {
+                            skeletons.push(skel);
+                        }
                     }
                 }
                 const toon = (0, toon_js_1.toTOON)(skeletons);

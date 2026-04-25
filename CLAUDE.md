@@ -9,22 +9,25 @@ mission:cut_claude_api_token_usage_by_95_percent
 cd loommcp
 npm install --legacy-peer-deps
 npm run build
-node dist/index.js
+npm start
 ```
 
 ## Project Structure
 
 src/
   index.ts           - entry point (stdio MCP server + dashboard on :2337)
-  tools.ts           - MCP tool handlers (14 tools!)
+  tools.ts           - MCP tool handlers (17 tools)
   ast.ts             - tree-sitter skeletonization + fallback
   toon.ts           - TOON format compiler
   cache.ts          - state persistence (.loom/)
   security.ts       - path traversal + circuit breakers
   watcher.ts        - file system watchers
-  cli.ts            - CLI with init/start/replay commands
+  cli.ts            - CLI with init/start/replay/pack commands
   dashboard/
-    server.ts      - Express + SSE dashboard with /badge and /replay
+    server.ts      - Express + SSE dashboard (/health, /badge, /replay, /api/summary)
+  adapters/
+    graph.ts       - dependency graph builder (text/DOT/JSON)
+    metrics.ts     - session metrics collector
   replay/
     recorder.ts   - Session JSONL recorder
     replay-ui.ts  - Animated session replay HTML player
@@ -32,24 +35,32 @@ src/
     generator.ts - HTML report card generator
 
 __tests__/
-  mcp-tools.test.mjs - 11 tests passing
+  mcp-tools.test.mjs - 32 tests passing (covers all 17 tools)
+
+packs/             - 7 LoomPacks (React, Node, Django, Rust, Go, Java, C#)
+prompts/           - 3 system prompts (agent, reviewer, debugger)
+.github/workflows/ - CI/CD with auto-npm-publish
 
 ## CLI Commands
 
-loom init          - analyze repo, show ROI projection
-loom init --json   - machine-readable output
-loom start       - start MCP server (default)
-loom replay     - replay recorded session
+loom init           - analyze repo, show ROI projection
+loom init --json    - machine-readable output
+loom start          - start MCP server (default)
+loom replay        - replay recorded session
+loom pack list      - show available LoomPacks
+loom pack install <name> - install a LoomPacks config
+loom config show   - show current configuration
+loom config init    - create default loom.config.json
 
-## Benchmark Results (95% - matches jCodeMunch!)
+## Benchmark Results (95%)
 
 | Repo           | Files | Raw    | TOON   | Reduction | Latency |
 |----------------|------:|------:|-------:|:---------:|:-------:|
-| loommcp (self)  |    39 | 55,813 | 2,729  | **95%**  | 800ms   |
+| loommcp (self)  |    39 | 55,813 | 2,729  | **95%**  | ~800ms |
 
 Run: node eval/benchmark.js . --json
 
-## MCP Tools (14 Total)
+## MCP Tools (17 Total)
 
 | Tool | Description |
 |:-----|:-----------|
@@ -67,13 +78,22 @@ Run: node eval/benchmark.js . --json
 | loom_diff_compress | Compressed git diffs |
 | loom_get_active_diff | Session changes |
 | loom_blur | Remove focus |
+| loom_get_symbol_importance | Symbol centrality scoring |
+| loom_get_changed_symbols | Files changed vs last commit |
+| loom_get_untested_symbols | Heuristic test coverage |
+| loom_get_deps | Dependency graph (text/DOT/JSON) |
+| loom_get_metrics | Session metrics + tool breakdown |
+| loom_get_sessions | Historical session data |
 
 ## Unique Features
 
 1. **Cross-Session Memory** - remembers code insights across sessions
-2. **Task-Aware Compression** - adapts for debug/feature/explore
+2. **Task-Aware Compression** - adapts for debug/feature/explore/review
 3. **Session Replay** - JSONL playback
 4. **Live Dashboard** - localhost:2337 with SSE
+5. **LoomPacks** - framework-specific configs, one-command install
+6. **Dependency Graph** - text, DOT, JSON formats
+7. **Session Metrics** - per-tool breakdown with latency tracking
 
 ## Configuration
 
@@ -81,3 +101,14 @@ WORKSPACE_ROOT: process.cwd()
 .cache_dir: .loom/
 .focus_budget: 20 files max
 DASHBOARD_PORT: 2337 (env LOOM_DASHBOARD_PORT)
+
+## Dashboard Endpoints
+
+- GET /           - Dashboard HTML
+- GET /health     - Readiness probe (JSON)
+- GET /events     - SSE real-time updates
+- GET /badge.svg  - Token reduction badge
+- GET /replay     - Session replay UI
+- GET /state      - Current session state
+- GET /api/summary - JSON stats summary
+- POST /emit      - Emit custom events
