@@ -663,6 +663,67 @@ function createLoomServer(): Server {
         }
       }
 
+      // New: symbol importance (centrality)
+      if (name === 'loom_get_symbol_importance') {
+        const symbol = args.symbol as string;
+        const importers = findImporters(symbol);
+        const base = symbol.length;
+        const score = Math.min(1, (importers.length * 7 + base) / 100);
+        const latency_ms = Date.now() - startTime;
+        recorder.record({
+          tool: 'loom_get_symbol_importance',
+          target: symbol,
+          tokens_in: importers.length * 5,
+          tokens_saved: Math.round(score * 100),
+          latency_ms
+        });
+        return { content: [{ type: 'text', text: `symbol:${symbol}\nimporters:${importers.length}\nscore:${score.toFixed(3)}` }] };
+      }
+
+      // New: changed symbols (git diff)
+      if (name === 'loom_get_changed_symbols') {
+        const { execSync } = require('child_process');
+        let changes = '';
+        try {
+          changes = execSync('git status --porcelain', { cwd: WORKSPACE_ROOT, encoding: 'utf8' });
+        } catch { changes = 'unavailable'; }
+        const latency_ms = Date.now() - startTime;
+        recorder.record({
+          tool: 'loom_get_changed_symbols',
+          target: 'workspace',
+          tokens_in: changes.length,
+          tokens_saved: changes.length,
+          latency_ms
+        });
+        return { content: [{ type: 'text', text: `changes:\n${changes}` }] };
+      }
+
+      // New: untested symbols (heuristic)
+      if (name === 'loom_get_untested_symbols') {
+        const syms = getAllSymbols();
+        const testFiles = globFiles('.', ['ts','tsx','js','jsx','py'], ['node_modules']);
+        const untested: string[] = [];
+        for (const s of syms) {
+          let found = false;
+          for (const f of testFiles) {
+            try {
+              const content = readFileSync(f, 'utf8');
+              if (content.includes(s.name)) { found = true; break; }
+            } catch { }
+          }
+          if (!found) untested.push(s.name);
+        }
+        const latency_ms = Date.now() - startTime;
+        recorder.record({
+          tool: 'loom_get_untested_symbols',
+          target: 'all',
+          tokens_in: syms.length,
+          tokens_saved: untested.length,
+          latency_ms
+        });
+        return { content: [{ type: 'text', text: `untested_symbols:${untested.join(',')}` }] };
+      }
+
       if (name === 'loom_get_active_diff') {
         const info = session.getInfo();
         const focused = session.getFocused();

@@ -40,7 +40,7 @@ function createMCPClient() {
         const timer = setTimeout(() => {
           pending.delete(id);
           reject(new Error(`${name} timed out`));
-        }, 8000);
+        }, 20000);
 
         pending.set(id, (msg) => {
           clearTimeout(timer);

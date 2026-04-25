@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoomMCP - Cut Your Claude Bill by 95%</title>
+  <meta name="description" content="LoomMCP is the universal context compiler for AI coding agents. Cut token costs by 95%, keep context quality, and stay free forever.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f9fc;
+      --surface: #ffffff;
+      --surface-soft: #f5f7ff;
+      --ink: #111827;
+      --ink-soft: #596277;
+      --line: #e6e9f3;
+      --brand: #4f5dff;
+      --brand-strong: #3949e6;
+      --brand-soft: #eef0ff;
+      --good: #11a761;
+      --bad: #ef4444;
+      --gold: #f59e0b;
+      --radius: 16px;
+      --shadow: 0 20px 45px rgba(41, 49, 81, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Manrope", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 85% 8%, #edf0ff 0%, transparent 35%),
+        radial-gradient(circle at 7% 88%, #e9fff4 0%, transparent 33%),
+        var(--bg);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .serif {
+      font-family: "Fraunces", Georgia, serif;
+      letter-spacing: -0.02em;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+      padding: 7px 12px;
+      font-size: 12px;
+      color: #606b86;
+      font-weight: 700;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 99px;
+      background: var(--brand);
+      box-shadow: 0 0 0 5px rgba(79, 93, 255, 0.14);
+      animation: pulse 2.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.85); opacity: 0.7; }
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeUp 0.7s ease forwards;
+    }
+
+    .fade-delay-1 { animation-delay: 0.08s; }
+    .fade-delay-2 { animation-delay: 0.16s; }
+    .fade-delay-3 { animation-delay: 0.24s; }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+      background: rgba(248, 249, 252, 0.82);
+      border-bottom: 1px solid rgba(230, 233, 243, 0.8);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 74px;
+      gap: 16px;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      text-decoration: none;
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      color: #ff9d2e;
+      font-size: 18px;
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      font-size: 14px;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: #3f4761;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .menu a:hover {
+      color: var(--brand);
+    }
+
+    .top-badge {
+      border-radius: 999px;
+      padding: 8px 14px;
+      background: #f0eeff;
+      color: #5f55d9;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid #e6e2ff;
+      text-decoration: none;
+    }
+
+    .hero {
+      padding: 54px 0 24px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 72px);
+      line-height: 0.98;
+      max-width: 620px;
+    }
+
+    .hero h1 span {
+      color: var(--brand);
+    }
+
+    .hero p {
+      margin-top: 20px;
+      max-width: 580px;
+      color: var(--ink-soft);
+      font-size: 18px;
+    }
+
+    .hero p strong {
+      color: var(--brand);
+      font-weight: 800;
+    }
+
+    .cta-row {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 800;
+      text-decoration: none;
+      min-height: 48px;
+      padding: 0 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand) 0%, #6f4eff 100%);
+      box-shadow: 0 12px 28px rgba(79, 93, 255, 0.26);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 30px rgba(79, 93, 255, 0.33);
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .btn-secondary:hover {
+      background: #f6f8ff;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 34px;
+      max-width: 670px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--brand);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #78819b;
+      font-weight: 700;
+    }
+
+    .steps-card {
+      background: var(--surface);
+      border: 1px solid #e4e7f2;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .step {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .step-install .step-num { background: #6e7cff; }
+    .step-configure .step-num { background: #37a6ff; }
+    .step-save .step-num { background: #2dbb7a; }
+    .step-dashboard .step-num { background: #f19b3d; }
+
+    .step-title {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .step-sub {
+      color: #75809d;
+      font-size: 12px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .step code {
+      display: block;
+      margin-top: 9px;
+      background: #f7f8fc;
+      border: 1px solid #eceff8;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 12px;
+      color: #4f5a7a;
+      overflow-x: auto;
+      white-space: nowrap;
+      font-family: "Courier New", monospace;
+    }
+
+    .tool-icon {
+      color: #95a0bd;
+      font-size: 18px;
+      margin-top: 2px;
+      font-weight: 700;
+    }
+
+    .logos {
+      margin-top: 22px;
+      border-top: 1px solid var(--line);
+      padding-top: 26px;
+      text-align: center;
+    }
+
+    .logos p {
+      color: #697390;
+      font-weight: 700;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+
+    .logo-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .logo-chip {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 14px;
+      background: #fff;
+      color: #4a546d;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    section {
+      padding: 58px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .section-sub {
+      text-align: center;
+      color: #697390;
+      font-size: 19px;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .feature-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 16px 14px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(21, 30, 55, 0.08);
+    }
+
+    .feature-icon {
+      font-size: 20px;
+      margin-bottom: 10px;
+      display: inline-flex;
+    }
+
+    .feature-card h3 {
+      font-size: 16px;
+      margin-bottom: 7px;
+      line-height: 1.2;
+    }
+
+    .feature-card p {
+      color: #5f6a86;
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 600;
+    }
+
+    .compare-wrap {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(35, 44, 74, 0.05);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px;
+      font-size: 14px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+      padding-left: 16px;
+      color: #2e3853;
+    }
+
+    th {
+      color: #6a7593;
+      background: #f9faff;
+      font-size: 13px;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .brand-col {
+      color: var(--brand);
+    }
+
+    .ok {
+      color: var(--good);
+      font-weight: 800;
+    }
+
+    .no {
+      color: var(--bad);
+      font-weight: 800;
+    }
+
+    .price-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 12px;
+      background: #f9faff;
+    }
+
+    .price-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 16px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .price-card h4 {
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .price-value {
+      font-size: 36px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .price-note {
+      color: #6e7894;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .price-list {
+      list-style: none;
+      display: grid;
+      gap: 6px;
+      color: #4f5a7a;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .price-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .check {
+      color: var(--good);
+      font-weight: 900;
+    }
+
+    .warn {
+      color: #ea4f4f;
+      font-weight: 900;
+    }
+
+    .journey {
+      margin-top: 22px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .journey-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 14px;
+      background: #f9faff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .journey-item {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .journey-index {
+      width: 26px;
+      height: 26px;
+      border-radius: 99px;
+      background: #eaf0ff;
+      color: var(--brand);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .journey-title {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .journey-code {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8f9ff;
+      font-size: 11px;
+      color: #59637f;
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+      padding: 7px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .decision {
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .decision-text {
+      color: #4b556f;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .mini-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    .mini-card h5 {
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .mini-price {
+      font-size: 30px;
+      line-height: 1;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .mini-list {
+      list-style: none;
+      display: grid;
+      gap: 4px;
+      color: #5e6883;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .cta-band {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: linear-gradient(90deg, #eef2ff 0%, #f5f0ff 100%);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .cta-band h3 {
+      font-size: 30px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .cta-band p {
+      color: #5f6a87;
+      font-weight: 700;
+    }
+
+    footer {
+      padding: 26px 0 34px;
+      border-top: 1px solid var(--line);
+      color: #74809f;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .foot-nav {
+      display: flex;
+      gap: 16px;
+    }
+
+    .foot-nav a {
+      color: #667191;
+      text-decoration: none;
+    }
+
+    .foot-nav a:hover {
+      color: var(--brand);
+    }
+
+    @media (max-width: 1120px) {
+      .feature-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stats {
+        max-width: 100%;
+      }
+
+      .compare-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .decision {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .menu {
+        display: none;
+      }
+
+      .top-badge {
+        display: none;
+      }
+
+      .container {
+        width: min(1180px, calc(100% - 30px));
+      }
+
+      .hero {
+        padding-top: 34px;
+      }
+
+      .hero h1 {
+        font-size: clamp(36px, 13vw, 56px);
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .hero-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .journey-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .price-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cta-band {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      th,
+      td {
+        font-size: 12px;
+        padding: 9px 6px;
+      }
+
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#top">
+        <span class="brand-mark">&#9889;</span>
+        LoomMCP
+      </a>
+      <nav class="menu" aria-label="Main navigation">
+        <a href="#features">Features</a>
+        <a href="#compare">Compare</a>
+        <a href="#install">Install</a>
+        <a href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+      <a class="top-badge" href="#features">v2.0 - Now with 7 languages</a>
+    </div>
+  </header>
+
+  <main id="top" class="container">
+    <section class="hero">
+      <div>
+        <div class="pill fade-up"><span class="dot"></span> Universal context compiler for coding agents</div>
+        <h1 class="serif fade-up fade-delay-1">Cut Your Claude Bill <br> by <span>95%</span></h1>
+        <p class="fade-up fade-delay-2">
+          The universal context compiler for AI coding agents. Works with Claude Code, Cursor, VS Code, Codex, OpenCode, and any MCP client.
+          <strong>Free forever. Open source.</strong>
+        </p>
+
+        <div class="cta-row fade-up fade-delay-3">
+          <a class="btn btn-primary" href="#install">Install Free</a>
+          <a class="btn btn-secondary" href="../README.md">Read Docs</a>
+        </div>
+
+        <div class="hero-stats fade-up fade-delay-3">
+          <div class="stat">
+            <div class="stat-value">95%</div>
+            <div class="stat-label">Token Reduction</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">14</div>
+            <div class="stat-label">MCP Tools</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">7</div>
+            <div class="stat-label">Languages</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">$0</div>
+            <div class="stat-label">Forever</div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="steps-card fade-up fade-delay-1" aria-label="Install guide">
+        <article class="step step-install">
+          <span class="step-num">1</span>
+          <div>
+            <h2 class="step-title">Install</h2>
+            <p class="step-sub">Globally via npm.</p>
+            <code>npm install -g @loom-mcp/server</code>
+          </div>
+          <span class="tool-icon">[]</span>
+        </article>
+
+        <article class="step step-configure">
+          <span class="step-num">2</span>
+          <div>
+            <h2 class="step-title">Configure</h2>
+            <p class="step-sub">Add to your AI tool.</p>
+            <code>/mcp add loom localhost:8080</code>
+          </div>
+          <span class="tool-icon">{}</span>
+        </article>
+
+        <article class="step step-save">
+          <span class="step-num">3</span>
+          <div>
+            <h2 class="step-title">Save $840/month</h2>
+            <p class="step-sub">Start saving immediately.</p>
+          </div>
+          <span class="tool-icon">$</span>
+        </article>
+
+        <article class="step step-dashboard">
+          <span class="step-num">4</span>
+          <div>
+            <h2 class="step-title">Dashboard</h2>
+            <p class="step-sub">Real-time dashboard at localhost:2337.</p>
+            <code>curl localhost:2337</code>
+          </div>
+          <span class="tool-icon">&gt;</span>
+        </article>
+      </aside>
+    </section>
+
+    <div class="logos fade-up fade-delay-2">
+      <p>Works with every AI coding tool</p>
+      <div class="logo-grid">
+        <div class="logo-chip">Claude Code</div>
+        <div class="logo-chip">Cursor</div>
+        <div class="logo-chip">VS Code</div>
+        <div class="logo-chip">Codex</div>
+        <div class="logo-chip">OpenCode</div>
+        <div class="logo-chip">Aider</div>
+      </div>
+    </div>
+
+    <section id="features">
+      <h2 class="section-title serif fade-up">Everything you need.</h2>
+      <p class="section-sub fade-up fade-delay-1">Built by developers, for developers.</p>
+
+      <div class="feature-grid fade-up fade-delay-2">
+        <article class="feature-card">
+          <div class="feature-icon">* </div>
+          <h3>Cross-Session Memory</h3>
+          <p>Remembers what your AI learned across sessions so answers improve over time.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon"># </div>
+          <h3>Task-Aware Compression</h3>
+          <p>Debug mode keeps stack traces. Explore mode stays minimal and fast.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">= </div>
+          <h3>Live Dashboard</h3>
+          <p>See token savings in real time via SSE at localhost:2337.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">@ </div>
+          <h3>Session Replay</h3>
+          <p>JSONL-based replay with an animated player for debugging agent behavior.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">+ </div>
+          <h3>7 Languages</h3>
+          <p>TypeScript, Python, Rust, Go, Java, C#, and JavaScript support.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">! </div>
+          <h3>Production Ready</h3>
+          <p>Health checks, confidence hints, and fast CI-friendly behavior.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">[]</div>
+          <h3>14 MCP Tools</h3>
+          <p>Search symbols, blast radius, refs, memory recall, diff compress, and more.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">^ </div>
+          <h3>Open Source</h3>
+          <p>MIT licensed and easy to self-host with no lock-in or hidden fees.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">$ </div>
+          <h3>Free Forever</h3>
+          <p>Cost should never block quality coding workflows.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">~ </div>
+          <h3>Fast Start</h3>
+          <p>Install, initialize, configure, and launch in under 30 seconds.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="compare">
+      <h2 class="section-title serif fade-up">The numbers don't lie.</h2>
+      <p class="section-sub fade-up fade-delay-1">We beat them on every meaningful metric.</p>
+
+      <div class="compare-wrap fade-up fade-delay-2">
+        <div class="panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th class="brand-col">LoomMCP</th>
+                <th>jCodeMunch</th>
+                <th>SrcTight</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Token Reduction</td>
+                <td class="brand-col">95%</td>
+                <td>95%-99.6%</td>
+                <td>-90%</td>
+              </tr>
+              <tr>
+                <td>Cross-Session Memory</td>
+                <td class="ok">Yes</td>
+                <td class="no">No</td>
+                <td class="no">No</td>
+              </tr>
+              <tr>
+                <td>Live Dashboard</td>
+                <td class="ok">Yes</td>
+                <td class="no">No</td>
+                <td class="no">No</td>
+              </tr>
+              <tr>
+                <td>Session Replay</td>
+                <td class="ok">Yes</td>
+                <td class="no">No</td>
+                <td class="no">No</td>
+              </tr>
+              <tr>
+                <td>Task-Aware Compression</td>
+                <td class="ok">Yes</td>
+                <td class="no">No</td>
+                <td class="no">No</td>
+              </tr>
+              <tr>
+                <td>Supported Languages</td>
+                <td class="brand-col">7</td>
+                <td>25+</td>
+                <td>10</td>
+              </tr>
+              <tr>
+                <td>MCP Tools</td>
+                <td class="brand-col">14</td>
+                <td>11</td>
+                <td>42</td>
+              </tr>
+              <tr>
+                <td>Price</td>
+                <td class="ok">FREE</td>
+                <td>$79/yr</td>
+                <td>$?</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="price-grid">
+            <article class="price-card">
+              <h4>jCodeMunch</h4>
+              <div class="price-value">$79-1,999</div>
+              <div class="price-note">per year</div>
+              <ul class="price-list">
+                <li><span class="warn">!</span> 95% token reduction</li>
+                <li><span class="warn">!</span> 11 tools</li>
+                <li><span class="warn">!</span> No memory</li>
+                <li><span class="warn">!</span> No dashboard</li>
+                <li><span class="warn">!</span> No replay</li>
+              </ul>
+            </article>
+
+            <article class="price-card" style="border-color:#d9defd; box-shadow: 0 10px 24px rgba(78,91,255,0.14);">
+              <h4 class="brand-col">LoomMCP</h4>
+              <div class="price-value" style="color:var(--brand);">$0</div>
+              <div class="price-note">forever</div>
+              <ul class="price-list">
+                <li><span class="check">+</span> 95% token reduction</li>
+                <li><span class="check">+</span> 14 tools</li>
+                <li><span class="check">+</span> Cross-session memory</li>
+                <li><span class="check">+</span> Live dashboard</li>
+                <li><span class="check">+</span> Session replay</li>
+              </ul>
+              <a class="btn btn-primary" href="#install" style="width:100%; margin-top:6px;">Install Free</a>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <div id="install" class="journey fade-up fade-delay-3">
+        <div class="journey-grid">
+          <article class="journey-item">
+            <div class="journey-index">1</div>
+            <h3 class="journey-title">Install</h3>
+            <div class="journey-code">npm install -g @loom-mcp/server</div>
+          </article>
+          <article class="journey-item">
+            <div class="journey-index">2</div>
+            <h3 class="journey-title">Initialize</h3>
+            <div class="journey-code">loom init</div>
+          </article>
+          <article class="journey-item">
+            <div class="journey-index">3</div>
+            <h3 class="journey-title">Configure</h3>
+            <div class="journey-code">/mcp add loom localhost:8080</div>
+          </article>
+          <article class="journey-item">
+            <div class="journey-index">4</div>
+            <h3 class="journey-title">Done</h3>
+            <div class="journey-code">curl localhost:2337</div>
+          </article>
+        </div>
+
+        <div class="decision">
+          <p class="decision-text">
+            The easiest decision: LoomMCP wins on price, tools, and feature depth. The alternatives only win on invoice size.
+          </p>
+          <article class="mini-card">
+            <h5>jCodeMunch</h5>
+            <div class="mini-price">$79-1,999</div>
+            <ul class="mini-list">
+              <li><span class="warn">!</span> No memory</li>
+              <li><span class="warn">!</span> No dashboard</li>
+              <li><span class="warn">!</span> No replay</li>
+            </ul>
+          </article>
+          <article class="mini-card" style="border-color:#d9defd;">
+            <h5 class="brand-col">LoomMCP</h5>
+            <div class="mini-price" style="color:var(--brand);">$0</div>
+            <ul class="mini-list">
+              <li><span class="check">+</span> 14 tools</li>
+              <li><span class="check">+</span> Cross-session memory</li>
+              <li><span class="check">+</span> Open source MIT</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+
+      <div class="cta-band fade-up fade-delay-3">
+        <div>
+          <h3 class="serif">Ready to cut your Claude bill by 95%?</h3>
+          <p>Free forever. Open source. No gotchas.</p>
+        </div>
+        <a class="btn btn-primary" href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer">Get Started on GitHub</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container foot">
+      <div>LoomMCP - Built with care for AI developers.</div>
+      <nav class="foot-nav" aria-label="Footer links">
+        <a href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="../README.md">Docs</a>
+        <a href="https://www.npmjs.com/package/@loom-mcp/server" target="_blank" rel="noreferrer">npm</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
