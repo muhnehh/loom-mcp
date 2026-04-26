@@ -6,6 +6,22 @@
 
 **[🌐 Live Website](https://muhnehh.github.io/loom-mcp/)** · **[📦 npm](https://www.npmjs.com/package/@loom-mcp/server)** · **[⭐ GitHub](https://github.com/muhnehh/loom-mcp)**
 
+---
+
+## LoomMCP
+
+### Structured code retrieval for serious AI agents
+
+![License](https://img.shields.io/badge/license-MIT-green)
+![MCP](https://img.shields.io/badge/MCP-compatible-purple)
+![Local-first](https://img.shields.io/badge/local--first-yes-brightgreen)
+![Polyglot](https://img.shields.io/badge/parsing-tree--sitter-9cf)
+![npm version](https://img.shields.io/npm/v/@loom-mcp/server)
+![npm](https://img.shields.io/npm/dy/@loom-mcp/server)
+
+---
+
+
 <!-- mcp-name: @loom-mcp/server -->
 
 ---
@@ -72,21 +88,6 @@ loom_get_symbol({ symbol: "get_user", format: "auto" })
 Benchmark: **45.5%** bytes saved across representative tools, peaks at **55.4%** on graph and outline responses.
 
 Encoding savings stack on top of retrieval savings — every byte off the wire is a byte the agent doesn't pay to read.
-
----
-
-## LoomMCP
-
-### Structured code retrieval for serious AI agents
-
-![License](https://img.shields.io/badge/license-MIT-green)
-![MCP](https://img.shields.io/badge/MCP-compatible-purple)
-![Local-first](https://img.shields.io/badge/local--first-yes-brightgreen)
-![Polyglot](https://img.shields.io/badge/parsing-tree--sitter-9cf)
-![npm version](https://img.shields.io/npm/v/@loom-mcp/server)
-![npm](https://img.shields.io/npm/dy/@loom-mcp/server)
-
----
 
 ## Why LoomMCP is Better
 
