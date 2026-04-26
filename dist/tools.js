@@ -811,6 +811,165 @@ function createLoomServer() {
                         required: ['query']
                     }
                 },
+                // Index folder
+                {
+                    name: 'loom_index_folder',
+                    description: 'Index a local folder. Like jCodeMunch index_folder.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            path: { type: 'string', default: '.' },
+                            extra_ignore_patterns: { type: 'array', items: { type: 'string' } }
+                        },
+                        required: []
+                    }
+                },
+                // Get file tree
+                {
+                    name: 'loom_get_file_tree',
+                    description: 'Get file structure. Like jCodeMunch get_file_tree.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            path: { type: 'string', default: '.' },
+                            max_depth: { type: 'number', default: 10 }
+                        },
+                        required: []
+                    }
+                },
+                // Get file outline
+                {
+                    name: 'loom_get_file_outline',
+                    description: 'Get symbols in a file. Like jCodeMunch get_file_outline.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            file: { type: 'string', description: 'File path' }
+                        },
+                        required: ['file']
+                    }
+                },
+                // Get file content (cached)
+                {
+                    name: 'loom_get_file_content',
+                    description: 'Get cached file content. Like jCodeMunch get_file_content.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            file: { type: 'string', description: 'File path' },
+                            offset: { type: 'number', default: 0 },
+                            length: { type: 'number', default: 5000 }
+                        },
+                        required: ['file']
+                    }
+                },
+                // Full-text search
+                {
+                    name: 'loom_search_text',
+                    description: 'Full-text search across files. Like jCodeMunch search_text.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            query: { type: 'string', description: 'Search query' },
+                            max_results: { type: 'number', default: 20 }
+                        },
+                        required: ['query']
+                    }
+                },
+                // List repos
+                {
+                    name: 'loom_list_repos',
+                    description: 'List indexed repositories.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {},
+                        required: []
+                    }
+                },
+                // Suggest queries
+                {
+                    name: 'loom_suggest_queries',
+                    description: 'Suggest high-value initial queries.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            max_suggestions: { type: 'number', default: 5 }
+                        },
+                        required: []
+                    }
+                },
+                // Get changed symbols
+                {
+                    name: 'loom_get_changed_symbols',
+                    description: 'Map git diff to affected symbols.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            ref: { type: 'string', default: 'HEAD' }
+                        },
+                        required: []
+                    }
+                },
+                // Get hotspots
+                {
+                    name: 'loom_get_hotspots',
+                    description: 'Find risky code by complexity x churn.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            top_n: { type: 'number', default: 10 }
+                        },
+                        required: []
+                    }
+                },
+                // Dependency cycles
+                {
+                    name: 'loom_get_dependency_cycles',
+                    description: 'Detect circular imports.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {},
+                        required: []
+                    }
+                },
+                // Audit agent config
+                {
+                    name: 'loom_audit_agent_config',
+                    description: 'Audit CLAUDE.md, .cursorrules for token waste.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            config_path: { type: 'string' }
+                        },
+                        required: []
+                    }
+                },
+                // Get related symbols
+                {
+                    name: 'loom_get_related_symbols',
+                    description: 'Find related symbols by import graph.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            symbol: { type: 'string', description: 'file:symbol' }
+                        },
+                        required: ['symbol']
+                    }
+                },
+                // Refactoring planner
+                {
+                    name: 'loom_plan_refactoring',
+                    description: 'Plan rename, move, extract operations.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            operation: { type: 'string', enum: ['rename', 'move', 'extract'] },
+                            symbol: { type: 'string', description: 'Symbol to refactor' },
+                            new_name: { type: 'string', description: 'New name/location' }
+                        },
+                        required: ['operation', 'symbol']
+                    }
+                },
                 // Symbol provenance (git history)
                 {
                     name: 'loom_get_symbol_provenance',

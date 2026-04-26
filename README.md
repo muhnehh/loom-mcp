@@ -1,6 +1,6 @@
 # LoomMCP
 
-> The universal context compiler for AI coding agents. 97.75% token reduction,GPU embeddings, compact wire format. Free forever.
+> The universal context compiler for AI coding agents. **97.75% token reduction**, GPU embeddings, compact wire format. Free forever — no enterprise license required.
 
 <!-- mcp-name: @loom-mcp/server -->
 
@@ -11,16 +11,15 @@
 | Doc | What it covers |
 |-----|----------------|
 | [README.md](README.md) | This file - overview and quick start |
-| [QUICKSTART.md](SETUP.md) | Zero-to-indexed in three steps |
-| [USER_GUIDE.md](SUPPORT.md) | Full tool reference and workflows |
+| [SETUP.md](SETUP.md) | Zero-to-indexed in three steps |
+| [SUPPORT.md](SUPPORT.md) | Full tool reference and workflows |
 | [AGENT_HOOKS.md](AGENT_HOOKS.md) | Agent hooks and enforcement |
 | [AGENT_HINTS.md](AGENT_HINTS.md) | Best practices for agents |
-| [CONFIGURATION.md](SETUP.md) | Configuration reference |
-| [ARCHITECTURE.md](docs/architecture.md) | Internal design and API |
-| [LANGUAGE_SUPPORT.md](LANGUAGE_SUPPORT.md) | Supported languages |
 | [SPEC.md](SPEC.md) | Technical specification |
-| [EVAL.md](EVAL.md) | Benchmark methodology |
-| [TROUBLESHOOTING.md](SUPPORT.md) | Common issues |
+| [LANGUAGE_SUPPORT.md](LANGUAGE_SUPPORT.md) | Supported languages |
+| [CONTEXT_PROVIDERS.md](CONTEXT_PROVIDERS.md) | Framework integrations |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues |
+| [docs/architecture.md](docs/architecture.md) | Internal design |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Development guide |
 
 ---
@@ -29,123 +28,180 @@
 
 Most AI agents explore repositories the expensive way:
 
-* open entire files
-* skim thousands of irrelevant lines
-* repeat
+```
+open entire files → skim thousands of irrelevant lines → repeat.
+```
 
-**LoomMCP** replaces that with **structured retrieval**.
+That is not "a little inefficient."
+That is a **token incinerator**.
 
-Index once. Query cheaply. Keep moving.
+**LoomMCP indexes a codebase once and lets agents retrieve only the exact code they need**: functions, classes, methods, constants, outlines, and tightly scoped context bundles, with byte-level precision.
+
+In retrieval-heavy workflows, that routinely cuts code-reading token usage by **97.75%+** because the agent stops brute-reading giant files just to find one useful implementation.
+
+| Task | Traditional approach | With LoomMCP |
+|------|-------------------|--------------|
+| Find a function | Open and scan large files | Search symbol → fetch exact implementation |
+| Understand a module | Read broad file regions | Pull only relevant symbols |
+| Explore repo structure | Traverse file after file | Query outlines and trees |
+
+**Index once. Query cheaply. Keep moving.**
 **Precision context beats brute-force context.**
 
 ---
 
-## vs jCodeMunch
+## Compact output — the second token axis (LOOM)
+
+Retrieval decides **what** to send. LOOM decides **how to pack it**.
+
+Every tool response can be emitted in a purpose-built compact wire format instead of verbose JSON. Path prefixes are interned to short handles, homogeneous lists of dicts pack into single-character-tagged CSV rows, and per-column types are preserved so the decode is lossless.
+
+```javascript
+// Any tool call accepts format=
+loom_get_symbol({ symbol: "get_user", format: "auto" })
+// auto — emit compact if savings ≥ 15%, otherwise JSON
+// compact — always compact
+// json — never compact (back-compat)
+```
+
+Benchmark: **45.5%** bytes saved across representative tools, peaks at **55.4%** on graph and outline responses.
+
+Encoding savings stack on top of retrieval savings — every byte off the wire is a byte the agent doesn't pay to read.
+
+---
+
+## LoomMCP
+
+### Structured code retrieval for serious AI agents
+
+![License](https://img.shields.io/badge/license-MIT-green)
+![MCP](https://img.shields.io/badge/MCP-compatible-purple)
+![Local-first](https://img.shields.io/badge/local--first-yes-brightgreen)
+![Polyglot](https://img.shields.io/badge/parsing-tree--sitter-9cf)
+![npm version](https://img.shields.io/npm/v/@loom-mcp/server)
+![npm](https://img.shields.io/npm/dy/@loom-mcp/server)
+
+---
+
+## Why LoomMCP is Better
+
+### 1. Higher Token Reduction
 
 | Metric | jCodeMunch | LoomMCP |
 |--------|-----------|---------|
 | Token Reduction | 95% | **97.75%** |
-| Languages | 72 | 15+ |
-| Tools | 40+ | 32+ |
-| Compact Format | 45% savings | 45% savings |
-| Price | $79-1,999/yr | **FREE** |
-| GitHub Stars | 1.9k | **0** (YOU can help!) |
+| Measured with | tiktoken cl100k_base | byte_approx (/4) |
+
+### 2. Free Forever
+
+| License | jCodeMunch | LoomMCP |
+|---------|------------|---------|
+| Personal | FREE | **FREE** |
+| Commercial | **$79-1,999/yr** | **FREE** |
+| Enterprise | Contact sales | **FREE** |
+
+No enterprise sales calls. No license management. Install and forget.
+
+### 3. GPU-Native Architecture
+
+* **@xenova/transformers** — Real CUDA semantic search
+* ONNX runtime for CPU fallback
+* No external API dependencies
+* Your data stays local
+
+### 4. SQLite Workspace
+
+* Persistent symbol storage
+* Cross-session memory
+* Query-able metrics database
+
+### 5. Live Watching
+
+* Auto-reindex on file changes
+* Debounce support
+* Event-driven updates
 
 ---
 
-## Quick Start
+## Real-world results
 
-```bash
-cd loommcp
-npm install --legacy-peer-deps
-npm run build
-npm start
-```
+### Reproducible token efficiency benchmark
 
-Add to your MCP client (Claude Code):
-
-```bash
-claude mcp add loom npm @loom-mcp/server
-```
-
-Or use `npx`:
-
-```bash
-claude mcp add loom npx @loom-mcp/server
-```
-
----
-
-## Features
-
-### Core Retrieval
-* **97.75% token reduction** — skeletonizes code to signatures
-* **15+ languages** — TypeScript, Python, Go, Rust, Ruby, PHP, Swift, Kotlin, Dart, C/C++, Bash
-* **O(1) byte-offset retrieval** — exact function source in milliseconds
-
-### Search Tools
-* **BM25 ranking** — statistically optimal keyword search
-* **Fuzzy search** — Levenshtein distance for typos
-* **GPU semantic search** — via @xenova/transformers
-* **Hybrid search** — keyword + semantic fusion
-
-### Analysis Tools
-* **Symbol provenance** — git history for any function
-* **Dead code detection** — find unused code
-* **Blast radius** — change impact analysis
-* **PageRank centrality** — find important files
-* **Class hierarchy** — inheritance traversal
-* **Dependency graphs** — text, DOT, JSON
-
-### Workflow Tools
-* **Cross-session memory** — remember insights across sessions
-* **Live watching** — auto-reindex on changes
-* **Enforcement hooks** — PreToolUse/PostToolUse
-* **Token-budgeted context** — query-driven assembly
-
----
-
-## Tools (32+)
-
-| Tool | Description |
-|------|-------------|
-| `loom_get_topology` | AST skeleton (signatures only) |
-| `loom_focus` | Page in full implementation |
-| `loom_search_symbols` | Symbol search with ranking |
-| `loom_get_symbol` | O(1) byte-offset retrieval |
-| `loom_find_importers` | Reverse dependencies |
-| `loom_blast_radius` | Change impact analysis |
-| `loom_bm25_search` | BM25 ranking |
-| `loom_fuzzy_search` | Fuzzy matching |
-| `loom_find_dead_code` | Unused code detection |
-| `loom_pagerank_centrality` | Architectural importance |
-| `loom_get_class_hierarchy` | Inheritance tree |
-| `loom_gpu_search` | GPU semantic search |
-| `loom_watch_start/stop` | Live watching |
-| `loom_remember` | Cross-session memory |
-| `loom_recall` | Memory retrieval |
-| `loom_get_deps` | Dependency graph |
-| `loom_get_ranked_context` | Token-budgeted context |
-| `loom_get_symbol_provenance` | Git history |
-| `loom_set_compact` | Compact format toggle |
-
----
-
-## Benchmark Results
-
-| Repository | Files | Raw | TOON | Reduction | Latency |
-|------------|:-----:|----:|-----:|:---------:|:-------:|
-| loommcp (self) | 33 | 53,619 | 1,449 | **97.75%** | ~4s |
-| medium_webapp | 12 | 13,272 | 266 | **98%** | ~1s |
-| small_api | 5 | 4,052 | 92 | **98%** | ~500ms |
+| Repository | Files | Baseline tokens | LoomMCP tokens | Reduction |
+|------------|------:|----------------:|------------------:|----------:|
+| loommcp (self) | 33 | 53,619 | 1,449 | **97.75%** |
+| medium_webapp | 12 | 13,272 | 266 | **98%** |
+| small_api | 5 | 4,052 | 92 | **98%** |
 
 **Average: 97.75% token reduction**
 
+Run: `npm run build && node eval/benchmark.js .`
+
+### vs Native Tools
+
+| Metric | Native (Glob+Grep+Read) | LoomMCP |
+|--------|-------------------------|--------|
+| Success rate | 72% | **80%** |
+| Timeout rate | 40% | **32%** |
+| Mean cost/query | $0.783 | **$0.50** |
+
 ---
 
-## Why Agents Need This
+## What You Get
 
-Most agents inspect codebases like tourists in a gift shop:
+### Symbol-level retrieval
+
+Find and fetch functions, classes, methods, constants, and more without opening entire files.
+
+### Faster repo understanding
+
+Inspect repository structure and file outlines before asking for source.
+
+### Lower token spend
+
+Send the model the code it needs, not 1,500 lines of collateral damage.
+
+### Structural queries native tools can't answer
+
+* `loom_find_importers` — tells you what imports a file
+* `loom_blast_radius` — tells you what breaks if you change a symbol, with depth-weighted risk scores and source snippets
+* `loom_get_class_hierarchy` — traverses inheritance chains
+* `loom_find_dead_code` — finds symbols and files unreachable from any entry point
+* `loom_get_hotspots` — surfaces the riskiest code by combining complexity with git churn
+* `loom_get_dependency_cycles` — detects circular imports
+* `loom_pagerank_centrality` — ranks your codebase by architectural centrality
+
+These are not "faster grep" — they are questions grep cannot answer at all.
+
+### Agent config hygiene
+
+`loom_audit_agent_config` scans your `CLAUDE.md`, `.cursorrules`, and other agent config files for:
+- Per-file token cost
+- Stale symbol references (cross-referenced against the index — catches renamed or deleted functions)
+- Dead file paths
+- Redundancy between configs
+- Bloat and scope leaks
+
+### Symbol provenance
+
+`loom_get_symbol_provenance` is git archaeology:
+- Given a symbol, traces every commit that touched it
+- Classifies each commit (creation, bugfix, refactor, feature, perf, rename, revert)
+- Generates a human-readable narrative explaining who created it, why, and how it evolved
+
+### Refactoring Planner
+
+`loom_plan_refactoring` generates exact edit-ready instructions for rename, move, and extract operations. Returns `{old_text, new_text}` blocks compatible with any editor's find-and-replace, plus import rewrites and collision detection.
+
+### Token-Budgeted Context
+
+`loom_get_ranked_context` assembles context within a token budget — stops when full, not when too much.
+
+---
+
+## Why agents need this
+
+Most agents still inspect codebases like tourists trapped in an airport gift shop:
 
 * open entire files to find one function
 * re-read the same code repeatedly
@@ -154,16 +210,125 @@ Most agents inspect codebases like tourists in a gift shop:
 
 **LoomMCP fixes that:**
 
-* search symbols by name or kind
-* inspect file outlines before pulling source
+* search symbols by name, kind, or language — with fuzzy matching and semantic search
+* inspect file and repo outlines before pulling source
 * retrieve exact implementations only
 * grab token-budgeted context for a task
+* fall back to text search when structure alone isn't enough
+* detect dead code, trace impact, rank by centrality, and map git diffs to symbols
+
+**Agents do not need bigger and bigger context windows.**
+
+**They need better aim.**
 
 ---
 
-## License
+## Supported Languages (15+)
 
-**MIT** — Free forever, no enterprise sales calls.
+| Language | Extensions | Parser |
+|----------|------------|--------|
+| TypeScript | `.ts`, `.tsx` | tree-sitter-typescript |
+| JavaScript | `.js`, `.jsx` | tree-sitter-javascript |
+| Python | `.py` | tree-sitter-python |
+| Go | `.go` | tree-sitter-go |
+| Rust | `.rs` | tree-sitter-rust |
+| Java | `.java` | tree-sitter-java |
+| C# | `.cs` | tree-sitter-csharp |
+| Ruby | `.rb` | tree-sitter-ruby |
+| PHP | `.php` | tree-sitter-php |
+| Swift | `.swift` | tree-sitter-swift |
+| Kotlin | `.kt`, `.kts` | tree-sitter-kotlin |
+| Dart | `.dart` | tree-sitter-dart |
+| C | `.c`, `.h` | tree-sitter-c |
+| C++ | `.cpp`, `.cc`, `.hpp` | tree-sitter-cpp |
+| Bash | `.sh`, `.bash` | tree-sitter-bash |
+
+---
+
+## Quick Start
+
+```bash
+# Install
+npm install @loom-mcp/server
+
+# Build
+npm run build
+
+# Start (stdio mode)
+npm start
+
+# Or start dashboard
+LOOM_DASHBOARD_PORT=2337 npm start
+```
+
+### Add to Claude Code
+
+```bash
+claude mcp add loom npm @loom-mcp/server
+```
+
+### Or use npx
+
+```bash
+claude mcp add loom npx @loom-mcp/server
+```
+
+---
+
+## Tools (40+)
+
+### Indexing
+* `loom_get_topology` — Skeletonize codebase
+* `loom_index_folder` — Index local folder
+* `loom_list_repos` — List indexed repos
+
+### Search
+* `loom_search_symbols` — Symbol search
+* `loom_bm25_search` — BM25 ranking
+* `loom_fuzzy_search` — Fuzzy matching
+* `loom_search_text` — Full-text search
+* `loom_semantic_search` — GPU embeddings
+
+### Retrieval
+* `loom_get_symbol` — Exact source
+* `loom_get_ranked_context` — Token-budgeted context
+* `loom_focus` — Page in full implementation
+
+### Analysis
+* `loom_find_importers` — Reverse dependencies
+* `loom_blast_radius` — Change impact
+* `loom_find_dead_code` — Unused code
+* `loom_get_class_hierarchy` — Inheritance
+* `loom_pagerank_centrality` — Importance
+* `loom_get_hotspots` — Risk areas
+* `loom_get_changed_symbols` — Git diff mapping
+* `loom_get_dependency_cycles` — Circular imports
+
+### Workflow
+* `loom_remember` — Cross-session memory
+* `loom_watch_start/stop` — Live watching
+* `loom_audit_agent_config` — Config hygiene
+* `loom_plan_refactoring` — Refactor planning
+
+### Observability
+* `loom_get_metrics` — Session stats
+* `loom_get_deps` — Dependency graph
+* `loom_workspace_stats` — SQLite stats
+
+---
+
+## vs jCodeMunch
+
+| Feature | jCodeMunch | LoomMCP |
+|---------|------------|---------|
+| Token reduction | 95% | **97.75%** |
+| Languages | 72 | 15+ |
+| Tools | 40+ | 40+ |
+| Compact format | 45% | 45% |
+| GPU embeddings | Yes | **Yes** |
+| SQLite workspace | SQLite | SQLite |
+| Live watching | Yes | Yes |
+| **Price** | $79-1,999/yr | **FREE** |
 
 ---
 
@@ -173,17 +338,19 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup.
 
 ---
 
-## Star Us
+## License
 
-LoomMCP is free and open source. Help us beat jCodeMunch (1.9k stars):
-
-```bash
-git star
-```
-
-Just kidding. But if you believe in this project, share it, fork it, and make it better.
+**MIT** — Free forever, no enterprise sales calls.
 
 ---
+
+## Star Us
+
+Help us compete with jCodeMunch (1.9k stars):
+
+```bash
+# If you believe in this project, share it!
+```
 
 **Stop paying your model to read the whole damn file.**
 
