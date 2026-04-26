@@ -1,11 +1,11 @@
-name: Deploy Dashboard to GitHub Pages
+name: Deploy Website
 
 on:
   push:
     branches: [main]
     paths:
-      - 'dashboard/out/**'
-      - 'dashboard/public/**'
+      - 'website/**'
+      - 'loom-mcp-logo.png'
 
 jobs:
   deploy:
@@ -24,7 +24,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'dashboard/out'
+          path: 'website'
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
