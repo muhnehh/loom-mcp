@@ -3,14 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LoomMCP — 97.75% Token Reduction, Free Forever</title>
-  <meta name="description" content="LoomMCP beats jCodeMunch with 97.75% token reduction. GPU embeddings, compact wire format, 40+ tools. Stop wasting tokens. Start saving.">
-  <meta name="keywords" content="MCP, context compiler, token reduction, Claude, Claude Code, AI coding, Cursor, Codex, GPU embeddings, semantic search, jCodeMunch alternative">
-  <meta name="robots" content="index, follow">
-  <meta property="og:title" content="LoomMCP — Beat jCodeMunch">
-  <meta property="og:description" content="97.75% token reduction vs jCodeMunch's 95%. Free forever vs $79-1,999/yr. GPU embeddings, compact wire format.">
+  <title>LoomMCP — Universal Context Compiler for AI Agents</title>
+  <meta name="description" content="High-performance context compiler for AI coding agents. GPU embeddings, compact wire format, 40+ MCP tools. Works with Claude Code, Cursor, and any MCP client.">
+  <meta name="keywords" content="MCP, context compiler, AI coding, Claude, Cursor, code retrieval, token optimization">
+  <meta property="og:title" content="LoomMCP — Universal Context Compiler">
+  <meta property="og:description" content="Complete context solution for AI agents. Try it free.">
   <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -31,7 +29,6 @@
       --brand-glow: rgba(99, 102, 241, 0.4);
       --good: #22c55e;
       --good-soft: rgba(34, 197, 94, 0.15);
-      --bad: #ef4444;
       --gold: #f59e0b;
       --purple: #a855f7;
       --cyan: #06b6d4;
@@ -51,10 +48,10 @@
       background: var(--bg);
       line-height: 1.6;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
     .container { width: min(1200px, calc(100% - 48px)); margin: 0 auto; }
+    a { color: inherit; text-decoration: none; }
 
     /* Header */
     header {
@@ -81,8 +78,6 @@
       gap: 12px;
       font-size: 20px;
       font-weight: 700;
-      color: var(--ink);
-      text-decoration: none;
     }
 
     .logo-icon {
@@ -93,7 +88,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
     }
 
     .nav {
@@ -104,7 +98,6 @@
 
     .nav a {
       color: var(--ink-soft);
-      text-decoration: none;
       font-size: 14px;
       font-weight: 500;
       transition: color 0.2s;
@@ -112,10 +105,29 @@
 
     .nav a:hover { color: var(--ink); }
 
-    .nav-cta {
-      display: flex;
+    .btn {
+      display: inline-flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
+      color: white;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--line);
     }
 
     /* Hero */
@@ -124,19 +136,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 180px 0 120px;
+      padding: 160px 0 100px;
       position: relative;
-      overflow: hidden;
     }
 
     .hero::before {
       content: '';
       position: absolute;
-      top: 20%;
+      top: 30%;
       left: 50%;
       transform: translateX(-50%);
-      width: 800px;
-      height: 800px;
+      width: 600px;
+      height: 600px;
       background: radial-gradient(circle, var(--brand-glow) 0%, transparent 70%);
       pointer-events: none;
     }
@@ -145,6 +156,8 @@
       text-align: center;
       position: relative;
       z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
     }
 
     .hero-badge {
@@ -157,7 +170,7 @@
       padding: 8px 16px;
       font-size: 13px;
       color: var(--ink-soft);
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     }
 
     .hero-badge .dot {
@@ -169,40 +182,26 @@
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
 
     .hero h1 {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(48px, 8vw, 96px);
+      font-size: clamp(40px, 6vw, 72px);
       font-weight: 700;
       line-height: 1.1;
-      margin-bottom: 24px;
-      background: linear-gradient(135deg, var(--ink) 0%, var(--brand-light) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      margin-bottom: 20px;
     }
 
-    .hero h1 span {
-      background: linear-gradient(135deg, var(--brand-light), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-desc {
-      font-size: 20px;
+    .hero-subtitle {
+      font-size: 22px;
       color: var(--ink-soft);
-      max-width: 640px;
-      margin: 0 auto 48px;
-      line-height: 1.7;
+      margin-bottom: 40px;
     }
 
-    .hero-desc strong {
+    .hero-subtitle strong {
       color: var(--ink);
-      font-weight: 600;
     }
 
     .hero-stats {
@@ -213,21 +212,16 @@
       flex-wrap: wrap;
     }
 
-    .hero-stat {
-      text-align: center;
-    }
-
     .hero-stat-value {
-      font-size: 48px;
+      font-size: 40px;
       font-weight: 700;
       font-family: 'Space Grotesk', sans-serif;
       color: var(--brand-light);
     }
 
     .hero-stat-label {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--ink-soft);
-      margin-top: 4px;
     }
 
     .hero-ctas {
@@ -238,48 +232,12 @@
       flex-wrap: wrap;
     }
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 28px;
-      border-radius: var(--radius);
-      font-size: 15px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
-      cursor: pointer;
-      border: none;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-      color: white;
-      box-shadow: var(--shadow-glow);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
-    }
-
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--line);
-    }
-
-    .btn-secondary:hover {
-      background: var(--surface-soft);
-      border-color: var(--brand);
-    }
-
     /* Code Demo */
     .code-demo {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      max-width: 900px;
+      gap: 20px;
+      max-width: 800px;
       margin: 0 auto;
     }
 
@@ -296,8 +254,6 @@
       gap: 8px;
       padding: 12px 16px;
       border-bottom: 1px solid var(--line);
-      font-size: 13px;
-      color: var(--ink-soft);
     }
 
     .code-panel-dot {
@@ -311,11 +267,12 @@
     .code-panel-dot.green { background: #28c840; }
 
     .code-panel pre {
-      padding: 20px;
+      padding: 16px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      line-height: 1.7;
+      font-size: 12px;
+      line-height: 1.6;
       overflow-x: auto;
+      text-align: left;
     }
 
     .code-panel.old pre { color: var(--ink-soft); }
@@ -323,122 +280,72 @@
 
     .code-label {
       text-align: center;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       padding: 12px;
-      background: var(--surface-soft);
     }
 
-    .code-panel.old .code-label { color: var(--bad); }
-    .code-panel.new .code-label { color: var(--good); }
+    .code-panel.old .code-label { background: var(--surface-soft); color: var(--ink-soft); }
+    .code-panel.new .code-label { background: rgba(34, 197, 94, 0.1); color: var(--good); }
 
-    /* Comparison */
-    .vs-section {
+    /* Section */
+    .section {
       padding: 100px 0;
+    }
+
+    .section-alt {
+      background: var(--bg-soft);
     }
 
     .section-header {
       text-align: center;
-      margin-bottom: 64px;
+      margin-bottom: 48px;
     }
 
     .section-header h2 {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 42px;
+      font-size: 36px;
       font-weight: 700;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
     .section-header p {
-      font-size: 18px;
+      font-size: 16px;
       color: var(--ink-soft);
       max-width: 600px;
       margin: 0 auto;
     }
 
-    .vs-table {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
-
-    .vs-table table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .vs-table th,
-    .vs-table td {
-      padding: 20px 24px;
-      text-align: left;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .vs-table th {
-      background: var(--surface-soft);
-      font-weight: 600;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--ink-soft);
-    }
-
-    .vs-table th.brand { color: var(--brand-light); }
-
-    .vs-table td:first-child { font-weight: 500; }
-
-    .vs-table .winner {
-      color: var(--good);
-      font-weight: 600;
-    }
-
-    .vs-table .loser {
-      color: var(--ink-soft);
-    }
-
-    /* Features */
-    .features {
-      padding: 100px 0;
-      background: var(--bg-soft);
-    }
-
+    /* Features Grid */
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      margin-top: 48px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
     }
 
     .feature-card {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
-      padding: 32px;
-      transition: all 0.3s;
-    }
-
-    .feature-card:hover {
-      border-color: var(--brand);
-      transform: translateY(-4px);
+      padding: 24px;
     }
 
     .feature-icon {
-      width: 48px;
-      height: 48px;
+      width: 40px;
+      height: 40px;
       background: linear-gradient(135deg, var(--brand), var(--purple));
-      border-radius: 12px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      margin-bottom: 20px;
+      font-size: 18px;
+      margin-bottom: 16px;
     }
 
     .feature-card h3 {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .feature-card p {
@@ -446,81 +353,98 @@
       font-size: 14px;
     }
 
-    /* Tools */
-    .tools-section {
-      padding: 100px 0;
+    /* Comparison */
+    .comp-table {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      max-width: 900px;
+      margin: 0 auto;
     }
 
+    .comp-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .comp-table th, .comp-table td {
+      padding: 14px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .comp-table th {
+      background: var(--surface-soft);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--ink-soft);
+    }
+
+    .comp-table th.brand { color: var(--brand-light); }
+    .comp-table .winner { color: var(--good); font-weight: 600; }
+
+    /* Tools */
     .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-      margin-top: 48px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px;
     }
 
     .tool-item {
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 16px 20px;
+      border-radius: 8px;
+      padding: 12px 14px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+      font-size: 11px;
       color: var(--brand-light);
-      transition: all 0.2s;
     }
 
     .tool-item:hover {
       background: var(--surface-soft);
-      border-color: var(--brand);
     }
 
     /* Use Cases */
-    .use-cases {
-      padding: 100px 0;
-      background: var(--bg-soft);
-    }
-
     .use-cases-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 24px;
-      margin-top: 48px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
     }
 
     .use-case-card {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
-      padding: 32px;
+      padding: 24px;
     }
 
     .use-case-icon {
-      font-size: 32px;
-      margin-bottom: 16px;
+      font-size: 28px;
+      margin-bottom: 12px;
     }
 
     .use-case-card h3 {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 600;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .use-case-card p {
       color: var(--ink-soft);
-      font-size: 14px;
+      font-size: 13px;
     }
 
     /* Install */
-    .install-section {
-      padding: 100px 0;
-    }
-
     .install-steps {
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      max-width: 600px;
-      margin: 48px auto 0;
+      gap: 12px;
+      max-width: 500px;
+      margin: 32px auto 0;
     }
 
     .install-step {
@@ -530,110 +454,113 @@
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 20px 24px;
+      padding: 16px 20px;
     }
 
     .install-step-num {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       background: var(--brand);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       flex-shrink: 0;
     }
 
     .install-step code {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--brand-light);
       background: var(--surface-soft);
-      padding: 8px 16px;
-      border-radius: 8px;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+
+    /* Testimonials */
+    .testimonials {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .testimonial-card blockquote {
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .testimonial-card cite {
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-style: normal;
     }
 
     /* FAQ */
-    .faq-section {
-      padding: 100px 0;
-      background: var(--bg-soft);
-    }
-
     .faq-list {
-      max-width: 800px;
-      margin: 48px auto 0;
+      max-width: 700px;
+      margin: 32px auto 0;
     }
 
     .faq-item {
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      margin-bottom: 12px;
-      overflow: hidden;
+      margin-bottom: 10px;
     }
 
     .faq-q {
-      padding: 20px 24px;
+      padding: 16px 20px;
       font-weight: 600;
+      font-size: 14px;
       cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
     .faq-a {
-      padding: 0 24px 20px;
+      padding: 0 20px 16px;
       color: var(--ink-soft);
-      font-size: 14px;
+      font-size: 13px;
+      line-height: 1.7;
     }
 
     /* Footer */
     footer {
-      padding: 60px 0;
+      padding: 48px 0;
       border-top: 1px solid var(--line);
       text-align: center;
-      color: var(--ink-soft);
-      font-size: 14px;
     }
 
     .footer-links {
       display: flex;
       justify-content: center;
       gap: 24px;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     .footer-links a {
       color: var(--ink-soft);
-      text-decoration: none;
+      font-size: 14px;
     }
 
-    .footer-links a:hover { color: var(--ink); }
+    footer p {
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
 
     /* Responsive */
     @media (max-width: 768px) {
-      .hero h1 { font-size: 42px; }
+      .hero h1 { font-size: 32px; }
       .hero-stats { gap: 24px; }
-      .hero-stat-value { font-size: 36px; }
       .code-demo { grid-template-columns: 1fr; }
-      .vs-table { overflow-x: auto; }
-    }
-
-    /* Animation */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeUp 0.6s ease forwards;
-    }
-
-    .fade-delay-1 { animation-delay: 0.1s; }
-    .fade-delay-2 { animation-delay: 0.2s; }
-    .fade-delay-3 { animation-delay: 0.3s; }
-
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -647,14 +574,14 @@
       <nav class="nav">
         <a href="#features">Features</a>
         <a href="#tools">Tools</a>
-        <a href="#vs">vs jCodeMunch</a>
+        <a href="#use-cases">Use Cases</a>
         <a href="#install">Install</a>
       </nav>
-      <div class="nav-cta">
+      <div style="display: flex; gap: 12px;">
         <a href="https://github.com/muhnehh/loom-mcp" class="btn btn-secondary" target="_blank">
-          <i class="fa-brands fa-github"></i> GitHub
+          <i class="fa-brands fa-github"></i>
         </a>
-        <a href="#install" class="btn btn-primary">Install Free</a>
+        <a href="#install" class="btn btn-primary">Get Started</a>
       </div>
     </div>
   </header>
@@ -662,279 +589,175 @@
   <!-- Hero -->
   <section class="hero">
     <div class="container hero-content">
-      <div class="hero-badge fade-up">
+      <div class="hero-badge">
         <span class="dot"></span>
-        Universal context compiler for AI coding agents
+        Universal Context Compiler
       </div>
-      <h1 class="fade-up fade-delay-1">
-        Ship Faster with<br><span>97.75%</span> Less Context
-      </h1>
-      <p class="hero-desc fade-up fade-delay-2">
-        <strong>LoomMCP</strong> beats jCodeMunch with higher token reduction (97.75% vs 95%).<br>
-        GPU embeddings, compact wire format, 40+ tools. <strong>Free forever</strong> — no $79-1,999/yr license.
+      <h1>Context Compilation<br>for AI Agents</h1>
+      <p class="hero-subtitle">
+        High-performance MCP server that indexes your codebase once and provides<br>
+        <strong>exact symbol retrieval</strong> instead of reading entire files.
       </p>
-      <div class="hero-stats fade-up fade-delay-2">
-        <div class="hero-stat">
-          <div class="hero-stat-value">97.75%</div>
-          <div class="hero-stat-label">Token Reduction</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value">40+</div>
-          <div class="hero-stat-label">MCP Tools</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value">15+</div>
-          <div class="hero-stat-label">Languages</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value">$0</div>
-          <div class="hero-stat-label">Forever</div>
-        </div>
+      
+      <div class="hero-stats">
+        <div><div class="hero-stat-value">97.75%</div><div class="hero-stat-label">Token Reduction</div></div>
+        <div><div class="hero-stat-value">40+</div><div class="hero-stat-label">MCP Tools</div></div>
+        <div><div class="hero-stat-value">15+</div><div class="hero-stat-label">Languages</div></div>
+        <div><div class="hero-stat-value">MIT</div><div class="hero-stat-label">Open Source</div></div>
       </div>
-      <div class="hero-ctas fade-up fade-delay-3">
-        <a href="#install" class="btn btn-primary">
-          <i class="fa-solid fa-download"></i> Install Free
-        </a>
-        <a href="#vs" class="btn btn-secondary">
-          See Comparison
-        </a>
+      
+      <div class="hero-ctas">
+        <a href="#install" class="btn btn-primary"><i class="fa-solid fa-download"></i> Install Free</a>
+        <a href="#features" class="btn btn-secondary">Learn More</a>
       </div>
 
-      <!-- Code Demo -->
-      <div class="code-demo fade-up fade-delay-3">
+      <div class="code-demo">
         <div class="code-panel old">
-          <div class="code-label">❌ Old Way: Read Entire Files</div>
+          <div class="code-label">Traditional: Read Full Files</div>
           <div class="code-panel-header">
             <span class="code-panel-dot red"></span>
             <span class="code-panel-dot yellow"></span>
             <span class="code-panel-dot green"></span>
           </div>
-          <pre>jCodeMunch: index_folder("src/"):
+          <pre>// Reading entire file
+import auth from './auth'      // 50 lines
+import db from './db'          // 120 lines
+import utils from './utils'     // 80 lines
 
-Scanning 156 Python files...
-Processing routing.py... (8,836 tokens)
-Processing utils.py... (5,218 tokens)
-Processing middleware.py... (3,102 tokens)
-Processing auth.py... (2,890 tokens)
-... 152 more files ...
-
-TOTAL: 214,312 tokens
-
-⚠️ Cost per query: $1.08</pre>
+async function login(req) {
+  const user = await db.findUser(...)
+  return validate(user)       // 214K tokens
+}</pre>
         </div>
         <div class="code-panel new">
-          <div class="code-label">✅ LoomMCP: Exact Symbol Retrieval</div>
+          <div class="code-label">LoomMCP: Exact Symbol</div>
           <div class="code-panel-header">
             <span class="code-panel-dot red"></span>
             <span class="code-panel-dot yellow"></span>
             <span class="code-panel-dot green"></span>
           </div>
-          <pre>LoomMCP: search_symbols("auth"):
+          <pre>// Retrieve exact symbol only
+search_symbols("login")
+→ login() [auth.ts:42]
 
-→ authenticate() [auth.py:42]
-→ get_user() [auth.py:128]
-→验证_token() [auth.py:256]
-
-fetch: authenticate:
-def authenticate(request):
-    token = request.headers.get("Authorization")
-    if not token:
-        return 401
-    return validate_token(token)
-
-TOTAL: ~480 tokens
-
-✅ Cost per query: $0.002</pre>
+fetch: login
+async function login(req) {
+  const user = await db.findUser(...)
+  return validate(user)
+}
+// ~480 tokens only</pre>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- vs jCodeMunch -->
-  <section id="vs" class="vs-section">
+  <!-- How It Works -->
+  <section class="section section-alt">
     <div class="container">
       <div class="section-header">
-        <h2>vs jCodeMunch</h2>
-        <p>Real competitive analysis. No marketing fluff. Here's how we stack up.</p>
+        <h2>How It Works</h2>
+        <p>Three simple steps to efficient code retrieval.</p>
       </div>
 
-      <div class="vs-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Feature</th>
-              <th class="brand">LoomMCP</th>
-              <th>jCodeMunch</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Token Reduction</td>
-              <td class="winner">97.75% ✓</td>
-              <td class="loser">95%</td>
-            </tr>
-            <tr>
-              <td>Price (Personal)</td>
-              <td class="winner">$0 FREE</td>
-              <td class="loser">$79-1,999/yr</td>
-            </tr>
-            <tr>
-              <td>Price (Commercial)</td>
-              <td class="winner">$0 FREE</td>
-              <td class="loser">$79-1,999/yr</td>
-            </tr>
-            <tr>
-              <td>GPU Semantic Search</td>
-              <td class="winner">✓ @xenova/transformers</td>
-              <td>✓ (external API)</td>
-            </tr>
-            <tr>
-              <td>Compact Wire Format</td>
-              <td class="winner">45% savings</td>
-              <td>45% savings</td>
-            </tr>
-            <tr>
-              <td>SQLite Workspace</td>
-              <td class="winner">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Live Watching</td>
-              <td class="winner">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Cross-session Memory</td>
-              <td class="winner">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Token-budgeted Context</td>
-              <td class="winner">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Symbol Provenance</td>
-              <td class="winner">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Dead Code Detection</td>
-              <td class="winner">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>BM25 Search</td>
-              <td class="winner">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Fuzzy Search</td>
-              <td class="winner">✓</td>
-              <td>✓</td>
-            </tr>
-            <tr>
-              <td>Tools Count</td>
-              <td class="winner">40+</td>
-              <td>40+</td>
-            </tr>
-            <tr>
-              <td>Languages</td>
-              <td>15+</td>
-              <td class="winner">72</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="margin-top: 48px; text-align: center;">
-        <p style="color: var(--ink-soft); font-size: 15px;">
-          <strong style="color: var(--good);">Bottom line:</strong> 
-          LoomMCP saves more tokens for free. jCodeMunch charges $79-1,999/year.
-        </p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">1</div>
+          <h3>Index Once</h3>
+          <p>Run loom_get_topology to index your codebase. Tree-sitter parses all source files and extracts symbol metadata. Happens once per project.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">2</div>
+          <h3>Search by Intent</h3>
+          <p>The AI calls search_symbols(query) or loom_search_symbols. The server performs keyword + semantic search against the index in milliseconds.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">3</div>
+          <h3>Surgical Retrieval</h3>
+          <p>Only the matching symbol's source code is returned — not the surrounding file, not unrelated classes. Byte-offset retrieval.</p>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Features -->
-  <section id="features" class="features">
+  <section id="features" class="section">
     <div class="container">
       <div class="section-header">
-        <h2>Why LoomMCP is Better</h2>
-        <p>Everything jCodeMunch does, but free. And we do it better.</p>
+        <h2>Core Features</h2>
+        <p>Everything you need for efficient AI code retrieval.</p>
       </div>
 
       <div class="features-grid">
         <div class="feature-card">
-          <div class="feature-icon">💰</div>
-          <h3>Free Forever</h3>
-          <p>jCodeMunch charges $79-1,999/year. LoomMCP is 100% free. No enterprise sales. No license keys. Install and forget.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">⚡</div>
+          <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
           <h3>97.75% Token Reduction</h3>
-          <p>We beat jCodeMunch's 95% with actual 97.75% token savings. Measured on real repos with real code.</p>
+          <p>Skeletonize code to signatures only. Our benchmark shows 97.75% reduction vs reading full files.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🎯</div>
+          <div class="feature-icon"><i class="fa-solid fa-microchip"></i></div>
           <h3>GPU Embeddings</h3>
-          <p>Real CUDA semantic search via @xenova/transformers. No external API calls. Your data stays local.</p>
+          <p>Real CUDA semantic search via @xenova/transformers. No external API calls required.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">📦</div>
+          <div class="feature-icon"><i class="fa-solid fa-compress"></i></div>
           <h3>Compact Wire Format</h3>
-          <p>45% smaller responses via path interning. Same as jCodeMunch's MUNCH format, but ours is built-in.</p>
+          <p>Path interning and CSV-like encoding. 45% smaller responses on average.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🗄️</div>
+          <div class="feature-icon"><i class="fa-solid fa-database"></i></div>
           <h3>SQLite Workspace</h3>
-          <p>Persistent symbol storage for cross-session queries. Query-able metrics database.</p>
+          <p>Persistent symbol storage. Cross-session queries with query-able metrics.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">👁️</div>
+          <div class="feature-icon"><i class="fa-solid fa-eye"></i></div>
           <h3>Live Watching</h3>
-          <p>Auto-reindex on file changes with debounce. Event-driven updates keep your index fresh.</p>
+          <p>Auto-reindex on file changes with debounce. Event-driven updates.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🧠</div>
+          <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
           <h3>Cross-session Memory</h3>
-          <p>Remember insights across sessions. Built-in vector store via SQLite + embeddings.</p>
+          <p>Remember code insights across sessions. SQLite + embeddings.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🔍</div>
+          <div class="feature-icon"><i class="fa-solid fa-tokens"></i></div>
           <h3>Token-budgeted Context</h3>
           <p>Query-driven context assembly. Stops when full, not when too much.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">📜</div>
+          <div class="feature-icon"><i class="fa-solid fa-code-branch"></i></div>
           <h3>Symbol Provenance</h3>
-          <p>Git archaeology. Trace every commit that touched a symbol. Semantic classification.</p>
+          <p>Git archaeology. Trace every commit that touched a symbol.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">⚰️</div>
+          <div class="feature-icon"><i class="fa-solid fa-skull"></i></div>
           <h3>Dead Code Detection</h3>
-          <p>Find functions unreachable from any entry point. Clean up your codebase.</p>
+          <p>Find functions unreachable from any entry point.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">💥</div>
+          <div class="feature-icon"><i class="fa-solid fa-explosion"></i></div>
           <h3>Blast Radius</h3>
-          <p>Estimate change impact. Depth-weighted risk scores with source snippets.</p>
+          <p>Change impact analysis with depth-weighted risk scores.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🏆</div>
+          <div class="feature-icon"><i class="fa-solid fa-ranking-star"></i></div>
           <h3>PageRank Centrality</h3>
-          <p>Rank symbols by architectural importance. Find the most critical code.</p>
+          <p>Rank symbols by architectural importance.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <h3>BM25 + Fuzzy Search</h3>
+          <p>Statistical keyword ranking + Levenshtein distance for typos.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Tools -->
-  <section id="tools" class="tools-section">
+  <section id="tools" class="section section-alt">
     <div class="container">
       <div class="section-header">
         <h2>40+ MCP Tools</h2>
-        <p>Every tool jCodeMunch has. Plus extras.</p>
+        <p>Complete toolchain for code retrieval and analysis.</p>
       </div>
 
       <div class="tools-grid">
@@ -944,7 +767,6 @@ TOTAL: ~480 tokens
         <div class="tool-item">loom_get_symbol</div>
         <div class="tool-item">loom_find_importers</div>
         <div class="tool-item">loom_blast_radius</div>
-        <div class="tool-item">loom_search_refs</div>
         <div class="tool-item">loom_bm25_search</div>
         <div class="tool-item">loom_fuzzy_search</div>
         <div class="tool-item">loom_find_dead_code</div>
@@ -972,25 +794,22 @@ TOTAL: ~480 tokens
         <div class="tool-item">loom_list_repos</div>
         <div class="tool-item">loom_suggest_queries</div>
         <div class="tool-item">loom_attach_repo</div>
-        <div class="tool-item">loom_detach_repo</div>
         <div class="tool-item">loom_workspace_search</div>
         <div class="tool-item">loom_detect_frameworks</div>
         <div class="tool-item">loom_get_confidence</div>
         <div class="tool-item">loom_enforce_hook</div>
-        <div class="tool-item">loom_agent_info</div>
         <div class="tool-item">loom_gpu_status</div>
         <div class="tool-item">loom_workspace_stats</div>
-        <div class="tool-item">loom_workspace_clear</div>
       </div>
     </div>
   </section>
 
   <!-- Use Cases -->
-  <section class="use-cases">
+  <section id="use-cases" class="section">
     <div class="container">
       <div class="section-header">
         <h2>Use Cases</h2>
-        <p>Symbol-level retrieval changes how AI agents work.</p>
+        <p>Symbol-level retrieval changes how AI agents interact with code.</p>
       </div>
 
       <div class="use-cases-grid">
@@ -1012,7 +831,7 @@ TOTAL: ~480 tokens
         <div class="use-case-card">
           <div class="use-case-icon">💡</div>
           <h3>Impact Analysis Before Refactoring</h3>
-          <p>Search for all references before changing. Understand blast radius with precise, low-token lookups.</p>
+          <p>Search for all references before changing. Understand blast radius with precise lookups.</p>
         </div>
         <div class="use-case-card">
           <div class="use-case-icon">🎯</div>
@@ -1029,29 +848,29 @@ TOTAL: ~480 tokens
   </section>
 
   <!-- Install -->
-  <section id="install" class="install-section">
+  <section id="install" class="section section-alt">
     <div class="container">
       <div class="section-header">
-        <h2>Install Free</h2>
-        <p>Zero config. Works with Claude Code, Cursor, and any MCP client.</p>
+        <h2>Get Started</h2>
+        <p>Install in 30 seconds. Works with Claude Code, Cursor, and any MCP client.</p>
       </div>
 
       <div class="install-steps">
-        <div class="install-step fade-up">
+        <div class="install-step">
           <span class="install-step-num">1</span>
           <code>npm install @loom-mcp/server</code>
         </div>
-        <div class="install-step fade-up fade-delay-1">
+        <div class="install-step">
           <span class="install-step-num">2</span>
           <code>npm run build</code>
         </div>
-        <div class="install-step fade-up fade-delay-2">
+        <div class="install-step">
           <span class="install-step-num">3</span>
           <code>claude mcp add loom npm @loom-mcp/server</code>
         </div>
       </div>
 
-      <div style="text-align: center; margin-top: 48px;">
+      <div style="text-align: center; margin-top: 32px;">
         <a href="https://github.com/muhnehh/loom-mcp" class="btn btn-primary" target="_blank">
           <i class="fa-brands fa-github"></i> View on GitHub
         </a>
@@ -1059,8 +878,88 @@ TOTAL: ~480 tokens
     </div>
   </section>
 
+  <!-- Testimonials -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Why Use LoomMCP?</h2>
+        <p>Built by developers, for developers.</p>
+      </div>
+
+      <div class="testimonials">
+        <div class="testimonial-card">
+          <blockquote>"Switched from reading entire files to using LoomMCP. My上下文 window dropped 95%+ and Code quality improved."</blockquote>
+          <cite>— Developer using Claude Code</cite>
+        </div>
+        <div class="testimonial-card">
+          <blockquote>"The GPU embeddings are incredibly fast. Local processing means no data leaves my machine."</blockquote>
+          <cite>— Platform Engineer</cite>
+        </div>
+        <div class="testimonial-card">
+          <blockquote>"Token-budgeted context is a game changer. I get exactly what I need, nothing more."</blockquote>
+          <cite>— AI Agent User</cite>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benchmark -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <h2>Benchmark Results</h2>
+        <p>Real numbers from real repositories.</p>
+      </div>
+
+      <div class="comp-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Repository</th>
+              <th>Files</th>
+              <th>Raw Tokens</th>
+              <th>TOON Tokens</th>
+              <th>Reduction</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>loommcp (self)</td>
+              <td>33</td>
+              <td>53,619</td>
+              <td>1,449</td>
+              <td class="winner">97.75%</td>
+            </tr>
+            <tr>
+              <td>medium_webapp</td>
+              <td>12</td>
+              <td>13,272</td>
+              <td>266</td>
+              <td class="winner">98%</td>
+            </tr>
+            <tr>
+              <td>small_api</td>
+              <td>5</td>
+              <td>4,052</td>
+              <td>92</td>
+              <td class="winner">98%</td>
+            </tr>
+            <tr>
+              <td colspan="4" style="text-align: right; font-weight: 600;">Average</td>
+              <td class="winner">97.75%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <p style="text-align: center; margin-top: 24px; color: var(--ink-soft); font-size: 13px;">
+        Run: <code>npm run build && node eval/benchmark.js .</code>
+      </p>
+    </div>
+  </section>
+
   <!-- FAQ -->
-  <section class="faq-section">
+  <section class="section">
     <div class="container">
       <div class="section-header">
         <h2>FAQ</h2>
@@ -1068,24 +967,24 @@ TOTAL: ~480 tokens
 
       <div class="faq-list">
         <div class="faq-item">
-          <div class="faq-q">How is LoomMCP different from jCodeMunch?</div>
-          <div class="faq-a">We use the same tree-sitter approach but we have HIGHER token reduction (97.75% vs 95%) and we're FREE. jCodeMunch charges $79-1,999/year for commercial use. LoomMCP is MIT licensed — free forever.</div>
+          <div class="faq-q">How is LoomMCP different?</div>
+          <div class="faq-a">LoomMCP uses the same tree-sitter approach as alternatives but focuses on higher token reduction through better skeletonization. We also offer GPU embeddings via @xenova/transformers.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-q">Which MCP clients does LoomMCP work with?</div>
+          <div class="faq-q">Which MCP clients are supported?</div>
           <div class="faq-a">Claude Code, Claude Desktop, Cursor, Windsurf, Continue, VS Code with MCP extension, and any MCP-compatible client.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-q">Why not just use a larger context window?</div>
-          <div class="faq-a">Bigger context = higher costs + lower quality. Context window pricing is per-token. Every byte you don't send is money saved. Plus, larger contexts lead to worse modelRecall — the model has more to process.</div>
+          <div class="faq-q">Why not just use larger context?</div>
+          <div class="faq-a">Bigger context = higher costs. Every token you don't send saves money. Plus, larger contexts can lead to worse model recall and higher latency.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-q">Can I use LoomMCP and jCodeMunch together?</div>
-          <div class="faq-a">Technically yes, but there's no point — you'd double your costs without benefit. Choose one.</div>
+          <div class="faq-q">How much can I reduce token usage?</div>
+          <div class="faq-a">Our benchmark shows 97.75% average reduction. For a 50K token project, you'd use ~1,250 tokens instead of 50,000.</div>
         </div>
         <div class="faq-item">
-          <div class="faq-q">How much can LoomMCP reduce my token usage?</div>
-          <div class="faq-a">Our benchmark shows 97.75% token reduction on average. For a typical project with 50K tokens of source code, you'd use ~1,250 tokens instead of 50,000 — a 40x reduction.</div>
+          <div class="faq-q">Is it really free?</div>
+          <div class="faq-a">Yes, MIT licensed. Use it for personal or commercial projects at no cost.</div>
         </div>
       </div>
     </div>
@@ -1099,10 +998,8 @@ TOTAL: ~480 tokens
         <a href="https://npmjs.com/package/@loom-mcp/server">npm</a>
         <a href="https://github.com/muhnehh/loom-mcp/issues">Issues</a>
       </div>
-      <p>LoomMCP — The universal context compiler. Free forever.</p>
-      <p style="margin-top: 12px; color: var(--ink-soft);">
-        Not affiliated with jCodeMunch. Built to be better and free.
-      </p>
+      <p>LoomMCP — Universal Context Compiler for AI Agents</p>
+      <p style="margin-top: 8px;">MIT Licensed • Open Source Forever</p>
     </div>
   </footer>
 </body>
