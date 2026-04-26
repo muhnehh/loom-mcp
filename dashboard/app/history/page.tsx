@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Zap, Network, Filter } from "lucide-react"
+import { Search, Zap, Network, Clock } from "lucide-react"
 
 interface Session {
   id: string
@@ -11,13 +11,6 @@ interface Session {
   tokens: number
   date: string
 }
-
-const placeholderSessions: Session[] = [
-  { id: "a77ec2d1", title: "Fix OAuth login bug", duration: 24 * 60000 + 18 * 1000, files: 8, tokens: 142391, date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
-  { id: "3fc37a0d", title: "Add rate limiting middleware", duration: 16 * 60000 + 42 * 1000, files: 5, tokens: 68714, date: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString() },
-  { id: "1c3a1e62", title: "Refactor user service", duration: 32 * 60000 + 7 * 1000, files: 12, tokens: 216847, date: new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString() },
-  { id: "4d3f4e53", title: "Fix types in auth module", duration: 12 * 60000 + 33 * 1000, files: 4, tokens: 45123, date: new Date(Date.now() - 27 * 60 * 60 * 1000).toISOString() },
-]
 
 function formatDuration(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000)
@@ -49,6 +42,7 @@ const iconColors = [
 
 export default function HistoryPage() {
   const [sessions, setSessions] = useState<Session[]>([])
+  const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState("")
   const [status, setStatus] = useState("all")
   const [selectedSession, setSelectedSession] = useState<string | null>(null)
@@ -58,15 +52,20 @@ export default function HistoryPage() {
       .then((r) => r.json())
       .then((d) => {
         if (Array.isArray(d) && d.length > 0) setSessions(d)
-        else setSessions(placeholderSessions)
+        else setSessions([])
+        setLoading(false)
       })
-      .catch(() => setSessions(placeholderSessions))
+      .catch(() => {
+        setSessions([])
+        setLoading(false)
+      })
   }, [])
 
-  const display = sessions.length > 0 ? sessions : placeholderSessions
-
-  const filtered = display.filter((s) => {
-    const matchQ = query === "" || s.title.toLowerCase().includes(query.toLowerCase()) || s.id.toLowerCase().includes(query.toLowerCase())
+  const filtered = sessions.filter((s) => {
+    const matchQ =
+      query === "" ||
+      (s.title && s.title.toLowerCase().includes(query.toLowerCase())) ||
+      s.id.toLowerCase().includes(query.toLowerCase())
     return matchQ
   })
 
@@ -75,8 +74,8 @@ export default function HistoryPage() {
       <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-6">
         {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-foreground">History</h1>
-          <p className="text-sm text-muted-foreground">View and restore your previous sessions.</p>
+          <h1 className="text-[28px] font-serif text-foreground">History</h1>
+          <p className="text-sm text-muted-foreground font-serif italic">View and restore your previous sessions.</p>
         </div>
 
         {/* Controls */}
@@ -105,9 +104,21 @@ export default function HistoryPage() {
 
         {/* Session List */}
         <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-          {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-              <p className="text-sm">No sessions found.</p>
+          {loading ? (
+            <div className="flex items-center justify-center py-16 text-muted-foreground text-sm">
+              Loading...
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
+              <Clock className="w-10 h-10 opacity-30" />
+              <p className="text-sm font-medium">
+                {query ? `No sessions match "${query}".` : "No sessions yet."}
+              </p>
+              {!query && (
+                <p className="text-xs text-center max-w-xs">
+                  Sessions appear after using LoomMCP tools with Claude.
+                </p>
+              )}
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -129,16 +140,20 @@ export default function HistoryPage() {
 
                       {/* Title + ID */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground truncate">{session.title}</p>
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {session.title || `Session ${session.id.slice(0, 8)}`}
+                        </p>
                         <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{session.id}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {formatDuration(session.duration)} · {session.files} files · {session.tokens.toLocaleString()} tokens
+                          {session.duration ? `${formatDuration(session.duration)} · ` : ''}
+                          {session.files != null ? `${session.files} files · ` : ''}
+                          {session.tokens != null ? `${session.tokens.toLocaleString()} tokens` : ''}
                         </p>
                       </div>
 
                       {/* Date */}
                       <div className="text-xs text-muted-foreground shrink-0 text-right">
-                        {formatDate(session.date)}
+                        {session.date ? formatDate(session.date) : '—'}
                       </div>
 
                       {/* View button */}
@@ -156,25 +171,31 @@ export default function HistoryPage() {
                           <div className="grid grid-cols-3 gap-4">
                             <div>
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Duration</p>
-                              <p className="text-sm font-semibold text-foreground">{formatDuration(session.duration)}</p>
+                              <p className="text-sm font-semibold text-foreground">
+                                {session.duration ? formatDuration(session.duration) : '—'}
+                              </p>
                             </div>
                             <div>
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Files</p>
-                              <p className="text-sm font-semibold text-foreground">{session.files}</p>
+                              <p className="text-sm font-semibold text-foreground">{session.files ?? '—'}</p>
                             </div>
                             <div>
                               <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Tokens</p>
-                              <p className="text-sm font-semibold text-foreground">{session.tokens.toLocaleString()}</p>
+                              <p className="text-sm font-semibold text-foreground">
+                                {session.tokens != null ? session.tokens.toLocaleString() : '—'}
+                              </p>
                             </div>
                           </div>
                           <div>
                             <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Session ID</p>
                             <p className="text-xs font-mono text-foreground">{session.id}</p>
                           </div>
-                          <div>
-                            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Date</p>
-                            <p className="text-xs text-foreground">{formatDate(session.date)}</p>
-                          </div>
+                          {session.date && (
+                            <div>
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Date</p>
+                              <p className="text-xs text-foreground">{formatDate(session.date)}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}

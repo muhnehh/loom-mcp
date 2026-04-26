@@ -6,10 +6,18 @@ on:
     paths:
       - 'website/**'
       - 'loom-mcp-logo.png'
+      - 'README.md'
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     permissions:
       contents: read
       pages: write
@@ -27,4 +35,5 @@ jobs:
           path: 'website'
 
       - name: Deploy to GitHub Pages
+        id: deploy
         uses: actions/deploy-pages@v4

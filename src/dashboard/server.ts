@@ -1,11 +1,43 @@
 import { createServer as createHttpServer } from 'http';
-import { readFileSync, existsSync, statSync, createReadStream } from 'fs';
+import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync, createReadStream } from 'fs';
 import { join } from 'path';
 
 const CACHE_DIR = '.loom';
 const PORT = parseInt(process.env.LOOM_DASHBOARD_PORT || '2337');
+const SAVINGS_FILE = join(process.cwd(), CACHE_DIR, 'savings.json');
 
-let toolCalls: { tool: string; args: any; result: any; timestamp: number; duration: number }[] = [];
+// Persisted cumulative savings across all sessions
+interface PersistedSavings {
+  totalCalls: number;
+  totalRawTokens: number;
+  totalSavedTokens: number;
+  sessions: number;
+  firstSeen: number;
+  lastSeen: number;
+}
+
+function loadSavings(): PersistedSavings {
+  try {
+    if (existsSync(SAVINGS_FILE)) {
+      return JSON.parse(readFileSync(SAVINGS_FILE, 'utf8'));
+    }
+  } catch {}
+  return { totalCalls: 0, totalRawTokens: 0, totalSavedTokens: 0, sessions: 0, firstSeen: Date.now(), lastSeen: Date.now() };
+}
+
+function writeSavings(s: PersistedSavings) {
+  try {
+    const dir = join(process.cwd(), CACHE_DIR);
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    writeFileSync(SAVINGS_FILE, JSON.stringify(s));
+  } catch {}
+}
+
+let persisted = loadSavings();
+persisted.sessions++;
+writeSavings(persisted);
+
+let toolCalls: { tool: string; args: any; result: any; timestamp: number; duration: number; rawTokens: number; savedTokens: number }[] = [];
 let events: EventEmitter = new (require('events') as any).EventEmitter;
 
 class EventEmitter {
@@ -25,11 +57,18 @@ class EventEmitter {
   }
 }
 
-export function trackToolCall(tool: string, args: any, result: any, duration: number) {
-  const call = { tool, args, result, timestamp: Date.now(), duration };
+export function trackToolCall(tool: string, args: any, result: any, duration: number, rawTokens = 0, savedTokens = 0) {
+  const call = { tool, args, result, timestamp: Date.now(), duration, rawTokens, savedTokens };
   toolCalls.push(call);
   if (toolCalls.length > 1000) toolCalls = toolCalls.slice(-500);
   events.emit('tool-call', call);
+
+  // Persist cumulative savings to disk
+  persisted.totalCalls++;
+  persisted.totalRawTokens += rawTokens;
+  persisted.totalSavedTokens += savedTokens;
+  persisted.lastSeen = Date.now();
+  writeSavings(persisted);
 }
 
 function getMetrics() {
@@ -42,20 +81,37 @@ function getMetrics() {
     byTool[c.tool].totalDuration += c.duration;
   });
 
-  const tokensSaved = toolCalls.reduce((acc, curr) => {
-    if (curr.tool === 'loom_get_topology' || curr.tool === 'loom_focus') {
-       return acc + (curr.result?.tokensSaved || 0);
-    }
-    return acc;
-  }, 0);
+  // Real active lens: focus calls minus blur calls
+  const focused = new Set<string>();
+  toolCalls.forEach(c => {
+    if (c.tool === 'loom_focus' && c.args?.target) focused.add(c.args.target);
+    if (c.tool === 'loom_blur' && c.args?.target) focused.delete(c.args.target);
+  });
+
+  // Session savings
+  const sessionRaw = toolCalls.reduce((a, c) => a + (c.rawTokens || 0), 0);
+  const sessionSaved = toolCalls.reduce((a, c) => a + (c.savedTokens || 0), 0);
 
   return {
-    totalCalls: toolCalls.length,
+    // Session (current server run)
+    sessionCalls: toolCalls.length,
+    sessionRawTokens: sessionRaw,
+    sessionSavedTokens: sessionSaved,
+    sessionReduction: sessionRaw > 0 ? Math.round((sessionSaved / sessionRaw) * 100) : 0,
+    // All-time persisted
+    totalCalls: persisted.totalCalls,
+    totalRawTokens: persisted.totalRawTokens,
+    totalSavedTokens: persisted.totalSavedTokens,
+    allTimeReduction: persisted.totalRawTokens > 0 ? Math.round((persisted.totalSavedTokens / persisted.totalRawTokens) * 100) : 0,
+    totalSessions: persisted.sessions,
+    firstSeen: persisted.firstSeen,
+    // Compat fields
+    tokensSaved: persisted.totalSavedTokens,
+    rawTokens: persisted.totalRawTokens,
     last24h: last24h.length,
     byTool,
     recent: toolCalls.slice(-20).reverse(),
-    tokensSaved,
-    activeLens: 3, // TODO: Get from SessionStateManager
+    activeLens: focused.size,
     sessionDuration: Date.now() - (toolCalls[0]?.timestamp || Date.now())
   };
 }
@@ -585,8 +641,76 @@ export function startDashboard(port: number = PORT) {
       res.end(JSON.stringify(toolCalls.slice(-100).reverse()));
       return;
     }
+
+    if (url === '/api/diff') {
+      // Return recent tool calls that represent changes
+      const recentCalls = toolCalls.slice(-50)
+      const focusCalls = recentCalls.filter(c => c.tool === 'loom_focus' || c.tool === 'loom_get_active_diff')
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        files: focusCalls.length,
+        additions: focusCalls.reduce((a, c) => a + (c.result?.additions || 0), 0),
+        deletions: focusCalls.reduce((a, c) => a + (c.result?.deletions || 0), 0),
+        calls: focusCalls.slice(-10),
+        sessionId: toolCalls[0] ? toolCalls[0].timestamp.toString(16).slice(-8) : 'none',
+        lastChange: focusCalls[focusCalls.length-1]?.timestamp || null
+      }));
+      return;
+    }
+
+    if (url === '/api/sessions') {
+      // Group tool calls into sessions by 30min gaps
+      const sessions: any[] = []
+      let current: any = null
+      toolCalls.forEach(call => {
+        if (!current || call.timestamp - current.lastTs > 30 * 60 * 1000) {
+          current = { id: call.timestamp.toString(16).slice(-8), calls: [], firstTs: call.timestamp, lastTs: call.timestamp, files: new Set(), tokens: 0 }
+          sessions.push(current)
+        }
+        current.calls.push(call)
+        current.lastTs = call.timestamp
+        if (call.args?.target) current.files.add(call.args.target)
+        current.tokens += call.result?.tokensSaved || 0
+      })
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(sessions.reverse().map(s => ({
+        id: s.id,
+        title: s.calls[0]?.tool || 'Session',
+        duration: s.lastTs - s.firstTs,
+        files: s.files.size,
+        tokens: s.tokens,
+        calls: s.calls.length,
+        date: new Date(s.firstTs).toISOString()
+      }))));
+      return;
+    }
+
+    if (url === '/api/events') {
+      const categorized = toolCalls.slice(-100).reverse().map(c => ({
+        ...c,
+        category: c.tool.includes('focus') ? 'focus' :
+                   c.tool.includes('topology') ? 'cache' :
+                   c.tool.includes('search') ? 'system' : 'system',
+        message: `${c.tool} completed in ${c.duration}ms`
+      }))
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(categorized));
+      return;
+    }
+
+    if (url === '/api/settings') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        workspaceRoot: process.cwd(),
+        maxDepth: 3,
+        focusBudget: 20,
+        autoRefresh: true,
+        theme: 'light'
+      }));
+      return;
+    }
     
-    if (url === '/events') {
+    if (url === '/events' && req.headers.accept?.includes('text/event-stream')) {
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -651,6 +775,14 @@ export function startDashboard(port: number = PORT) {
     // 404
     res.writeHead(404);
     res.end('Not Found');
+  });
+
+  server.on('error', (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`[WARN] Dashboard port ${port} already in use — dashboard disabled, MCP tools still work`);
+    } else {
+      console.error(`[ERROR] Dashboard server error: ${err.message}`);
+    }
   });
 
   server.listen(port, () => {

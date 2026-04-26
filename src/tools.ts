@@ -1081,7 +1081,9 @@ function createLoomServer(): Server {
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params as { name: string; arguments: Record<string, unknown> };
+    const _t0 = Date.now();
 
+    const _run = async (): Promise<any> => {
     try {
       session.incrementTurn();
       const startTime = Date.now();
@@ -1146,7 +1148,7 @@ function createLoomServer(): Server {
         return {
           content: [{
             type: 'text',
-            text: `topology:${dir}\nfiles:${skeletons.length}\ntoken_estimate:${tokenEstimate}\ntoken_reduction:${reduction}%\nlatency_ms:${latency_ms}\n\n${toon}`
+            text: `topology:${dir}\nfiles:${skeletons.length}\nraw_tokens:${rawTokens}\ntoken_estimate:${tokenEstimate}\ntoken_reduction:${reduction}%\nlatency_ms:${latency_ms}\n\n${toon}`
           }]
         };
       }
@@ -1191,7 +1193,8 @@ function createLoomServer(): Server {
               latency_ms
             });
 
-            return { content: [{ type: 'text', text: `focused:${target}\nlines:${fnNode.lineEnd - fnNode.lineStart + 1}\nbyte_start:${fnNode.lineStart}\nbyte_end:${fnNode.lineEnd}\ntoken_estimate:${estimateTokens(focusedLines)}\n\n${focusedLines}` }] };
+            const rawFnTokens = Math.ceil(focusedLines.length / 4);
+            return { content: [{ type: 'text', text: `focused:${target}\nlines:${fnNode.lineEnd - fnNode.lineStart + 1}\nbyte_start:${fnNode.lineStart}\nbyte_end:${fnNode.lineEnd}\nraw_tokens:${rawFnTokens}\ntoken_estimate:${estimateTokens(focusedLines)}\n\n${focusedLines}` }] };
           }
         }
 
@@ -1208,7 +1211,8 @@ function createLoomServer(): Server {
           latency_ms
         });
 
-        return { content: [{ type: 'text', text: `focused:${filePath}\nlines:${lines.length}\ntoken_estimate:${estimateTokens(content)}\n\n${content}` }] };
+        const rawFileTokens = Math.ceil(content.length / 4);
+        return { content: [{ type: 'text', text: `focused:${filePath}\nlines:${lines.length}\nraw_tokens:${rawFileTokens}\ntoken_estimate:${estimateTokens(content)}\n\n${content}` }] };
       }
 
       if (name === 'loom_search_symbols') {
@@ -2016,6 +2020,18 @@ function createLoomServer(): Server {
       const msg = error instanceof Error ? error.message : String(error);
       return { content: [{ type: 'text', text: `ERROR:${msg}` }] };
     }
+    }; // end _run
+    const _result = await _run();
+    try {
+      const text: string = _result?.content?.[0]?.text || '';
+      const rawMatch = text.match(/\nraw_tokens:(\d+)/);
+      const estMatch = text.match(/\ntoken_estimate:(\d+)/);
+      const rawTokens = rawMatch ? parseInt(rawMatch[1]) : 0;
+      const tokenEstimate = estMatch ? parseInt(estMatch[1]) : 0;
+      const savedTokens = rawTokens > 0 ? Math.max(0, rawTokens - tokenEstimate) : 0;
+      trackToolCall(name, args || {}, { preview: text.slice(0, 300), rawTokens, savedTokens }, Date.now() - _t0, rawTokens, savedTokens);
+    } catch {}
+    return _result;
   });
 
   return server;

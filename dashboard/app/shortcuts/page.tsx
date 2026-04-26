@@ -29,8 +29,8 @@ export default function ShortcutsPage() {
       <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-6">
         {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-foreground">Keyboard Shortcuts</h1>
-          <p className="text-sm text-muted-foreground">Speed up your workflow with these shortcuts.</p>
+          <h1 className="text-[28px] font-serif text-foreground">Keyboard Shortcuts</h1>
+          <p className="text-sm text-muted-foreground font-serif italic">Speed up your workflow with these shortcuts.</p>
         </div>
 
         {/* Shortcuts Table */}

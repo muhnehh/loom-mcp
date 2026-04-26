@@ -39,16 +39,15 @@ export function Sidebar() {
   return (
     <div className="w-[260px] h-screen bg-background border-r border-border flex flex-col fixed left-0 top-0 z-40">
       {/* Logo Area */}
-      <div className="p-5 flex items-center gap-3 border-b border-border">
-        <div className="w-8 h-8 bg-gradient-to-br from-[#7C3AED] to-[#9333EA] rounded-lg flex items-center justify-center shrink-0">
-          <Zap className="w-4 h-4 text-white fill-white" />
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span className="font-bold text-base text-foreground leading-none">LoomMCP</span>
-          <span className="text-[10px] text-muted-foreground font-medium mt-0.5 leading-none truncate">
-            Context Compiler for Coding Agents
-          </span>
-        </div>
+      <div className="p-4 flex items-center gap-3 border-b border-border">
+        <img
+          src="/loom-mcp-logo.png"
+          alt="LoomMCP"
+          width={80}
+          height={80}
+          className="rounded-lg shrink-0"
+          style={{ width: '80px', height: 'auto' }}
+        />
       </div>
 
       {/* Navigation */}

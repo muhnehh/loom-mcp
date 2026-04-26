@@ -1,73 +1,35 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Copy, X, Check } from "lucide-react"
+import { Info, FileCode } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-const PLACEHOLDER_CODE = `export async function loginUser(
-  email: string,
-  password: string,
-): Promise<User> {
-  const user = await db.query(...)
-  if (!user) throw new Error("User not found")
-  const valid = await bcrypt.compare(password, user.hash)
-  if (!valid) throw new Error("Invalid password")
-  return generateSession(user)
-}`
-
 interface FocusedFile {
   path: string
-  lines: number
-  tokens: number
-  focusedAt: string
-  deps: number
 }
 
 export default function FocusPage() {
   const [target, setTarget] = useState("")
   const [focused, setFocused] = useState<FocusedFile[]>([])
   const [toast, setToast] = useState("")
-  const [copied, setCopied] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetch('http://localhost:2337/api/active-lens')
       .then(r => r.json())
       .then(d => {
-        const files: FocusedFile[] = (d.focused || []).map((p: string) => ({
-          path: p,
-          lines: 42,
-          tokens: 1204,
-          focusedAt: new Date().toLocaleTimeString(),
-          deps: 3,
-        }))
+        const files: FocusedFile[] = (d.focused || []).map((p: string) => ({ path: p }))
         setFocused(files)
+        setLoading(false)
       })
-      .catch(() => {})
+      .catch(() => setLoading(false))
   }, [])
 
   const handleFocus = () => {
     if (!target.trim()) return
-    setToast("Connect to loom_focus MCP tool to focus files.")
-    setTimeout(() => setToast(""), 3000)
-  }
-
-  const handleUnfocus = (path: string) => {
-    setFocused(prev => prev.filter(f => f.path !== path))
-  }
-
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(PLACEHOLDER_CODE)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  const displayFile: FocusedFile = focused[0] || {
-    path: 'src/auth.ts::loginUser',
-    lines: 42,
-    tokens: 1204,
-    focusedAt: '2:42:18 PM',
-    deps: 3,
+    setToast("Files are focused when Claude calls loom_focus. Use Claude to focus this file.")
+    setTimeout(() => setToast(""), 4000)
   }
 
   return (
@@ -75,8 +37,14 @@ export default function FocusPage() {
       <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Focus</h1>
-          <p className="text-sm text-muted-foreground mt-1">Page in the code you need. Be intentional with your focus budget.</p>
+          <h1 className="text-[28px] font-serif text-foreground">Focus</h1>
+          <p className="text-sm text-muted-foreground font-serif italic mt-1">Page in the code you need. Be intentional with your focus budget.</p>
+        </div>
+
+        {/* Info note */}
+        <div className="flex items-start gap-2 bg-[#F5F3FF] border border-[#DDD6FE] text-[#7C3AED] px-4 py-3 rounded-xl text-xs">
+          <Info className="w-4 h-4 mt-0.5 shrink-0" />
+          <span>Files are focused when Claude calls <code className="font-mono font-semibold">loom_focus</code>. Focused files appear here.</span>
         </div>
 
         {/* Toast */}
@@ -109,44 +77,35 @@ export default function FocusPage() {
           </p>
         </div>
 
-        {/* Focused file card */}
-        <div className="bg-card border border-border rounded-xl shadow-sm p-5 space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-[#10B981] bg-[#ECFDF5] border border-[#D1FAE5] px-2 py-0.5 rounded-full">
-              <Check className="w-3 h-3" /> Focused
-            </span>
+        {/* Focused files list */}
+        <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="px-5 py-3 border-b border-border bg-muted flex items-center justify-between">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Focused Files</span>
+            <span className="text-xs font-medium text-foreground">{focused.length} / 20</span>
           </div>
-          <div>
-            <p className="text-sm font-bold text-foreground font-mono">{displayFile.path}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {displayFile.lines} lines • {displayFile.tokens.toLocaleString()} tokens • {displayFile.deps} Dependencies
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopyCode}
-              className="h-8 px-3 text-xs font-medium border-border text-muted-foreground hover:text-foreground"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 mr-1.5 text-[#10B981]" /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
-              Copy Code
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleUnfocus(displayFile.path)}
-              className="h-8 px-3 text-xs font-medium text-[#EF4444] hover:bg-[#FEF2F2] hover:text-[#EF4444]"
-            >
-              <X className="w-3.5 h-3.5 mr-1.5" />
-              Un-focus
-            </Button>
-          </div>
-        </div>
 
-        {/* Dark code preview */}
-        <div className="bg-[#1F2937] rounded-xl p-4 overflow-auto">
-          <pre className="text-green-300 font-mono text-sm leading-relaxed">{PLACEHOLDER_CODE}</pre>
+          {loading ? (
+            <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
+              Loading...
+            </div>
+          ) : focused.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
+              <FileCode className="w-10 h-10 opacity-30" />
+              <p className="text-sm font-medium">No files focused yet.</p>
+              <p className="text-xs text-center max-w-xs">
+                Ask Claude to call <code className="font-mono font-semibold">loom_focus</code> on a file to see it here.
+              </p>
+            </div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {focused.map((file, i) => (
+                <li key={i} className="flex items-center gap-3 px-5 py-3 hover:bg-muted transition-colors">
+                  <FileCode className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm font-mono text-foreground truncate">{file.path}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>

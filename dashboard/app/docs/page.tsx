@@ -116,8 +116,8 @@ export default function DocsPage() {
       <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-6">
         {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-foreground">Documentation</h1>
-          <p className="text-sm text-muted-foreground">Everything you need to know about LoomMCP.</p>
+          <h1 className="text-[28px] font-serif text-foreground">Documentation</h1>
+          <p className="text-sm text-muted-foreground font-serif italic">Everything you need to know about LoomMCP.</p>
         </div>
 
         <div className="flex gap-6 items-start">

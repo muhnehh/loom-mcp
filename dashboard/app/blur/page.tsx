@@ -62,8 +62,8 @@ export default function BlurPage() {
       <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Blur (Un-focus Files)</h1>
-          <p className="text-sm text-muted-foreground mt-1">Remove files from the active lens to free up focus budget.</p>
+          <h1 className="text-[28px] font-serif text-foreground">Blur (Un-focus Files)</h1>
+          <p className="text-sm text-muted-foreground font-serif italic mt-1">Remove files from the active lens to free up focus budget.</p>
         </div>
 
         {/* Main card */}

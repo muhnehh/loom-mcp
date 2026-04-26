@@ -25,15 +25,7 @@ import {
 } from "recharts"
 import { Button } from "@/components/ui/button"
 
-const chartData = [
-  { name: '1', raw: 38000, loom: 10000 },
-  { name: '2', raw: 32000, loom: 8500 },
-  { name: '3', raw: 29000, loom: 7200 },
-  { name: '4', raw: 27000, loom: 6800 },
-  { name: '5', raw: 24000, loom: 6200 },
-  { name: '7', raw: 16000, loom: 5500 },
-  { name: '8', raw: 8500, loom: 4800 },
-]
+// Chart data built from real metrics (populated after first tool calls)
 
 function formatDuration(ms: number): string {
   if (!ms) return '0m 0s'
@@ -107,7 +99,7 @@ export default function DashboardPage() {
     )
   }
 
-  const activeLensCount = (metrics?.activeLens as number) || 3
+  const activeLensCount = (metrics?.activeLens as number) ?? 0
   const focusBudgetPct = Math.round((activeLensCount / 20) * 100)
   const sessionDuration = metrics?.sessionDuration as number
   const recentItems = (metrics?.recent as Array<Record<string, unknown>>) || []
@@ -115,16 +107,37 @@ export default function DashboardPage() {
     ? formatTime(recentItems[recentItems.length - 1]?.timestamp as string)
     : '--:--'
 
+  // Real token savings from persisted backend data
+  const totalRaw = (metrics?.totalRawTokens as number) ?? 0
+  const totalSaved = (metrics?.totalSavedTokens as number) ?? 0
+  const allTimeReduction = (metrics?.allTimeReduction as number) ?? 0
+  const sessionCalls = (metrics?.sessionCalls as number) ?? 0
+  const totalCalls = (metrics?.totalCalls as number) ?? 0
+  const hasData = totalRaw > 0
+
+  // Build chart from recent tool call history (real data)
+  const byTool = (metrics?.byTool as Record<string, { calls: number; totalDuration: number }>) || {}
+  const rawChartData = recentItems
+    .filter((item) => (item.rawTokens as number) > 0)
+    .slice(0, 8)
+    .reverse()
+    .map((item, i) => ({
+      name: String(i + 1),
+      raw: (item.rawTokens as number) || 0,
+      loom: Math.max(0, ((item.rawTokens as number) || 0) - ((item.savedTokens as number) || 0)),
+    }))
+  const chartData = rawChartData
+
   return (
     <div className="flex flex-col min-h-[calc(100vh-64px)] bg-background">
       <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-8">
 
         {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-[32px] font-bold text-foreground leading-tight">
+          <h1 className="text-[36px] font-serif text-foreground leading-tight">
             Welcome to LoomMCP 👋
           </h1>
-          <p className="text-[14px] text-muted-foreground">
+          <p className="text-[15px] text-muted-foreground font-serif italic">
             The AST-aware context compiler for coding agents.
           </p>
         </div>
@@ -139,7 +152,7 @@ export default function DashboardPage() {
             <div className="bg-[#F5F3FF] border border-[#DDD6FE] rounded-2xl p-6 flex items-center justify-between">
               <div className="space-y-1.5">
                 <h2 className="text-[20px] font-bold text-[#7C3AED]">
-                  Save 80%+ on Claude API costs
+                  <span className="font-serif">Save 80%+ on Claude API costs</span>
                 </h2>
                 <p className="text-[14px] text-muted-foreground">
                   Stop re-reading unchanged code. Smart context. Sharp focus.
@@ -234,7 +247,7 @@ export default function DashboardPage() {
                     {(metrics?.totalCalls as number)?.toLocaleString() || '482'}
                   </p>
                   <p className="text-[11px] font-bold text-[#10B981]">
-                    ↑ 12 this session
+                    {sessionCalls > 0 ? `↑ ${sessionCalls} this session` : 'No calls yet'}
                   </p>
                 </div>
 
@@ -244,10 +257,10 @@ export default function DashboardPage() {
                     Total Tokens Saved
                   </p>
                   <p className="text-[28px] font-extrabold text-foreground leading-none">
-                    {(metrics?.tokensSaved as number)?.toLocaleString() || '142,391'}
+                    {totalSaved > 0 ? totalSaved.toLocaleString() : '0'}
                   </p>
                   <p className="text-[11px] font-bold text-[#10B981]">
-                    ↑ 92.1% vs baseline
+                    {hasData ? `↑ ${allTimeReduction}% vs baseline` : 'Use tools to see savings'}
                   </p>
                 </div>
 
@@ -376,13 +389,13 @@ export default function DashboardPage() {
                 <div className="space-y-2 pt-1">
                   <div className="flex justify-between items-center">
                     <span className="text-[11px] font-semibold text-foreground">Focus Budget</span>
-                    <span className="text-[11px] font-semibold text-[#7C3AED]">15% used</span>
+                    <span className="text-[11px] font-semibold text-[#7C3AED]">{focusBudgetPct}% used</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-[#7C3AED] rounded-full" style={{ width: '15%' }} />
+                    <div className="h-full bg-[#7C3AED] rounded-full transition-all" style={{ width: `${focusBudgetPct}%` }} />
                   </div>
                   <p className="text-[10px] text-muted-foreground">
-                    3 / 20 files focused (15%)
+                    {activeLensCount} / 20 files focused ({focusBudgetPct}%)
                   </p>
                   <p className="text-[10px] text-muted-foreground">
                     Tip: Keep your focused files under 20% for optimal performance.
@@ -410,24 +423,28 @@ export default function DashboardPage() {
                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                       Baseline (Raw)
                     </p>
-                    <p className="text-[24px] font-bold text-foreground leading-none">142,391</p>
-                    <p className="text-[10px] text-muted-foreground">tokens</p>
+                    <p className="text-[24px] font-bold text-foreground leading-none">
+                      {hasData ? totalRaw.toLocaleString() : '0'}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">raw tokens</p>
                   </div>
                   <div className="space-y-0.5">
                     <p className="text-[10px] font-bold text-[#7C3AED] uppercase tracking-widest">
                       With LoomMCP
                     </p>
-                    <p className="text-[24px] font-bold text-[#10B981] leading-none">11,247</p>
+                    <p className="text-[24px] font-bold text-[#10B981] leading-none">
+                      {hasData ? totalSaved.toLocaleString() : '0'}
+                    </p>
                     <p className="text-[10px] text-muted-foreground">tokens saved</p>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-center py-4 border-t border-border">
-                  <span className="text-[48px] font-extrabold text-[#10B981] leading-none tracking-tighter">
-                    92.1%
+                  <span className="text-[52px] font-serif text-[#10B981] leading-none tracking-tight">
+                    {hasData ? `${allTimeReduction}%` : '—'}
                   </span>
                   <span className="text-[11px] font-semibold text-[#10B981] mt-1 uppercase tracking-wide">
-                    tokens saved
+                    {hasData ? 'tokens saved' : 'run a tool to start'}
                   </span>
                 </div>
               </div>
@@ -448,93 +465,75 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 4, right: 4, bottom: 4, left: -20 }}>
-                    <XAxis
-                      dataKey="name"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 9, fill: '#9CA3AF', fontWeight: 'bold' }}
-                      dy={6}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fontSize: 9, fill: '#9CA3AF', fontWeight: 'bold' }}
-                      tickFormatter={(val) => `${val / 1000}k`}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: '12px',
-                        border: 'none',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                        padding: '10px'
-                      }}
-                      labelStyle={{ fontSize: '10px', fontWeight: '700' }}
-                      itemStyle={{ fontSize: '10px' }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="raw"
-                      stroke="#F97316"
-                      strokeWidth={2}
-                      dot={false}
-                      activeDot={{ r: 4, strokeWidth: 0 }}
-                      name="Raw Claude Code"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="loom"
-                      stroke="#10B981"
-                      strokeWidth={2}
-                      dot={false}
-                      activeDot={{ r: 4, strokeWidth: 0 }}
-                      name="LoomMCP"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+              {chartData.length === 0 ? (
+                <div className="h-48 flex flex-col items-center justify-center text-muted-foreground gap-2">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                    <Network className="w-4 h-4 opacity-40" />
+                  </div>
+                  <p className="text-xs font-medium">No tool calls yet</p>
+                  <p className="text-[10px] opacity-60">Run loom_get_topology in Claude to see data</p>
+                </div>
+              ) : (
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData} margin={{ top: 4, right: 4, bottom: 4, left: -20 }}>
+                      <XAxis
+                        dataKey="name"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 9, fill: '#9CA3AF', fontWeight: 'bold' }}
+                        dy={6}
+                      />
+                      <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fontSize: 9, fill: '#9CA3AF', fontWeight: 'bold' }}
+                        tickFormatter={(val) => `${Math.round(val / 1000)}k`}
+                      />
+                      <Tooltip
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', padding: '10px' }}
+                        labelStyle={{ fontSize: '10px', fontWeight: '700' }}
+                        itemStyle={{ fontSize: '10px' }}
+                      />
+                      <Line type="monotone" dataKey="raw" stroke="#F97316" strokeWidth={2} dot={false} activeDot={{ r: 4 }} name="Raw" />
+                      <Line type="monotone" dataKey="loom" stroke="#10B981" strokeWidth={2} dot={false} activeDot={{ r: 4 }} name="LoomMCP" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </div>
 
             {/* Recent Events */}
             <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[14px] font-semibold text-foreground">Recent Events</h3>
-                <Link
-                  href="/events"
-                  className="text-[11px] font-semibold text-[#7C3AED] hover:underline"
-                >
+                <Link href="/events" className="text-[11px] font-semibold text-[#7C3AED] hover:underline">
                   View All
                 </Link>
               </div>
-              <div className="space-y-3">
-                {(recentItems.length > 0
-                  ? recentItems.slice(0, 5).map((item) => ({
-                      label: (item.tool as string) || '',
-                      timeLabel: formatTime(item.timestamp as string),
-                    }))
-                  : [
-                      { label: 'Focused file: src/auth.ts::loginUser', timeLabel: '2m ago' },
-                      { label: 'Focused file: src/middleware.ts', timeLabel: '2m ago' },
-                      { label: 'Get Topology: src/ (482 files)', timeLabel: '1m ago' },
-                      { label: 'Search Refs: loginUser (14 refs)', timeLabel: '45s ago' },
-                      { label: 'Focused file: src/types.ts', timeLabel: '10s ago' },
-                    ]
-                ).map((event, i) => (
-                  <div key={i} className="flex items-start gap-2.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#10B981] mt-1.5 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] text-foreground font-medium leading-snug truncate">
-                        {event.label}
-                      </p>
-                      <p className="text-[10px] font-bold text-muted-foreground mt-0.5">
-                        {event.timeLabel}
-                      </p>
+              {recentItems.length === 0 ? (
+                <div className="py-6 text-center text-muted-foreground">
+                  <p className="text-xs">No events yet</p>
+                  <p className="text-[10px] mt-1 opacity-60">Use LoomMCP tools in Claude</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {recentItems.slice(0, 5).map((event, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#10B981] mt-1.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] text-foreground truncate">
+                          {String(event.tool || '').replace('loom_', '').replace(/_/g, ' ')}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {new Date((event.timestamp as number) || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {(event.duration as number) ? ` · ${event.duration}ms` : ''}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
           </div>

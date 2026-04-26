@@ -4,6 +4,8 @@
 
 > The universal context compiler for AI coding agents. **97.75% token reduction**, GPU embeddings, compact wire format. Free forever — no enterprise license required.
 
+**[🌐 Live Website](https://muhnehh.github.io/loom-mcp/)** · **[📦 npm](https://www.npmjs.com/package/@loom-mcp/server)** · **[⭐ GitHub](https://github.com/muhnehh/loom-mcp)**
+
 <!-- mcp-name: @loom-mcp/server -->
 
 ---
@@ -13,6 +15,7 @@
 | Doc | What it covers |
 |-----|----------------|
 | [README.md](README.md) | This file - overview and quick start |
+| [Dashboard](http://localhost:2337) | Live token savings, tool call tracking, session history |
 | [SETUP.md](SETUP.md) | Zero-to-indexed in three steps |
 | [SUPPORT.md](SUPPORT.md) | Full tool reference and workflows |
 | [AGENT_HOOKS.md](AGENT_HOOKS.md) | Agent hooks and enforcement |
@@ -274,6 +277,93 @@ claude mcp add loom npm @loom-mcp/server
 ```bash
 claude mcp add loom npx @loom-mcp/server
 ```
+
+---
+
+## Live Dashboard
+
+LoomMCP ships with a full observability dashboard at **http://localhost:2337** — no extra setup required.
+
+![LoomMCP Dashboard](website/assets/screenshots/dashboard.jpg)
+
+The dashboard tracks every tool call, accumulates token savings across sessions, and gives you real-time visibility into what Claude is doing with your codebase.
+
+### What it shows
+
+| Panel | What it tracks |
+|-------|---------------|
+| **Token Savings** | Baseline raw tokens vs TOON-compressed tokens — persisted to `.loom/savings.json` so numbers accumulate across restarts |
+| **Active Lens** | Which files Claude currently has in focus, with line counts and focus budget percentage |
+| **Session Overview** | Total tool calls this session, tokens saved, active lens count, session duration |
+| **Recent Activity** | Last 20 tool calls with tool name, timestamp, and duration |
+| **Tokens per Turn** | Line chart of raw vs compressed tokens per tool call (live from real data) |
+| **Live Events** | SSE stream — every MCP tool call appears here in real time |
+
+### Dashboard pages
+
+**Get Topology** — Shows the last AST skeleton Claude fetched. TOON output with file count, token estimate, and language breakdown.
+
+![Topology page](website/assets/screenshots/topology.jpg)
+
+**Active Lens** — Detailed view of focused files with lines, tokens, dependencies, and focus timestamps.
+
+![Active Lens page](website/assets/screenshots/active-lens.jpg)
+
+**Settings** — Configure workspace root, max depth, focus budget, auto-refresh, and theme. Reads from `/api/settings`.
+
+![Settings page](website/assets/screenshots/settings.jpg)
+
+### Real-world example: fixing an auth bug
+
+Here's what happens in the dashboard when Claude diagnoses a login bug in a 40,000-token TypeScript codebase:
+
+```
+Step 1 — loom_get_topology("src/")
+  → 16 files scanned, 54,932 raw tokens → 1,456 TOON tokens (97% reduction)
+  → Dashboard: Files Indexed +16, Tokens Saved +53,476
+
+Step 2 — loom_focus("src/auth.ts::loginUser")
+  → 42 lines paged in (1,204 tokens). Rest of auth.ts stays out of context.
+  → Dashboard: Active Lens 1/20, Focus Budget 5%
+
+Step 3 — loom_search_refs("loginUser")
+  → 14 call sites found across 8 files in 44ms
+  → Dashboard: Events feed records loom_search_refs · 44ms
+
+Step 4 — loom_get_active_diff()
+  → Diff scoped to changed symbols only
+  → Dashboard: Total session savings 40,616 tokens (66%)
+```
+
+### Accessing the dashboard
+
+The dashboard starts automatically when LoomMCP runs:
+
+```bash
+# Start MCP server (dashboard starts at :2337 automatically)
+node dist/index.js
+
+# Or via npm
+npm start
+```
+
+Open **http://localhost:2337** in your browser.
+
+The dashboard is a static Next.js app served directly by the MCP server — no separate process needed. Token savings persist to `.loom/savings.json` between restarts.
+
+### Dashboard API endpoints
+
+| Endpoint | Returns |
+|----------|---------|
+| `GET /api/summary` | Total calls, token savings (all-time + session), active lens count, tool breakdown |
+| `GET /api/active-lens` | Array of currently focused file paths |
+| `GET /api/topology` | Last `loom_get_topology` result |
+| `GET /api/history` | All tool calls (last 100) |
+| `GET /api/sessions` | Tool calls grouped into sessions by 30-min gaps |
+| `GET /api/events` | Categorized recent events |
+| `GET /api/settings` | Current workspace configuration |
+| `GET /events` | SSE stream — live tool-call events |
+| `GET /health` | Readiness probe `{"status":"ok"}` |
 
 ---
 

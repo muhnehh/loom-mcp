@@ -8,6 +8,11 @@
   <meta property="og:title" content="LoomMCP - Context compiler for AI coding agents">
   <meta property="og:description" content="Index once. Retrieve exact symbols. Cut context token waste with real benchmarked reductions.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://muhnehh.github.io/loom-mcp/">
+  <meta property="og:image" content="https://muhnehh.github.io/loom-mcp/assets/screenshots/dashboard.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://muhnehh.github.io/loom-mcp/assets/screenshots/dashboard.jpg">
+  <link rel="canonical" href="https://muhnehh.github.io/loom-mcp/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -803,14 +808,320 @@
       .feature-strip { grid-template-columns: 1fr; }
       .foot { grid-template-columns: 1fr; }
     }
+
+    /* Dashboard section */
+    .dashboard-hero {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-md), 0 0 0 1px var(--border);
+      margin-bottom: 80px;
+    }
+
+    .dashboard-hero img {
+      width: 100%;
+      display: block;
+      border-radius: var(--radius-lg);
+    }
+
+    .dashboard-hero-badge {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dashboard-hero-badge::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      display: inline-block;
+    }
+
+    .dashboard-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    @media (min-width: 900px) {
+      .dashboard-tabs {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .dashboard-tab {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .dashboard-tab:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dashboard-tab-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      color: var(--accent);
+      font-size: 16px;
+    }
+
+    .dashboard-tab h4 {
+      font-family: "Inter", sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .dashboard-tab p {
+      font-size: 13px;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .walkthrough {
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+      margin-top: 80px;
+    }
+
+    .walkthrough-step {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .walkthrough-step.reverse {
+      direction: rtl;
+    }
+
+    .walkthrough-step.reverse > * {
+      direction: ltr;
+    }
+
+    @media (max-width: 860px) {
+      .walkthrough-step,
+      .walkthrough-step.reverse {
+        grid-template-columns: 1fr;
+        direction: ltr;
+      }
+    }
+
+    .walkthrough-img {
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md), 0 0 0 1px var(--border);
+    }
+
+    .walkthrough-img img {
+      width: 100%;
+      display: block;
+    }
+
+    .walkthrough-text .step-num {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .walkthrough-text h3 {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: 36px;
+      line-height: 1.1;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .walkthrough-text p {
+      font-size: 16px;
+      color: var(--text-soft);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .walkthrough-text .code-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1F2937;
+      color: #A78BFA;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      margin-right: 8px;
+    }
+
+    .walkthrough-text .metric-row {
+      display: flex;
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    .walkthrough-text .metric {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .walkthrough-text .metric-val {
+      font-size: 28px;
+      font-family: "Instrument Serif", Georgia, serif;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .walkthrough-text .metric-val.green { color: var(--success); }
+    .walkthrough-text .metric-label {
+      font-size: 12px;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    .example-block {
+      background: #0F172A;
+      border-radius: var(--radius);
+      padding: 32px;
+      margin-top: 64px;
+    }
+
+    .example-block .ex-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .example-block .ex-badge {
+      background: rgba(124, 58, 237, 0.15);
+      color: #A78BFA;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+
+    .example-block h4 {
+      font-family: "Instrument Serif", Georgia, serif;
+      color: #F8FAFC;
+      font-size: 22px;
+      font-weight: 400;
+    }
+
+    .example-block .ex-sub {
+      color: #94A3B8;
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .example-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .example-step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .example-step:last-child { border-bottom: none; }
+
+    .example-step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(124, 58, 237, 0.2);
+      color: #A78BFA;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .example-step-body h5 {
+      color: #F1F5F9;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .example-step-body p {
+      color: #94A3B8;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .example-step-body code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      color: #A78BFA;
+      background: rgba(124, 58, 237, 0.1);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .example-step-body .result-chip {
+      display: inline-block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: #34D399;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
   <div class="nav-wrap">
     <div class="container nav">
-      <a class="brand" href="#top"><img src="../loom-mcp-logo.png" alt="LoomMCP" style="height:95px;vertical-align:middle"></a>
+      <a class="brand" href="#top"><img src="loom-mcp-logo.png" alt="LoomMCP" style="height:95px;vertical-align:middle"></a>
       <nav class="nav-links" aria-label="Main navigation">
         <a href="#features">Features</a>
+        <a href="#dashboard">Dashboard</a>
         <a href="#tools">Tools</a>
         <a href="#benchmarks">Benchmarks</a>
         <a href="https://github.com/muhnehh/loom-mcp/blob/main/README.md" target="_blank" rel="noreferrer">Docs</a>
@@ -962,6 +1273,169 @@
       </div>
     </section>
 
+    <section id="dashboard">
+      <div class="container">
+        <div class="eyebrow">Live Dashboard</div>
+        <h2>See every token saved, in real time.</h2>
+        <p class="section-sub">LoomMCP ships with a full observability dashboard at <code style="font-family:JetBrains Mono,monospace;background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:6px;font-size:14px">localhost:2337</code>. Track token savings, focused files, tool call history, and live events — all persisted across sessions.</p>
+
+        <!-- Hero screenshot -->
+        <div class="dashboard-hero">
+          <img src="assets/screenshots/dashboard.jpg" alt="LoomMCP Dashboard showing 66% token savings" loading="lazy" />
+          <div class="dashboard-hero-badge">Live — 66% tokens saved</div>
+        </div>
+
+        <!-- Feature tabs -->
+        <div class="dashboard-tabs">
+          <div class="dashboard-tab">
+            <div class="dashboard-tab-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <h4>Token Savings</h4>
+            <p>Real baseline vs compressed token counts. Persisted across sessions.</p>
+          </div>
+          <div class="dashboard-tab">
+            <div class="dashboard-tab-icon"><i class="fa-solid fa-crosshairs"></i></div>
+            <h4>Active Lens</h4>
+            <p>Which files Claude is currently focused on, with line and token counts.</p>
+          </div>
+          <div class="dashboard-tab">
+            <div class="dashboard-tab-icon"><i class="fa-solid fa-bolt"></i></div>
+            <h4>Live Events</h4>
+            <p>Real-time SSE stream of every MCP tool call as it happens.</p>
+          </div>
+          <div class="dashboard-tab">
+            <div class="dashboard-tab-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <h4>Session History</h4>
+            <p>Browse past sessions, tool call breakdowns, and token totals.</p>
+          </div>
+        </div>
+
+        <!-- In-depth walkthrough -->
+        <div class="walkthrough">
+
+          <!-- Step 1: Topology -->
+          <div class="walkthrough-step">
+            <div class="walkthrough-img">
+              <img src="assets/screenshots/topology.jpg" alt="Get Topology page" loading="lazy" />
+            </div>
+            <div class="walkthrough-text">
+              <div class="step-num">Step 01 — Index</div>
+              <h3>Index your codebase in one call.</h3>
+              <p>The Topology page shows the last AST skeleton Claude fetched. Every function signature, class, and type — compressed to TOON format. 97% fewer tokens than raw files.</p>
+              <div>
+                <span class="code-chip">loom_get_topology("src/")</span>
+              </div>
+              <div class="metric-row">
+                <div class="metric">
+                  <span class="metric-val">97%</span>
+                  <span class="metric-label">token reduction</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-val green">&lt; 20ms</span>
+                  <span class="metric-label">index latency</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Active Lens -->
+          <div class="walkthrough-step reverse">
+            <div class="walkthrough-img">
+              <img src="assets/screenshots/active-lens.jpg" alt="Active Lens page" loading="lazy" />
+            </div>
+            <div class="walkthrough-text">
+              <div class="step-num">Step 02 — Focus</div>
+              <h3>Focus only what Claude needs right now.</h3>
+              <p>The Active Lens tracks every file Claude has focused into context. See exact token counts per file, dependency depth, and how much of your 20-file budget is used.</p>
+              <div>
+                <span class="code-chip">loom_focus("src/auth.ts::loginUser")</span>
+              </div>
+              <div class="metric-row">
+                <div class="metric">
+                  <span class="metric-val">20</span>
+                  <span class="metric-label">max files in lens</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-val green">O(1)</span>
+                  <span class="metric-label">byte-offset retrieval</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Settings -->
+          <div class="walkthrough-step">
+            <div class="walkthrough-img">
+              <img src="assets/screenshots/settings.jpg" alt="Settings page" loading="lazy" />
+            </div>
+            <div class="walkthrough-text">
+              <div class="step-num">Step 03 — Configure</div>
+              <h3>Configure once. Works across every session.</h3>
+              <p>Set your workspace root, focus budget, max topology depth, and auto-refresh behaviour. All settings persist and take effect immediately — no restart required.</p>
+              <div class="metric-row">
+                <div class="metric">
+                  <span class="metric-val">52</span>
+                  <span class="metric-label">MCP tools</span>
+                </div>
+                <div class="metric">
+                  <span class="metric-val green">:2337</span>
+                  <span class="metric-label">dashboard port</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- In-depth example -->
+        <div class="example-block">
+          <div class="ex-header">
+            <span class="ex-badge">Real example</span>
+            <h4>Fixing an auth bug — end to end</h4>
+          </div>
+          <p class="ex-sub">Here's exactly what happens in the dashboard when Claude uses LoomMCP to diagnose and fix a login bug in a 40,000-token TypeScript codebase.</p>
+
+          <div class="example-steps">
+            <div class="example-step">
+              <div class="example-step-num">1</div>
+              <div class="example-step-body">
+                <h5>Claude calls loom_get_topology("src/")</h5>
+                <p>LoomMCP scans all TypeScript files, generates TOON skeletons (function signatures only), and returns them in ~16ms. Dashboard records: <strong>raw 54,932 tokens → 1,456 TOON tokens</strong>.</p>
+                <code>token_reduction: 97% · latency_ms: 16</code>
+                <br/><span class="result-chip">✓ Dashboard: Files Indexed +16, Tokens Saved +53,476</span>
+              </div>
+            </div>
+            <div class="example-step">
+              <div class="example-step-num">2</div>
+              <div class="example-step-body">
+                <h5>Claude spots loginUser in the skeleton, calls loom_focus("src/auth.ts::loginUser")</h5>
+                <p>Only the exact function body is paged in — 42 lines, 1,204 tokens. The other 2,038 lines of auth.ts stay out of context.</p>
+                <code>focused: src/auth.ts::loginUser · lines: 42 · token_estimate: 1204</code>
+                <br/><span class="result-chip">✓ Dashboard: Active Lens 1/20 · Focus Budget 5%</span>
+              </div>
+            </div>
+            <div class="example-step">
+              <div class="example-step-num">3</div>
+              <div class="example-step-body">
+                <h5>Claude calls loom_search_refs("loginUser") to find all callers</h5>
+                <p>AST-aware reference search finds 14 call sites across 8 files in milliseconds — no grep, no file reads.</p>
+                <code>symbol: loginUser · refs: 14 · scope: workspace</code>
+                <br/><span class="result-chip">✓ Dashboard: Events feed shows loom_search_refs · 44ms</span>
+              </div>
+            </div>
+            <div class="example-step">
+              <div class="example-step-num">4</div>
+              <div class="example-step-body">
+                <h5>Claude edits the file and calls loom_get_active_diff()</h5>
+                <p>The diff is compressed and scoped to only changed symbols. The dashboard Diff page shows the exact additions and deletions without noise.</p>
+                <code>files_changed: 1 · additions: 3 · deletions: 1</code>
+                <br/><span class="result-chip">✓ Dashboard: Total session savings: 40,616 tokens (66%)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
     <section id="tools">
       <div class="eyebrow">Tooling</div>
       <h2>17 MCP tools in one server.</h2>
@@ -1052,13 +1526,14 @@
   <footer>
     <div class="container foot">
       <div class="foot-brand">
-        <img src="../loom-mcp-logo.png" alt="LoomMCP" style="height:95px;margin-bottom:8px">
+        <img src="loom-mcp-logo.png" alt="LoomMCP" style="height:95px;margin-bottom:8px">
         <p>Context compiler for AI agents.</p>
         <span class="badge">MIT License</span>
       </div>
       <div class="foot-col">
         <h5>Product</h5>
         <a href="#features">Features</a>
+        <a href="#dashboard">Dashboard</a>
         <a href="#tools">Tools</a>
         <a href="#benchmarks">Benchmarks</a>
         <a href="https://github.com/muhnehh/loom-mcp/releases" target="_blank" rel="noreferrer">Changelog</a>

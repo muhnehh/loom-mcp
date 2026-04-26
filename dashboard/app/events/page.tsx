@@ -183,8 +183,8 @@ export default function EventsPage() {
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold text-foreground">Events</h1>
-            <p className="text-sm text-muted-foreground">Real-time system events and notifications.</p>
+            <h1 className="text-[28px] font-serif text-foreground">Events</h1>
+            <p className="text-sm text-muted-foreground font-serif italic">Real-time system events and notifications.</p>
           </div>
           <div className={cn(
             "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border",

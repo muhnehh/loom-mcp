@@ -18,7 +18,7 @@ const navItems: { key: SettingsTab; label: string }[] = [
 export default function SettingsPage() {
   const [tab, setTab] = useState<SettingsTab>("general")
   const [settings, setSettings] = useState<any>({
-    workspaceRoot: "~/Projects/loom-mcp",
+    workspaceRoot: "",
     maxDepth: 3,
     focusBudget: 20,
     autoRefresh: true,
@@ -36,8 +36,8 @@ export default function SettingsPage() {
       <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-6">
         {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-          <p className="text-sm text-muted-foreground">Configure LoomMCP to fit your workflow.</p>
+          <h1 className="text-[28px] font-serif text-foreground">Settings</h1>
+          <p className="text-sm text-muted-foreground font-serif italic">Configure LoomMCP to fit your workflow.</p>
         </div>
 
         <div className="flex gap-6 items-start">
@@ -88,21 +88,22 @@ function SettingRow({ label, desc, children }: { label: string; desc: string; ch
 
 function GeneralTab({ settings, setSettings }: { settings: any; setSettings: React.Dispatch<React.SetStateAction<any>> }) {
   const handleChangeRoot = () => {
-    const newRoot = prompt("Enter new workspace root:", settings.workspaceRoot)
-    if (newRoot) setSettings((prev: any) => ({ ...prev, workspaceRoot: newRoot }))
+    const newRoot = prompt("Enter new workspace root:", settings.workspaceRoot || "")
+    if (newRoot !== null && newRoot !== undefined) setSettings((prev: any) => ({ ...prev, workspaceRoot: newRoot }))
   }
 
   return (
     <div className="space-y-1">
       <h2 className="text-base font-semibold text-foreground mb-4">General Settings</h2>
 
-      <SettingRow label="Workspace Root" desc={settings.workspaceRoot || "~/Projects/loom-mcp"}>
+      <SettingRow label="Workspace Root" desc={settings.workspaceRoot || "Loaded from server"}>
         <div className="flex items-center gap-2">
           <input
             type="text"
-            value={settings.workspaceRoot || "~/Projects/loom-mcp"}
+            value={settings.workspaceRoot || ""}
+            placeholder="Loading from server..."
             onChange={(e) => setSettings((prev: any) => ({ ...prev, workspaceRoot: e.target.value }))}
-            className="w-48 px-3 py-1.5 text-sm border border-border rounded-lg outline-none focus:ring-2 focus:ring-[#7C3AED]/20 focus:border-[#7C3AED]"
+            className="w-48 px-3 py-1.5 text-sm border border-border rounded-lg outline-none focus:ring-2 focus:ring-[#7C3AED]/20 focus:border-[#7C3AED] placeholder:text-muted-foreground/50"
           />
           <button
             onClick={handleChangeRoot}
