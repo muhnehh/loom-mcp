@@ -1,154 +1,188 @@
 "use client"
 
-import { 
-  History, 
-  PlayCircle, 
-  Search, 
-  ChevronRight, 
-  Calendar,
-  Clock,
-  Zap,
-  FileCode,
-  ArrowRight
-} from "lucide-react"
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+import { useState, useEffect } from "react"
+import { Search, Zap, Network, Filter } from "lucide-react"
 
-const pastSessions = [
-  { id: '7f3a2b5c', date: 'Today, 2:35 PM', duration: '24m 18s', files: 3, tokensSaved: '142,391', status: 'Active' },
-  { id: '9d2e1f8a', date: 'Yesterday, 10:12 AM', duration: '1h 12m', files: 12, tokensSaved: '842,901', status: 'Completed' },
-  { id: '5c6d4e3f', date: 'Apr 24, 4:45 PM', duration: '45m 02s', files: 5, tokensSaved: '312,450', status: 'Completed' },
-  { id: '2a1b3c4d', date: 'Apr 24, 1:20 PM', duration: '32m 15s', files: 2, tokensSaved: '124,000', status: 'Completed' },
-  { id: '1a2b3c4d', date: 'Apr 23, 11:05 AM', duration: '2h 05m', files: 18, tokensSaved: '1,245,670', status: 'Completed' },
+interface Session {
+  id: string
+  title: string
+  duration: number
+  files: number
+  tokens: number
+  date: string
+}
+
+const placeholderSessions: Session[] = [
+  { id: "a77ec2d1", title: "Fix OAuth login bug", duration: 24 * 60000 + 18 * 1000, files: 8, tokens: 142391, date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
+  { id: "3fc37a0d", title: "Add rate limiting middleware", duration: 16 * 60000 + 42 * 1000, files: 5, tokens: 68714, date: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString() },
+  { id: "1c3a1e62", title: "Refactor user service", duration: 32 * 60000 + 7 * 1000, files: 12, tokens: 216847, date: new Date(Date.now() - 26 * 60 * 60 * 1000).toISOString() },
+  { id: "4d3f4e53", title: "Fix types in auth module", duration: 12 * 60000 + 33 * 1000, files: 4, tokens: 45123, date: new Date(Date.now() - 27 * 60 * 60 * 1000).toISOString() },
+]
+
+function formatDuration(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes}m ${seconds}s`
+}
+
+function formatDate(iso: string): string {
+  const d = new Date(iso)
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today.getTime() - 86400000)
+  const day = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+
+  const timeStr = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })
+
+  if (day.getTime() === today.getTime()) return `Today, ${timeStr}`
+  if (day.getTime() === yesterday.getTime()) return `Yesterday, ${timeStr}`
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+}
+
+const iconColors = [
+  { bg: "bg-[#F5F3FF]", text: "text-[#7C3AED]" },
+  { bg: "bg-[#EFF6FF]", text: "text-[#3B82F6]" },
+  { bg: "bg-[#ECFDF5]", text: "text-[#10B981]" },
+  { bg: "bg-[#FFF7ED]", text: "text-[#F97316]" },
 ]
 
 export default function HistoryPage() {
+  const [sessions, setSessions] = useState<Session[]>([])
+  const [query, setQuery] = useState("")
+  const [status, setStatus] = useState("all")
+  const [selectedSession, setSelectedSession] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch("http://localhost:2337/api/sessions")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d) && d.length > 0) setSessions(d)
+        else setSessions(placeholderSessions)
+      })
+      .catch(() => setSessions(placeholderSessions))
+  }, [])
+
+  const display = sessions.length > 0 ? sessions : placeholderSessions
+
+  const filtered = display.filter((s) => {
+    const matchQ = query === "" || s.title.toLowerCase().includes(query.toLowerCase()) || s.id.toLowerCase().includes(query.toLowerCase())
+    return matchQ
+  })
+
   return (
-    <div className="p-8 max-w-[1600px] mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-background">
+      <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-6">
+        {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-[#111827]">History</h1>
-          <p className="text-[#6B7280]">View and replay past LoomMCP sessions.</p>
+          <h1 className="text-2xl font-bold text-foreground">History</h1>
+          <p className="text-sm text-muted-foreground">View and restore your previous sessions.</p>
         </div>
+
+        {/* Controls */}
         <div className="flex items-center gap-3">
-           <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
-              <Input placeholder="Search sessions..." className="pl-10 w-64 border-[#E5E7EB] h-10" />
-           </div>
-           <Button className="bg-[#7C3AED] hover:bg-[#6D28D9] font-bold">
-             <Calendar className="w-4 h-4 mr-2" /> Filter by Date
-           </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-12 gap-8">
-        <div className="col-span-12 xl:col-span-9 space-y-6">
-          <Card className="border-[#E5E7EB] shadow-sm overflow-hidden">
-            <Table>
-              <TableHeader className="bg-[#F9FAFB]">
-                <TableRow className="border-b border-[#E5E7EB]">
-                  <TableHead className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider px-6 py-4">Session ID</TableHead>
-                  <TableHead className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider px-6 py-4">Date & Time</TableHead>
-                  <TableHead className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider px-6 py-4">Duration</TableHead>
-                  <TableHead className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider px-6 py-4">Files Touched</TableHead>
-                  <TableHead className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider px-6 py-4">Tokens Saved</TableHead>
-                  <TableHead className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider px-6 py-4 text-right">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pastSessions.map((session, i) => (
-                  <TableRow key={i} className="group hover:bg-[#F9FAFB] border-b border-[#F3F4F6] last:border-0 cursor-pointer">
-                    <TableCell className="px-6 py-4">
-                       <span className="text-xs font-bold text-[#7C3AED] font-mono">{session.id}</span>
-                    </TableCell>
-                    <TableCell className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold text-[#111827]">{session.date}</span>
-                        <span className="text-[10px] text-[#9CA3AF]">{session.status}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-6 py-4 text-xs text-[#6B7280] tabular-nums">{session.duration}</TableCell>
-                    <TableCell className="px-6 py-4">
-                       <div className="flex items-center gap-1.5">
-                         <FileCode className="w-3.5 h-3.5 text-[#9CA3AF]" />
-                         <span className="text-xs font-medium text-[#111827]">{session.files}</span>
-                       </div>
-                    </TableCell>
-                    <TableCell className="px-6 py-4">
-                       <div className="flex items-center gap-1.5">
-                         <Zap className="w-3.5 h-3.5 text-[#16A34A]" />
-                         <span className="text-xs font-bold text-[#16A34A]">{session.tokensSaved}</span>
-                       </div>
-                    </TableCell>
-                    <TableCell className="px-6 py-4 text-right">
-                       <Button variant="ghost" size="sm" className="text-[#7C3AED] hover:bg-[#F3F0FF] font-bold text-xs h-8 px-3">
-                         <PlayCircle className="w-3.5 h-3.5 mr-2" /> Replay Session
-                       </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
-
-          <div className="flex justify-center pt-4">
-             <Button variant="outline" className="border-[#E5E7EB] text-[#6B7280]">Load More Sessions</Button>
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search sessions..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 text-sm border border-border rounded-lg bg-card outline-none focus:ring-2 focus:ring-[#7C3AED]/20 focus:border-[#7C3AED] placeholder:text-muted-foreground"
+            />
           </div>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="px-3 py-2 text-sm border border-border rounded-lg bg-card outline-none focus:ring-2 focus:ring-[#7C3AED]/20 focus:border-[#7C3AED] text-foreground"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="archived">Archived</option>
+          </select>
         </div>
 
-        <div className="col-span-12 xl:col-span-3 space-y-8">
-           <Card className="border-[#E5E7EB] shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-sm font-semibold">Lifetime Impact</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                   <div className="space-y-1">
-                      <p className="text-[10px] font-medium text-[#6B7280] uppercase tracking-wider">Total Sessions</p>
-                      <p className="text-3xl font-bold text-[#111827]">142</p>
-                   </div>
-                   <div className="space-y-1">
-                      <p className="text-[10px] font-medium text-[#6B7280] uppercase tracking-wider">Cumulative Tokens Saved</p>
-                      <p className="text-3xl font-bold text-[#16A34A]">12.4M</p>
-                   </div>
-                   <div className="space-y-1">
-                      <p className="text-[10px] font-medium text-[#6B7280] uppercase tracking-wider">Avg Reduction</p>
-                      <p className="text-3xl font-bold text-[#7C3AED]">94.2%</p>
-                   </div>
-                </div>
+        {/* Session List */}
+        <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+              <p className="text-sm">No sessions found.</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-border">
+              {filtered.map((session, i) => {
+                const color = iconColors[i % iconColors.length]
+                return (
+                  <div key={session.id} className="flex flex-col">
+                    <div className="flex items-center gap-4 px-5 py-4 hover:bg-muted transition-colors">
+                      {/* Icon */}
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${color.bg}`}>
+                        {i % 3 === 0 ? (
+                          <Zap className={`w-5 h-5 ${color.text}`} />
+                        ) : i % 3 === 1 ? (
+                          <Network className={`w-5 h-5 ${color.text}`} />
+                        ) : (
+                          <Search className={`w-5 h-5 ${color.text}`} />
+                        )}
+                      </div>
 
-                <div className="p-4 bg-[#F9FAFB] rounded-xl border border-[#E5E7EB] space-y-4">
-                   <h3 className="text-xs font-bold text-[#111827]">Session Insights</h3>
-                   <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                         <Clock className="w-4 h-4 text-[#3B82F6]" />
-                         <span className="text-[11px] text-[#6B7280]">Avg session lasts 42m</span>
+                      {/* Title + ID */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">{session.title}</p>
+                        <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{session.id}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {formatDuration(session.duration)} · {session.files} files · {session.tokens.toLocaleString()} tokens
+                        </p>
                       </div>
-                      <div className="flex items-center gap-3">
-                         <Zap className="w-4 h-4 text-[#F97316]" />
-                         <span className="text-[11px] text-[#6B7280]">Most active: src/auth.ts</span>
+
+                      {/* Date */}
+                      <div className="text-xs text-muted-foreground shrink-0 text-right">
+                        {formatDate(session.date)}
                       </div>
-                   </div>
-                </div>
-              </CardContent>
-           </Card>
+
+                      {/* View button */}
+                      <button
+                        onClick={() => setSelectedSession(selectedSession === session.id ? null : session.id)}
+                        className="shrink-0 px-3 py-1.5 text-sm font-medium text-[#7C3AED] border border-border rounded-lg hover:bg-[#F5F3FF] transition-colors"
+                      >
+                        {selectedSession === session.id ? "Close" : "View"}
+                      </button>
+                    </div>
+                    {selectedSession === session.id && (
+                      <div className="px-5 pb-4 bg-muted border-t border-border">
+                        <div className="py-3 space-y-2">
+                          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Session Details</p>
+                          <div className="grid grid-cols-3 gap-4">
+                            <div>
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Duration</p>
+                              <p className="text-sm font-semibold text-foreground">{formatDuration(session.duration)}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Files</p>
+                              <p className="text-sm font-semibold text-foreground">{session.files}</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Tokens</p>
+                              <p className="text-sm font-semibold text-foreground">{session.tokens.toLocaleString()}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Session ID</p>
+                            <p className="text-xs font-mono text-foreground">{session.id}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Date</p>
+                            <p className="text-xs text-foreground">{formatDate(session.date)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

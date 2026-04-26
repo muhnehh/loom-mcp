@@ -4,6 +4,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Navbar } from "@/components/layout/navbar";
 import { CommandPalette } from "@/components/modals/command-palette";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,17 +32,19 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className={`${inter.className} min-h-screen bg-[#FAFAFA]`}>
-        <div className="flex">
-          <Sidebar />
-          <div className="flex-1 ml-[260px]">
-            <Navbar />
-            <main className="min-h-[calc(100vh-64px)] overflow-x-hidden">
-              {children}
-            </main>
+      <body className={`${inter.className} min-h-screen bg-background`}>
+        <ThemeProvider>
+          <div className="flex">
+            <Sidebar />
+            <div className="flex-1 ml-[260px]">
+              <Navbar />
+              <main className="min-h-[calc(100vh-64px)] overflow-x-hidden">
+                {children}
+              </main>
+            </div>
           </div>
-        </div>
-        <CommandPalette />
+          <CommandPalette />
+        </ThemeProvider>
       </body>
     </html>
   );

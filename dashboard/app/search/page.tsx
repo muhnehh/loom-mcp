@@ -1,292 +1,287 @@
 "use client"
 
 import { useState } from "react"
-import { 
-  Search, 
-  ChevronDown, 
-  Filter, 
-  FileCode, 
-  ExternalLink,
-  Code2,
-  Box,
-  Layers,
-  CheckCircle2,
-  Zap,
-  Crosshair,
-  ArrowRight
-} from "lucide-react"
+import { Search, Filter, FileCode, ChevronRight, ChevronLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select"
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-const searchResults = [
-  { file: 'src/auth.ts', line: 22, context: 'export async function loginUser(username: string, password: string): Promise<User> {', type: 'definition' },
-  { file: 'src/api/auth-service.ts', line: 42, context: 'return await loginUser(user.email, user.password);', type: 'call' },
-  { file: 'src/middleware.ts', line: 15, context: 'import { loginUser } from "./auth";', type: 'import' },
-  { file: 'src/auth-provider.tsx', line: 31, context: 'await loginUser(credentials.email, token.password);', type: 'call' },
-  { file: 'src/__tests__/auth.test.ts', line: 56, context: 'const result = await loginUser("test@example.com", "pass");', type: 'call' },
-  { file: 'src/types.ts', line: 12, context: 'loginUser: (email: string, pass: string) => Promise<User>;', type: 'type' },
-  { file: 'src/constants.ts', line: 8, context: 'import { loginUser } from "./auth";', type: 'import' },
+interface RefResult {
+  file: string
+  line: number
+  context: string
+  type: 'call' | 'import' | 'type' | 'assignment' | 'definition'
+}
+
+const placeholderResults: RefResult[] = [
+  { file: 'src/routes.ts', line: 12, context: 'const result = await loginUser(email, pass)', type: 'call' },
+  { file: 'src/middleware.ts', line: 42, context: 'return await loginUser(email, pass)', type: 'call' },
+  { file: 'src/auth.test.ts', line: 8, context: "import { loginUser } from '../auth'", type: 'import' },
+  { file: 'src/api/auth-service.ts', line: 22, context: 'loginUser: (email: string, pass: string) => Promise<User>', type: 'type' },
+  { file: 'src/admin.ts', line: 15, context: 'const handler = loginUser', type: 'assignment' },
+  { file: 'src/auth.ts', line: 5, context: 'export async function loginUser(email: string, password: string): Promise<User>', type: 'definition' },
 ]
 
+const typeBadge = {
+  call: 'bg-[#EFF6FF] text-[#3B82F6] border-[#BFDBFE]',
+  import: 'bg-[#F0FDF4] text-[#16A34A] border-[#BBF7D0]',
+  type: 'bg-[#F5F3FF] text-[#7C3AED] border-[#DDD6FE]',
+  assignment: 'bg-[#FFF7ED] text-[#EA580C] border-[#FED7AA]',
+  definition: 'bg-muted text-muted-foreground border-border',
+}
+
+const PAGE_SIZE = 4
+
 export default function SearchPage() {
-  const [searchTerm, setSearchTerm] = useState("loginUser")
+  const [symbol, setSymbol] = useState("loginUser")
+  const [scope, setScope] = useState("workspace")
+  const [results, setResults] = useState<RefResult[]>(placeholderResults)
+  const [activeTab, setActiveTab] = useState("all")
+  const [page, setPage] = useState(1)
+  const [searching, setSearching] = useState(false)
+
+  const handleSearch = () => {
+    setSearching(true)
+    fetch('http://localhost:2337/api/history')
+      .then(r => r.json())
+      .then((calls: any[]) => {
+        const refCalls = calls.filter(c => c.tool === 'loom_search_refs')
+        if (refCalls.length > 0) {
+          setResults(refCalls[refCalls.length - 1].result || placeholderResults)
+        }
+        setSearching(false)
+        setPage(1)
+      })
+      .catch(() => setSearching(false))
+  }
+
+  const filterByTab = (r: RefResult) => {
+    if (activeTab === 'all') return true
+    if (activeTab === 'calls') return r.type === 'call'
+    if (activeTab === 'imports') return r.type === 'import'
+    if (activeTab === 'types') return r.type === 'type'
+    if (activeTab === 'assignments') return r.type === 'assignment'
+    return true
+  }
+
+  const filtered = results.filter(filterByTab)
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  const countByType = (type: string) => results.filter(r => r.type === type).length
+
+  const fileTypes = [...new Set(results.map(r => '.' + r.file.split('.').pop()))].map(ext => ({
+    ext,
+    count: results.filter(r => r.file.endsWith(ext)).length,
+  }))
+
+  const directories = [...new Set(results.map(r => r.file.split('/')[0] + '/'))].map(dir => ({
+    dir,
+    count: results.filter(r => r.file.startsWith(dir.replace('/', ''))).length,
+  }))
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#FAFAFB]">
-      <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-8">
+    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-background">
+      <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#111827] flex items-center gap-3">
-               AST Search <Search className="w-6 h-6 text-[#3B82F6]" />
-            </h1>
-            <p className="text-[#6B7280] font-medium">Find deterministic references to symbols without text-search noise.</p>
-          </div>
-          <div className="flex gap-3">
-             <div className="hidden lg:flex items-center gap-2 text-xs font-bold text-[#3B82F6] bg-[#EFF6FF] px-3 py-1.5 rounded-full border border-[#DBEAFE]">
-                <Box className="w-4 h-4" /> AST Engine Active
-             </div>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Search References</h1>
+          <p className="text-sm text-muted-foreground mt-1">Find all references to a symbol using AST-aware search.</p>
+        </div>
+
+        {/* Search bar card */}
+        <div className="bg-card border border-border rounded-xl shadow-sm p-6">
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                value={symbol}
+                onChange={e => setSymbol(e.target.value)}
+                placeholder="loginUser"
+                className="pl-9 border-border focus-visible:ring-[#7C3AED] h-10"
+                onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
+              />
+            </div>
+            <Select value={scope} onValueChange={setScope}>
+              <SelectTrigger className="w-40 h-10 border-border focus:ring-[#7C3AED]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="workspace">Workspace</SelectItem>
+                <SelectItem value="file">File</SelectItem>
+                <SelectItem value="directory">Directory</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              onClick={handleSearch}
+              disabled={searching}
+              className="h-10 px-6 bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-medium rounded-lg"
+            >
+              {searching ? 'Searching...' : 'Search'}
+            </Button>
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="premium-card p-2 relative overflow-hidden group">
-           <div className="absolute inset-0 bg-gradient-to-r from-[#3B82F6]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-           <div className="relative flex items-center gap-2 bg-white rounded-[1.25rem] p-2 border border-[#F3F4F6] shadow-sm">
-             <div className="w-12 h-12 flex items-center justify-center bg-[#F9FAFB] rounded-xl text-[#9CA3AF]">
-                <Search className="w-5 h-5" />
-             </div>
-             <Input 
-               value={searchTerm}
-               onChange={(e) => setSearchTerm(e.target.value)}
-               placeholder="Search for a symbol..." 
-               className="flex-1 border-0 h-12 shadow-none focus-visible:ring-0 text-lg font-mono placeholder:text-[#D1D5DB] placeholder:font-sans" 
-             />
-             <div className="w-px h-8 bg-[#E5E7EB] mx-2 hidden md:block" />
-             <Select defaultValue="workspace">
-               <SelectTrigger className="w-[180px] h-12 border-0 bg-transparent shadow-none focus:ring-0 font-bold hidden md:flex">
-                 <SelectValue placeholder="Scope" />
-               </SelectTrigger>
-               <SelectContent>
-                 <SelectItem value="workspace">Entire Workspace</SelectItem>
-                 <SelectItem value="file">Current File</SelectItem>
-                 <SelectItem value="module">Current Module</SelectItem>
-               </SelectContent>
-             </Select>
-             <Button className="h-12 px-8 bg-[#111827] hover:bg-[#374151] text-white font-bold rounded-xl shadow-lg transition-all ml-2">
-                Search <ArrowRight className="w-4 h-4 ml-2" />
-             </Button>
-           </div>
-        </div>
-
-        <div className="grid grid-cols-12 gap-8">
-          {/* Results Table */}
-          <div className="col-span-12 xl:col-span-9 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-[#F3F4F6] shadow-sm relative overflow-hidden group">
-               <div className="absolute top-0 left-0 w-1 h-full bg-[#3B82F6]" />
-               <div className="flex items-center gap-4">
-                 <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] flex items-center justify-center">
-                   <CheckCircle2 className="w-5 h-5 text-[#3B82F6]" />
-                 </div>
-                 <div>
-                   <span className="text-sm font-black text-[#111827] block">Found 14 references across 7 files</span>
-                   <span className="text-[11px] font-bold text-[#6B7280] flex items-center gap-2 mt-0.5">
-                      Search completed in 42ms
-                   </span>
-                 </div>
-               </div>
-               <div className="flex gap-2">
-                 <Button variant="outline" className="text-[11px] font-bold h-9 px-4 rounded-lg border-[#E5E7EB]">
-                    Export CSV
-                 </Button>
-                 <Button className="text-[11px] font-bold bg-[#3B82F6] hover:bg-[#2563EB] text-white h-9 px-4 rounded-lg">
-                    Focus All Results
-                 </Button>
-               </div>
+        {/* Results area */}
+        <div className="grid grid-cols-4 gap-6">
+          {/* Left: results (3/4) */}
+          <div className="col-span-3 space-y-4">
+            {/* Found badge */}
+            <div className="inline-flex items-center gap-2 text-xs font-medium text-[#10B981] bg-[#ECFDF5] border border-[#D1FAE5] px-3 py-1.5 rounded-full">
+              Found {results.length} references
             </div>
 
-            <div className="premium-card overflow-hidden">
-              <Tabs defaultValue="all" className="w-full">
-                <div className="px-8 pt-6 border-b border-[#F3F4F6] bg-white">
-                  <TabsList className="bg-transparent h-auto p-0 gap-8">
-                    <TabsTrigger value="all" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#3B82F6] data-[state=active]:bg-transparent px-0 pb-4 text-xs font-black uppercase tracking-widest shadow-none flex items-center gap-2 data-[state=active]:text-[#111827] text-[#9CA3AF]">
-                       All <Badge className="bg-[#EFF6FF] text-[#3B82F6] hover:bg-[#EFF6FF] text-[10px] px-2 py-0 border-0 rounded-full">14</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="calls" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#3B82F6] data-[state=active]:bg-transparent px-0 pb-4 text-xs font-black uppercase tracking-widest shadow-none flex items-center gap-2 data-[state=active]:text-[#111827] text-[#9CA3AF]">
-                       Calls <Badge className="bg-[#F3F4F6] text-[#6B7280] hover:bg-[#F3F4F6] text-[10px] px-2 py-0 border-0 rounded-full">8</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="imports" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#3B82F6] data-[state=active]:bg-transparent px-0 pb-4 text-xs font-black uppercase tracking-widest shadow-none flex items-center gap-2 data-[state=active]:text-[#111827] text-[#9CA3AF]">
-                       Imports <Badge className="bg-[#F3F4F6] text-[#6B7280] hover:bg-[#F3F4F6] text-[10px] px-2 py-0 border-0 rounded-full">2</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="types" className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#3B82F6] data-[state=active]:bg-transparent px-0 pb-4 text-xs font-black uppercase tracking-widest shadow-none flex items-center gap-2 data-[state=active]:text-[#111827] text-[#9CA3AF]">
-                       Types <Badge className="bg-[#F3F4F6] text-[#6B7280] hover:bg-[#F3F4F6] text-[10px] px-2 py-0 border-0 rounded-full">3</Badge>
-                    </TabsTrigger>
+            {/* Results table card */}
+            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+              <Tabs value={activeTab} onValueChange={v => { setActiveTab(v); setPage(1) }}>
+                <div className="px-5 pt-4 border-b border-border">
+                  <TabsList className="bg-transparent h-auto p-0 gap-5">
+                    {[
+                      { value: 'all', label: 'All', count: results.length },
+                      { value: 'calls', label: 'Calls', count: countByType('call') },
+                      { value: 'imports', label: 'Imports', count: countByType('import') },
+                      { value: 'types', label: 'Type Annotations', count: countByType('type') },
+                      { value: 'assignments', label: 'Assignments', count: countByType('assignment') },
+                    ].map(tab => (
+                      <TabsTrigger
+                        key={tab.value}
+                        value={tab.value}
+                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#7C3AED] data-[state=active]:bg-transparent px-0 pb-3 text-xs font-semibold shadow-none data-[state=active]:text-foreground text-muted-foreground flex items-center gap-1.5"
+                      >
+                        {tab.label}
+                        <span className="text-[10px] bg-[#F3F4F6] px-1.5 py-0.5 rounded-full text-muted-foreground">{tab.count}</span>
+                      </TabsTrigger>
+                    ))}
                   </TabsList>
                 </div>
-                <TabsContent value="all" className="m-0 bg-white">
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader className="bg-[#F9FAFB]/50">
-                        <TableRow className="border-b border-[#F3F4F6] hover:bg-transparent">
-                          <TableHead className="text-[10px] font-black text-[#9CA3AF] uppercase tracking-[0.1em] px-8 py-4 w-[250px]">File / Line</TableHead>
-                          <TableHead className="text-[10px] font-black text-[#9CA3AF] uppercase tracking-[0.1em] px-8 py-4">Context</TableHead>
-                          <TableHead className="text-[10px] font-black text-[#9CA3AF] uppercase tracking-[0.1em] px-8 py-4 text-right">Type</TableHead>
+
+                <TabsContent value={activeTab} className="m-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-b border-border hover:bg-transparent bg-muted">
+                        <TableHead className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide px-5 py-3">File</TableHead>
+                        <TableHead className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide px-5 py-3">Line</TableHead>
+                        <TableHead className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide px-5 py-3">Context</TableHead>
+                        <TableHead className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide px-5 py-3">Type</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {paged.map((r, i) => (
+                        <TableRow key={i} className="border-b border-border last:border-0 hover:bg-muted cursor-pointer">
+                          <TableCell className="px-5 py-3">
+                            <div className="flex items-center gap-2">
+                              <FileCode className="w-3.5 h-3.5 text-muted-foreground" />
+                              <span className="text-xs font-mono text-foreground font-medium">{r.file}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="px-5 py-3 text-xs text-muted-foreground tabular-nums">{r.line}</TableCell>
+                          <TableCell className="px-5 py-3">
+                            <span className="text-xs font-mono text-[#374151] bg-muted border border-border px-2 py-1 rounded truncate max-w-[280px] block">
+                              {r.context}
+                            </span>
+                          </TableCell>
+                          <TableCell className="px-5 py-3">
+                            <span className={cn(
+                              'inline-flex items-center text-[10px] font-semibold border px-2 py-0.5 rounded-full capitalize',
+                              typeBadge[r.type] || typeBadge.definition
+                            )}>
+                              {r.type}
+                            </span>
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {searchResults.map((result, i) => (
-                          <TableRow key={i} className="group hover:bg-[#F9FAFB] border-b border-[#F3F4F6] last:border-0 transition-colors cursor-pointer">
-                            <TableCell className="px-8 py-5">
-                              <div className="flex flex-col gap-1">
-                                 <div className="flex items-center gap-2">
-                                    <FileCode className="w-3.5 h-3.5 text-[#9CA3AF] group-hover:text-[#3B82F6] transition-colors" />
-                                    <span className="text-xs font-bold text-[#111827] font-mono truncate">{result.file}</span>
-                                 </div>
-                                 <span className="text-[10px] font-bold text-[#6B7280] ml-5">Line {result.line}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="px-8 py-5">
-                              <div className="text-xs text-[#111827] font-mono truncate max-w-[400px] xl:max-w-[600px] bg-[#F9FAFB] group-hover:bg-white border border-[#E5E7EB] px-3 py-2 rounded-lg transition-colors">
-                                {result.context}
-                              </div>
-                            </TableCell>
-                            <TableCell className="px-8 py-5 text-right">
-                               <Badge variant="outline" className={cn(
-                                 "text-[9px] font-black uppercase tracking-widest px-2 py-0.5 border",
-                                 result.type === 'definition' ? "bg-[#F5F3FF] text-[#7C3AED] border-[#EDE9FE]" :
-                                 result.type === 'call' ? "bg-[#EFF6FF] text-[#3B82F6] border-[#DBEAFE]" :
-                                 "bg-[#F9FAFB] text-[#6B7280] border-[#E5E7EB]"
-                               )}>
-                                 {result.type}
-                               </Badge>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </TabsContent>
               </Tabs>
             </div>
 
-            <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-[#F3F4F6] shadow-sm">
-               <span className="text-xs font-bold text-[#6B7280]">Showing 1-7 of 14</span>
-               <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" className="h-9 px-4 border-[#E5E7EB] text-xs font-bold rounded-lg" disabled>Previous</Button>
-                  <div className="flex items-center gap-1">
-                     <Button variant="outline" size="sm" className="h-9 w-9 p-0 border-[#3B82F6] text-[#3B82F6] bg-[#EFF6FF] text-xs font-black rounded-lg">1</Button>
-                     <Button variant="outline" size="sm" className="h-9 w-9 p-0 border-[#E5E7EB] text-[#6B7280] text-xs font-bold rounded-lg">2</Button>
-                  </div>
-                  <Button variant="outline" size="sm" className="h-9 px-4 border-[#E5E7EB] text-xs font-bold rounded-lg">Next</Button>
-               </div>
+            {/* Pagination */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">
+                Page {page} of {Math.max(1, totalPages)}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="h-8 px-3 text-xs border-border text-muted-foreground"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="h-8 px-3 text-xs border-border text-muted-foreground"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Right Filter Panel */}
-          <div className="col-span-12 xl:col-span-3 space-y-8">
-             <div className="premium-card p-6 space-y-8">
-                <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-[#111827]" />
-                  <h3 className="text-sm font-black text-[#111827] uppercase tracking-wider">Filters</h3>
-                </div>
-                
-                <div className="space-y-4">
-                   <p className="text-[10px] font-black text-[#9CA3AF] uppercase tracking-[0.2em]">File Type</p>
-                   <div className="space-y-3">
-                      {[
-                        { name: '.ts', count: 10, checked: true },
-                        { name: '.tsx', count: 2, checked: true },
-                        { name: '.js', count: 1, checked: false },
-                        { name: '.json', count: 1, checked: false },
-                      ].map((type) => (
-                        <div key={type.name} className="flex items-center justify-between group cursor-pointer">
-                           <div className="flex items-center gap-3">
-                              <Checkbox id={type.name} defaultChecked={type.checked} className="data-[state=checked]:bg-[#3B82F6] data-[state=checked]:border-[#3B82F6]" />
-                              <label htmlFor={type.name} className="text-xs font-bold text-[#111827] cursor-pointer">{type.name}</label>
-                           </div>
-                           <span className="text-[10px] font-bold text-[#9CA3AF] bg-[#F9FAFB] px-1.5 py-0.5 rounded border border-[#E5E7EB]">{type.count}</span>
-                        </div>
-                      ))}
-                   </div>
-                </div>
+          {/* Right: filter panel (1/4) */}
+          <div className="col-span-1">
+            <div className="bg-card border border-border rounded-xl shadow-sm p-5 space-y-5">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                <h3 className="text-sm font-semibold text-foreground">Filters</h3>
+              </div>
 
-                <div className="space-y-4 pt-6 border-t border-[#F3F4F6]">
-                   <p className="text-[10px] font-black text-[#9CA3AF] uppercase tracking-[0.2em]">Reference Type</p>
-                   <div className="space-y-3">
-                      {[
-                        { name: 'Definition', checked: true },
-                        { name: 'Function Call', checked: true },
-                        { name: 'Import Statement', checked: true },
-                        { name: 'Type Annotation', checked: true },
-                        { name: 'Assignment', checked: true },
-                      ].map((type) => (
-                        <div key={type.name} className="flex items-center gap-3 group cursor-pointer">
-                           <Checkbox id={type.name} defaultChecked={type.checked} className="data-[state=checked]:bg-[#3B82F6] data-[state=checked]:border-[#3B82F6]" />
-                           <label htmlFor={type.name} className="text-xs font-bold text-[#111827] cursor-pointer">{type.name}</label>
-                        </div>
-                      ))}
-                   </div>
-                </div>
-             </div>
-
-             <div className="bg-gradient-to-br from-[#3B82F6] to-[#2563EB] p-6 rounded-[2rem] space-y-3 shadow-xl shadow-blue-200 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Box className="w-16 h-16 text-white fill-white" />
-                </div>
-                <div className="flex items-center gap-2 relative z-10">
-                  <div className="w-7 h-7 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <Code2 className="w-4 h-4 text-white" />
+              <div className="space-y-3">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">File Type</p>
+                {fileTypes.map(({ ext, count }) => (
+                  <div key={ext} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Checkbox defaultChecked className="data-[state=checked]:bg-[#7C3AED] data-[state=checked]:border-[#7C3AED] h-3.5 w-3.5" />
+                      <label className="text-xs font-medium text-foreground">{ext}</label>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground bg-muted border border-border px-1.5 py-0.5 rounded">{count}</span>
                   </div>
-                  <span className="text-xs font-black text-white uppercase tracking-wider">Why AST?</span>
+                ))}
+              </div>
+
+              <div className="pt-4 border-t border-border space-y-3">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Directory</p>
+                {directories.map(({ dir, count }) => (
+                  <div key={dir} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Checkbox defaultChecked className="data-[state=checked]:bg-[#7C3AED] data-[state=checked]:border-[#7C3AED] h-3.5 w-3.5" />
+                      <label className="text-xs font-medium text-foreground">{dir}</label>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground bg-muted border border-border px-1.5 py-0.5 rounded">{count}</span>
+                  </div>
+                ))}
+                <div className="flex items-center gap-2">
+                  <Checkbox defaultChecked className="data-[state=checked]:bg-[#7C3AED] data-[state=checked]:border-[#7C3AED] h-3.5 w-3.5" />
+                  <label className="text-xs font-medium text-foreground">All Directories</label>
                 </div>
-                <ul className="space-y-2 mt-3 relative z-10">
-                   {[
-                     'Zero false positives from strings/comments',
-                     'Resolves local scope bindings correctly',
-                     'Uses 10x fewer tokens than raw grep',
-                   ].map((item, i) => (
-                     <li key={i} className="flex items-start gap-2 text-[10px] text-blue-100 font-medium leading-relaxed">
-                       <div className="w-1 h-1 bg-blue-300 rounded-full mt-1.5 shrink-0" />
-                       {item}
-                     </li>
-                   ))}
-                </ul>
-             </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Status Bar */}
-      <footer className="h-10 bg-white border-t border-[#F3F4F6] px-8 flex items-center justify-between text-[10px] font-bold text-[#9CA3AF]">
-        <div className="flex items-center gap-6">
-           <div className="flex items-center gap-2">
-             <span className="text-[#111827]">LoomMCP</span>
-             <span className="bg-[#F3F4F6] px-1.5 py-0.5 rounded text-[9px]">v0.1.0</span>
-           </div>
-        </div>
-        <div className="flex items-center gap-4">
-           <span>Engine: Tree-sitter AST</span>
-        </div>
-      </footer>
     </div>
   )
 }

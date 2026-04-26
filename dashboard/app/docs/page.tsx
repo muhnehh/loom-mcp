@@ -1,120 +1,153 @@
 "use client"
 
-import { 
-  BookOpen, 
-  ChevronRight, 
-  ExternalLink, 
-  Zap, 
-  Info, 
-  Terminal,
-  Cpu,
-  Layers,
-  Focus
-} from "lucide-react"
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { useState } from "react"
+import { Copy, Check, CheckCircle } from "lucide-react"
+import { cn } from "@/lib/utils"
 
-export default function DocsPage() {
+type DocsSection = "getting-started" | "tools-reference" | "best-practices" | "configuration" | "faq" | "troubleshooting"
+
+const navItems: { key: DocsSection; label: string }[] = [
+  { key: "getting-started", label: "Getting Started" },
+  { key: "tools-reference", label: "Tools Reference" },
+  { key: "best-practices", label: "Best Practices" },
+  { key: "configuration", label: "Configuration" },
+  { key: "faq", label: "FAQ" },
+  { key: "troubleshooting", label: "Troubleshooting" },
+]
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text).catch(() => {})
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
-    <div className="p-8 max-w-[1200px] mx-auto space-y-8">
-      {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight text-[#111827]">Documentation</h1>
-        <p className="text-[#6B7280]">Learn how to use LoomMCP to build context-aware AI agents.</p>
+    <button
+      onClick={handleCopy}
+      className="p-1.5 rounded-md hover:bg-card/10 text-[#9CA3AF] hover:text-white transition-colors"
+    >
+      {copied ? <Check className="w-4 h-4 text-[#10B981]" /> : <Copy className="w-4 h-4" />}
+    </button>
+  )
+}
+
+function CodeBlock({ code }: { code: string }) {
+  return (
+    <div className="relative bg-[#1F2937] rounded-lg p-3 flex items-center justify-between gap-3 mt-2">
+      <code className="text-[#34D399] font-mono text-sm">{code}</code>
+      <CopyButton text={code} />
+    </div>
+  )
+}
+
+function Step({ num, title, desc, code }: { num: number; title: string; desc: string; code: string }) {
+  return (
+    <div className="flex gap-4">
+      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
+        <span className="text-sm font-bold text-muted-foreground">{num}</span>
+      </div>
+      <div className="flex-1">
+        <p className="text-base font-semibold text-foreground">{title}</p>
+        <p className="text-sm text-muted-foreground mt-0.5">{desc}</p>
+        <CodeBlock code={code} />
+      </div>
+    </div>
+  )
+}
+
+function GettingStarted() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-foreground">Getting Started</h2>
+        <p className="text-sm text-muted-foreground mt-1">Connect to Claude Code in 3 steps</p>
       </div>
 
-      <div className="grid grid-cols-12 gap-8">
-        <div className="col-span-12 xl:col-span-8 space-y-8">
-           <section className="space-y-4">
-              <h2 className="text-xl font-bold text-[#111827]">Introduction</h2>
-              <p className="text-sm text-[#6B7280] leading-relaxed">
-                LoomMCP is an AST-aware context compiler designed specifically for coding agents like Claude Code. 
-                Instead of sending massive amounts of raw code to the LLM, LoomMCP allows agents to "page in" only the 
-                relevant code signatures and implementation details they need.
-              </p>
-           </section>
+      <div className="space-y-6">
+        <Step
+          num={1}
+          title="Install LoomMCP"
+          desc="Install the LoomMCP server using npx."
+          code="npx @loom-mcp/server start"
+        />
+        <Step
+          num={2}
+          title="Add to Claude Code"
+          desc="Register LoomMCP as an MCP server in Claude Code."
+          code="/mcp add stdio npx @loom-mcp/server"
+        />
+        <Step
+          num={3}
+          title="Start Using Tools"
+          desc="Begin with loom_get_topology to understand your codebase."
+          code="loom_get_topology"
+        />
+      </div>
 
-           <section className="space-y-4">
-              <h2 className="text-xl font-bold text-[#111827]">Core Concepts</h2>
-              <div className="grid grid-cols-2 gap-4">
-                 {[
-                   { title: 'AST-aware Indexing', icon: Layers, desc: 'Loom understands the structure of your code, not just the text.' },
-                   { title: 'TOON Compression', icon: Cpu, desc: 'Our proprietary wire format for extremely dense code representations.' },
-                   { title: 'Smart Focus', icon: Focus, desc: 'Never send more code than what fits in the immediate context.' },
-                   { title: 'Active Lens', icon: Zap, desc: 'Track exactly what the AI agent is "seeing" in real-time.' },
-                 ].map((feature) => (
-                   <div key={feature.title} className="flex gap-4 p-4 bg-white border border-[#E5E7EB] rounded-xl hover:border-[#7C3AED] transition-all">
-                      <div className="w-10 h-10 bg-[#F3F0FF] rounded-lg flex items-center justify-center shrink-0">
-                        <feature.icon className="w-5 h-5 text-[#7C3AED]" />
-                      </div>
-                      <div className="space-y-1">
-                         <h3 className="text-sm font-bold text-[#111827]">{feature.title}</h3>
-                         <p className="text-[11px] text-[#6B7280] leading-relaxed">{feature.desc}</p>
-                      </div>
-                   </div>
-                 ))}
-              </div>
-           </section>
+      {/* Success card */}
+      <div className="bg-[#ECFDF5] border border-[#D1FAE5] rounded-xl p-4 flex items-start gap-3">
+        <CheckCircle className="w-5 h-5 text-[#10B981] shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm font-semibold text-[#166534]">You&apos;re all set!</p>
+          <p className="text-sm text-[#166534] mt-0.5">Check out the Tools Reference to learn more.</p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
-           <section className="space-y-4">
-              <h2 className="text-xl font-bold text-[#111827]">Installation</h2>
-              <div className="bg-[#0F172A] p-6 rounded-xl font-mono text-sm">
-                 <div className="flex items-center justify-between mb-4">
-                    <div className="flex gap-1.5">
-                       <div className="w-2.5 h-2.5 bg-[#EF4444] rounded-full" />
-                       <div className="w-2.5 h-2.5 bg-[#F59E0B] rounded-full" />
-                       <div className="w-2.5 h-2.5 bg-[#10B981] rounded-full" />
-                    </div>
-                    <span className="text-[10px] text-slate-500">bash</span>
-                 </div>
-                 <pre className="text-slate-300">
-{`# Install globally
-npm install -g loommcp
+function PlaceholderSection({ title }: { title: string }) {
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold text-foreground">{title}</h2>
+      <p className="text-sm text-muted-foreground">This section is coming soon.</p>
+    </div>
+  )
+}
 
-# Run with Claude Code
-claude-code --mcp loommcp`}
-                 </pre>
-              </div>
-           </section>
+export default function DocsPage() {
+  const [section, setSection] = useState<DocsSection>("getting-started")
+
+  return (
+    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-background">
+      <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-6">
+        {/* Header */}
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold text-foreground">Documentation</h1>
+          <p className="text-sm text-muted-foreground">Everything you need to know about LoomMCP.</p>
         </div>
 
-        <div className="col-span-12 xl:col-span-4 space-y-8">
-           <Card className="border-[#E5E7EB] shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-sm font-semibold">Resources</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                 {[
-                   'GitHub Repository',
-                   'API Reference',
-                   'Architecture Overview',
-                   'Contributing Guide',
-                   'Security Policy'
-                 ].map((link) => (
-                   <div key={link} className="flex items-center justify-between group cursor-pointer">
-                      <span className="text-xs text-[#6B7280] group-hover:text-[#111827] transition-colors">{link}</span>
-                      <ExternalLink className="w-3.5 h-3.5 text-[#9CA3AF] group-hover:text-[#7C3AED]" />
-                   </div>
-                 ))}
-              </CardContent>
-           </Card>
+        <div className="flex gap-6 items-start">
+          {/* Left Nav */}
+          <div className="bg-card border border-border rounded-xl shadow-sm p-4 w-48 shrink-0 space-y-0.5">
+            {navItems.map((item) => (
+              <button
+                key={item.key}
+                onClick={() => setSection(item.key)}
+                className={cn(
+                  "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
+                  section === item.key
+                    ? "font-bold text-[#7C3AED] bg-[#F5F3FF]"
+                    : "font-medium text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
 
-           <div className="p-6 bg-[#F3F0FF] rounded-xl border border-[#DDD6FE] space-y-4">
-              <div className="flex items-center gap-2">
-                <Info className="w-4 h-4 text-[#7C3AED]" />
-                <span className="text-sm font-bold text-[#7C3AED]">Need Help?</span>
-              </div>
-              <p className="text-xs text-[#6B7280] leading-relaxed">
-                Join our Discord community or open an issue on GitHub if you encounter any problems.
-              </p>
-              <Button className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] font-bold">Join Discord</Button>
-           </div>
+          {/* Right Content */}
+          <div className="flex-1 bg-card border border-border rounded-xl shadow-sm p-6">
+            {section === "getting-started" && <GettingStarted />}
+            {section === "tools-reference" && <PlaceholderSection title="Tools Reference" />}
+            {section === "best-practices" && <PlaceholderSection title="Best Practices" />}
+            {section === "configuration" && <PlaceholderSection title="Configuration" />}
+            {section === "faq" && <PlaceholderSection title="FAQ" />}
+            {section === "troubleshooting" && <PlaceholderSection title="Troubleshooting" />}
+          </div>
         </div>
       </div>
     </div>

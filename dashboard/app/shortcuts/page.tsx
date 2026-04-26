@@ -1,117 +1,71 @@
 "use client"
 
-import { 
-  Keyboard, 
-  Command, 
-  Search, 
-  Zap, 
-  LayoutDashboard,
-  Focus,
-  Network,
-  History,
-  FileText,
-  MousePointer2
-} from "lucide-react"
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import React from "react"
 
 const shortcuts = [
-  { name: 'Command Palette', keys: ['Ctrl', 'K'], icon: Command },
-  { name: 'Quick Topology', keys: ['Ctrl', 'T'], icon: Network },
-  { name: 'Search Symbols', keys: ['Ctrl', 'Shift', 'F'], icon: Search },
-  { name: 'Dashboard', keys: ['G', 'D'], icon: LayoutDashboard },
-  { name: 'Active Lens', keys: ['G', 'L'], icon: Zap },
-  { name: 'History', keys: ['G', 'H'], icon: History },
-  { name: 'Events', keys: ['G', 'E'], icon: FileText },
-  { name: 'Focus Symbol', keys: ['F'], icon: Focus },
-  { name: 'Blur File', keys: ['B'], icon: MousePointer2 },
+  { action: "Get Topology", keys: ["⌘", "T"] },
+  { action: "Focus File / Function", keys: ["⌘", "F"] },
+  { action: "Active Diff", keys: ["⌘", "D"] },
+  { action: "Search References", keys: ["⌘", "R"] },
+  { action: "Blur (Un-focus)", keys: ["⌘", "B"] },
+  { action: "Show Active Lens", keys: ["⌘", "L"] },
+  { action: "History", keys: ["⌘", "H"] },
+  { action: "Toggle Sidebar", keys: ["⌘", "\\"] },
+  { action: "Clear Terminal", keys: ["⌘", "K"] },
+  { action: "Show Command Palette", keys: ["⌘", "P"] },
 ]
+
+function KbdBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <kbd className="bg-muted border border-border rounded-md px-2 py-1 text-xs font-mono font-bold text-foreground">
+      {children}
+    </kbd>
+  )
+}
 
 export default function ShortcutsPage() {
   return (
-    <div className="p-8 max-w-[1200px] mx-auto space-y-8">
-      {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight text-[#111827]">Shortcuts</h1>
-        <p className="text-[#6B7280]">Master LoomMCP with powerful keyboard shortcuts.</p>
-      </div>
+    <div className="flex flex-col min-h-[calc(100vh-64px)] bg-background">
+      <div className="p-8 flex-1 max-w-[1600px] mx-auto w-full space-y-6">
+        {/* Header */}
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold text-foreground">Keyboard Shortcuts</h1>
+          <p className="text-sm text-muted-foreground">Speed up your workflow with these shortcuts.</p>
+        </div>
 
-      <div className="grid grid-cols-2 gap-8">
-         <Card className="border-[#E5E7EB] shadow-sm col-span-2">
-            <CardHeader className="bg-[#F9FAFB] border-b border-[#E5E7EB]">
-               <CardTitle className="text-sm font-semibold">Global Shortcuts</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-               <div className="grid grid-cols-2 divide-x divide-[#F3F4F6]">
-                  <div className="divide-y divide-[#F3F4F6]">
-                     {shortcuts.slice(0, 5).map((s) => (
-                       <div key={s.name} className="flex items-center justify-between px-8 py-4 hover:bg-[#F9FAFB] transition-colors">
-                          <div className="flex items-center gap-4">
-                             <s.icon className="w-4 h-4 text-[#9CA3AF]" />
-                             <span className="text-sm font-medium text-[#111827]">{s.name}</span>
-                          </div>
-                          <div className="flex gap-1">
-                             {s.keys.map((k) => (
-                               <kbd key={k} className="px-2 py-1 bg-white border border-[#E5E7EB] rounded text-[10px] font-bold text-[#6B7280] shadow-sm">{k}</kbd>
-                             ))}
-                          </div>
-                       </div>
-                     ))}
-                  </div>
-                  <div className="divide-y divide-[#F3F4F6]">
-                     {shortcuts.slice(5).map((s) => (
-                       <div key={s.name} className="flex items-center justify-between px-8 py-4 hover:bg-[#F9FAFB] transition-colors">
-                          <div className="flex items-center gap-4">
-                             <s.icon className="w-4 h-4 text-[#9CA3AF]" />
-                             <span className="text-sm font-medium text-[#111827]">{s.name}</span>
-                          </div>
-                          <div className="flex gap-1">
-                             {s.keys.map((k) => (
-                               <kbd key={k} className="px-2 py-1 bg-white border border-[#E5E7EB] rounded text-[10px] font-bold text-[#6B7280] shadow-sm">{k}</kbd>
-                             ))}
-                          </div>
-                       </div>
-                     ))}
-                  </div>
-               </div>
-            </CardContent>
-         </Card>
+        {/* Shortcuts Table */}
+        <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="grid grid-cols-2 px-5 py-3 border-b border-border bg-muted">
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Action</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Shortcut</span>
+          </div>
 
-         <Card className="border-[#E5E7EB] shadow-sm">
-            <CardHeader>
-               <CardTitle className="text-sm font-semibold">Vim-style Navigation</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-               <p className="text-xs text-[#6B7280]">LoomMCP supports standard Vim navigation in focus views and diffs.</p>
-               <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between p-3 bg-[#F9FAFB] rounded-lg border border-[#E5E7EB]">
-                     <span className="text-xs font-medium">Scroll Down</span>
-                     <kbd className="px-2 py-1 bg-white border border-[#E5E7EB] rounded text-[10px] font-bold">j</kbd>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-[#F9FAFB] rounded-lg border border-[#E5E7EB]">
-                     <span className="text-xs font-medium">Scroll Up</span>
-                     <kbd className="px-2 py-1 bg-white border border-[#E5E7EB] rounded text-[10px] font-bold">k</kbd>
-                  </div>
-               </div>
-            </CardContent>
-         </Card>
+          {shortcuts.map((s, i) => (
+            <div
+              key={s.action}
+              className="grid grid-cols-2 px-5 py-3.5 border-b border-border last:border-0 hover:bg-muted transition-colors"
+            >
+              <span className="text-sm text-foreground">{s.action}</span>
+              <div className="flex items-center gap-1">
+                {s.keys.map((k, ki) => (
+                  <span key={ki} className="flex items-center gap-1">
+                    <KbdBadge>{k}</KbdBadge>
+                    {ki < s.keys.length - 1 && (
+                      <span className="text-xs text-muted-foreground">+</span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
 
-         <Card className="border-[#E5E7EB] shadow-sm">
-            <CardHeader>
-               <CardTitle className="text-sm font-semibold">Customizing Shortcuts</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-               <p className="text-xs text-[#6B7280]">You can remap any shortcut in the advanced settings tab.</p>
-               <Button variant="outline" className="w-full border-[#E5E7EB] text-[#7C3AED] font-bold h-10">Go to Settings</Button>
-            </CardContent>
-         </Card>
+        {/* Tip Card */}
+        <div className="bg-[#F5F3FF] border border-[#DDD6FE] rounded-xl p-4">
+          <p className="text-sm text-[#7C3AED]">
+            💡 Shortcuts work in Claude Code when LoomMCP is connected.
+          </p>
+        </div>
       </div>
     </div>
   )
