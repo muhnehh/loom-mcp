@@ -45,7 +45,7 @@ node eval/benchmark.js .
 
 | Repository | Files | Raw Tokens | TOON Tokens | Reduction | Latency |
 |:-----------|------:|----------:|------------:|:---------:|:-------:|
-| `loommcp` (self) | 39 | 55,813 | 2,729 | **95%** | ~800ms |
+| `loommcp` (self) | 31 | 49,207 | 1,241 | **97%** | ~1300ms |
 
 ## Quickstart
 

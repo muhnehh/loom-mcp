@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CircuitBreaker = exports.SecurityManager = void 0;
+exports.AuditLogger = exports.CircuitBreaker = exports.SecurityManager = void 0;
 const path_1 = require("path");
 class SecurityManager {
     workspaceRoot;
@@ -117,3 +117,16 @@ class CircuitBreaker {
     }
 }
 exports.CircuitBreaker = CircuitBreaker;
+// Audit logging extension for LoomMCP
+class AuditLogger {
+    log(tool, args, result, duration_ms) {
+        // Placeholder for audit logging
+    }
+    getRecent(limit = 100) {
+        return [];
+    }
+    getToolStats() {
+        return {};
+    }
+}
+exports.AuditLogger = AuditLogger;

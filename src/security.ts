@@ -131,3 +131,18 @@ export class CircuitBreaker {
     return stats;
   }
 }
+
+// Audit logging extension for LoomMCP
+export class AuditLogger {
+  log(tool: string, args: any, result: any, duration_ms: number): void {
+    // Placeholder for audit logging
+  }
+  
+  getRecent(limit: number = 100): any[] {
+    return [];
+  }
+  
+  getToolStats(): Record<string, any> {
+    return {};
+  }
+}
