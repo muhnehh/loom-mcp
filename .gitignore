@@ -7,3 +7,7 @@ dist/
 .DS_Store
 .env
 *.log
+dashboard/
+dashboard/.next/
+dashboard/node_modules/
+dashboard/out/
