@@ -17,6 +17,11 @@
 ![npm version](https://img.shields.io/npm/v/@loom-mcp/server)
 ![npm](https://img.shields.io/npm/dy/@loom-mcp/server)
 
+LoomMCP ships with a full observability dashboard at **http://localhost:2337** — no extra setup required.
+
+![LoomMCP Dashboard demo](website/assets/demo.gif)
+
+
 ---
 
 
