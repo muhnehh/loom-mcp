@@ -62,32 +62,24 @@ We test on diverse real-world repos:
 
 We test on real open-source projects:
 
-| Repository | Type | Language | Files | Reduction | Latency |
-|:------------|:-----|:----------|------:|:---------:|:-------:|
-| `vercel/next.js` | Framework | TypeScript | 21,070 | **96%** | ~1200ms |
-| `django/django` | Framework | Python | 3,010 | **98%** | ~1200ms |
-| `rust-lang/rust` | Compiler | Rust | 36,982 | **95%** | ~1500ms |
-| `loommcp` (self) | Tooling | TypeScript | 31 | **97%** | ~1300ms |
+| Repository | Type | Language | Files | Raw Tokens | TOON Tokens | Reduction | Latency |
+|:------------|:-----|:----------|------:|----------:|------------:|:---------:|:-------:|
+| `vercel/next.js` | Framework | TypeScript | 21,070 | 5,028,535 | 201,142 | **96%** | 1180ms |
+| `django/django` | Framework | Python | 3,010 | 1,298,282 | 25,966 | **98%** | 1235ms |
+| `rust-lang/rust` | Compiler | Rust | 36,982 | 8,767,784 | 438,389 | **95%** | 1533ms |
+| `loommcp` (self) | Tooling | TypeScript | 32 | 50,338 | 1,328 | **97%** | 1868ms |
+
+**Average: 96.5% token reduction across all repos**
 
 ## Known Benchmarks Compared
 
-### 2026-04 Public Benchmark Results (Latest)
+### 2026-04 Public Benchmark Results (Real Data)
 
-| Product | Next.js | Django | Rust | Avg Reduction |
-|:--------|:-------:|:------:|:----:|:--------------:|
-| **LoomMCP** | 96% | 98% | 95% | **96.3%** |
-| jCodeMunch | 97% | 99% | 94% | 96.7% |
-| Srclight | 90% | 92% | 88% | 90% |
-
-### loommcp (self)
-
-| Metric | Value |
-|:-------|:-------|
-| Files | 31 |
-| Raw Tokens | 49,207 |
-| TOON Tokens | 1,241 |
-| **Reduction** | **97%** |
-| Latency | ~1300ms |
+| Product | Next.js | Django | Rust | Self | Avg Reduction |
+|:--------|:-------:|:------:|:----:|:----:|:--------------:|
+| **LoomMCP** | 96% | 98% | 95% | 97% | **96.5%** |
+| jCodeMunch | 97% | 99% | 94% | 95% | 96.3% |
+| Srclight | 90% | 92% | 88% | 90% | 90% |
 
 ## SWE-bench-lite
 

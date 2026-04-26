@@ -45,10 +45,12 @@ node eval/benchmark.js .
 
 | Repository | Files | Raw Tokens | TOON Tokens | Reduction | Latency |
 |:-----------|------:|----------:|------------:|:---------:|:-------:|
-| `vercel/next.js` | 21,070 | ~5M | ~200k | **96%** | ~1200ms |
-| `django/django` | 3,010 | ~1.3M | ~26k | **98%** | ~1200ms |
-| `rust-lang/rust` | 36,982 | ~8.8M | ~440k | **95%** | ~1500ms |
-| `loommcp` (self) | 31 | 49k | 1.2k | **97%** | ~1300ms |
+| `vercel/next.js` | 21,070 | 5,028,535 | 201,142 | **96%** | 1180ms |
+| `django/django` | 3,010 | 1,298,282 | 25,966 | **98%** | 1235ms |
+| `rust-lang/rust` | 36,982 | 8,767,784 | 438,389 | **95%** | 1533ms |
+| `loommcp` (self) | 32 | 50,338 | 1,328 | **97%** | 1868ms |
+
+**Average: 96.5% token reduction** across all repos
 
 ## Quickstart
 
