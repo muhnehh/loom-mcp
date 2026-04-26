@@ -8,8 +8,6 @@
 
 ---
 
-## LoomMCP
-
 ### Structured code retrieval for serious AI agents
 
 ![License](https://img.shields.io/badge/license-MIT-green)
