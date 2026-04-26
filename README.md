@@ -284,7 +284,7 @@ claude mcp add loom npx @loom-mcp/server
 
 LoomMCP ships with a full observability dashboard at **http://localhost:2337** — no extra setup required.
 
-![LoomMCP Dashboard](website/assets/screenshots/dashboard.jpg)
+![LoomMCP Dashboard demo](website/assets/demo.gif)
 
 The dashboard tracks every tool call, accumulates token savings across sessions, and gives you real-time visibility into what Claude is doing with your codebase.
 
