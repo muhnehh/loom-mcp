@@ -5,6 +5,7 @@ import { resolve, relative, join } from 'path';
 import { execSync } from 'child_process';
 import { skeletonizeFile } from './ast.js';
 import { toTOON, estimateTokens } from './toon.js';
+import { encodeCompact, shouldUseCompact } from './compact.js';
 import { LoomCache, SessionStateManager } from './cache.js';
 import { SecurityManager, CircuitBreaker } from './security.js';
 import { LoomWatcher } from './watcher.js';
@@ -26,6 +27,7 @@ const recorder = new SessionRecorder('.loom/sessions');
 const metrics = new MetricsCollector('.loom/metrics');
 const sqliteWorkspace = new SQLiteWorkspace('.loom');
 let liveWatcher = new LiveWatcher();
+let compactModeEnabled = false;
 
 let gpuInitialized = false;
 let focusedFilesCount = 0;
@@ -43,6 +45,78 @@ interface EnforcementHook {
 
 const enforcementHooks: EnforcementHook[] = [];
 const forcedTools = ['loom_get_topology', 'loom_focus', 'loom_search_symbols', 'loom_hybrid_search'];
+
+// In-memory symbol index for search
+const loomSymbolIndex: Map<string, { name: string; kind: string; file: string; line: number; signature: string }[]> = new Map();
+
+function searchInLoomIndex(query: string): { name: string; kind: string; file: string; line: number }[] {
+  const q = query.toLowerCase();
+  const results: { name: string; kind: string; file: string; line: number }[] = [];
+  
+  for (const [file, symbols] of loomSymbolIndex.entries()) {
+    for (const sym of symbols) {
+      if (sym.name.toLowerCase().includes(q) || sym.signature?.toLowerCase().includes(q)) {
+        results.push({ name: sym.name, kind: sym.kind, file, line: sym.line });
+      }
+    }
+  }
+  
+  return results.slice(0, 20);
+}
+
+function getLoomSymbolSource(file: string, name: string): string | null {
+  try {
+    const content = readFileSync(resolve(WORKSPACE_ROOT, file), 'utf8');
+    const lines = content.split('\n');
+    const fnMatch = lines.find(l => l.includes(`function ${name}`) || l.includes(`def ${name}`) || l.includes(`fn ${name}`));
+    if (fnMatch) {
+      const idx = lines.indexOf(fnMatch);
+      return lines.slice(idx, idx + 20).join('\n');
+    }
+  } catch {}
+  return null;
+}
+
+function findLoomRelatedSymbols(file: string, name: string): { name: string; file: string; line: number }[] {
+  const related: { name: string; file: string; line: number }[] = [];
+  const symbols = loomSymbolIndex.get(file) || [];
+  
+  for (const sym of symbols) {
+    if (sym.name !== name && (name.includes(sym.name) || sym.name.includes(name))) {
+      related.push({ name: sym.name, file, line: sym.line });
+    }
+  }
+  
+  return related.slice(0, 5);
+}
+
+function buildLoomSymbolIndex(files: string[]) {
+  for (const file of files) {
+    try {
+      const content = readFileSync(file, 'utf8');
+      const lines = content.split('\n');
+      const symbols: any[] = [];
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const fnMatch = line.match(/(?:function|def|fn|class|struct|enum)\s+(\w+)/);
+        if (fnMatch) {
+          symbols.push({
+            name: fnMatch[1],
+            kind: line.includes('class') ? 'class' : line.includes('struct') ? 'type' : 'function',
+            file: relative(WORKSPACE_ROOT, file),
+            line: i + 1,
+            signature: line.trim()
+          });
+        }
+      }
+      
+      if (symbols.length > 0) {
+        loomSymbolIndex.set(relative(WORKSPACE_ROOT, file), symbols);
+      }
+    } catch {}
+  }
+}
 
 function registerEnforcementHook(hook: EnforcementHook) {
   enforcementHooks.push(hook);
@@ -803,6 +877,44 @@ function createLoomServer(): Server {
             },
             required: []
           }
+        },
+        // Token-budgeted context
+        {
+          name: 'loom_get_ranked_context',
+          description: 'Get token-budgeted context around a symbol. Like jCodeMunch get_ranked_context.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              query: { type: 'string', description: 'Query to find relevant symbols' },
+              max_tokens: { type: 'number', default: 2000, description: 'Maximum tokens to return' },
+              include_related: { type: 'boolean', default: true, description: 'Include related symbols' }
+            },
+            required: ['query']
+          }
+        },
+        // Symbol provenance (git history)
+        {
+          name: 'loom_get_symbol_provenance',
+          description: 'Get git history for a symbol. Lines, commits, authors.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              symbol: { type: 'string', description: 'Symbol path (file:symbol)' }
+            },
+            required: ['symbol']
+          }
+        },
+        // Compact format toggle
+        {
+          name: 'loom_set_compact',
+          description: 'Enable/disable compact wire format.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              enabled: { type: 'boolean', default: true }
+            },
+            required: []
+          }
         }
       ]
     };
@@ -831,7 +943,7 @@ function createLoomServer(): Server {
         const files = globFiles(dir, languages, ['node_modules', '.git', 'dist', 'build', 'target']);
         const skeletons: { path: string; nodes: any[]; tokenEstimate: number }[] = [];
         
-        buildSymbolIndex(files);
+        buildLoomSymbolIndex(files);
 
         const toProcess = files.slice(0, 500);
         const batchSize = 20;
@@ -848,10 +960,18 @@ function createLoomServer(): Server {
         }
 
         const toon = toTOON(skeletons);
-        const rawTokens = skeletons.reduce((s, sk) => s + (sk.tokenEstimate || 0), 0);
         const tokenEstimate = estimateTokens(toon);
-        const latency_ms = Date.now() - startTime;
         
+        // Use actual source tokens from file sizes (not AST-derived estimates)
+        let rawTokens = 0;
+        for (const skel of skeletons) {
+          try {
+            const content = readFileSync(resolve(WORKSPACE_ROOT, skel.path), 'utf8');
+            rawTokens += Math.ceil(content.length / 4);
+          } catch {}
+        }
+        
+        const latency_ms = Date.now() - startTime;
         const reduction = rawTokens > 0 ? Math.round((1 - tokenEstimate / rawTokens) * 100) : 0;
 
         recorder.record({
@@ -1657,6 +1777,79 @@ function createLoomServer(): Server {
         const repo = (args.repo as string) || 'main';
         sqliteWorkspace.clearRepo(repo);
         return { content: [{ type: 'text', text: `cleared:${repo}` }] };
+      }
+
+      // ========== TOKEN-BUDGETED CONTEXT ==========
+      if (name === 'loom_get_ranked_context') {
+        const query = args.query as string;
+        const maxTokens = (args.max_tokens as number) || 2000;
+        const includeRelated = args.include_related !== false;
+        
+        const symbols = searchInLoomIndex(query);
+        const results: string[] = [];
+        let tokenCount = 0;
+        
+        for (const sym of symbols.slice(0, 10)) {
+          const src = getLoomSymbolSource(sym.file, sym.name);
+          if (src && tokenCount + src.length / 4 < maxTokens) {
+            results.push(`${sym.kind}:${sym.name} [${sym.file}:${sym.line}]\n${src}`);
+            tokenCount += Math.ceil(src.length / 4);
+          }
+        }
+        
+        if (includeRelated) {
+          for (const sym of symbols.slice(0, 5)) {
+            const related = findLoomRelatedSymbols(sym.file, sym.name);
+            for (const rel of related.slice(0, 3)) {
+              const src = getLoomSymbolSource(rel.file, rel.name);
+              if (src && tokenCount + src.length / 4 < maxTokens) {
+                results.push(`related:${rel.name} [${rel.file}:${rel.line}]\n${src}`);
+                tokenCount += Math.ceil(src.length / 4);
+              }
+            }
+          }
+        }
+        
+        return { content: [{ type: 'text', text: `tokens:${tokenCount}\n${results.join('\n---\n')}` }] };
+      }
+
+      // ========== SYMBOL PROVENANCE ==========
+      if (name === 'loom_get_symbol_provenance') {
+        const symbol = args.symbol as string;
+        const [file, symName] = symbol.split(':');
+        
+        if (!file || !symName) {
+          return { content: [{ type: 'text', text: 'ERROR:invalid_symbol_format' }] };
+        }
+        
+        const fullPath = resolve(WORKSPACE_ROOT, file);
+        
+        try {
+          const gitLog = execSync(`git log --oneline -20 --format="%h|%an|%ai|%s" -- "${fullPath}"`, {
+            encoding: 'utf8',
+            cwd: WORKSPACE_ROOT,
+            timeout: 5000
+          });
+          
+          const commits = gitLog.trim().split('\n').slice(0, 10).map(line => {
+            const [hash, author, date, msg] = line.split('|');
+            return { hash: hash?.slice(0, 7), author, date, msg };
+          });
+          
+          if (commits.length === 0 || !commits[0].hash) {
+            return { content: [{ type: 'text', text: `provenance:${symbol}\ncommits:0` }] };
+          }
+          
+          return { content: [{ type: 'text', text: `provenance:${symbol}\ncommits:${commits.length}\n${commits.map(c => `${c.hash} ${c.author} ${c.date?.slice(0,10)} ${c.msg}`).join('\n')}` }] };
+        } catch {
+          return { content: [{ type: 'text', text: `provenance:${symbol}\ncommits:0\nno_git_history` }] };
+        }
+      }
+
+      // ========== COMPACT FORMAT ==========
+      if (name === 'loom_set_compact') {
+        compactModeEnabled = (args.enabled as boolean) ?? true;
+        return { content: [{ type: 'text', text: `compact:${compactModeEnabled ? 'enabled' : 'disabled'}` }] };
       }
 
       return { content: [{ type: 'text', text: 'ERROR:unknown_tool' }] };

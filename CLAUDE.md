@@ -1,7 +1,7 @@
 # LoomMCP - Context Compiler for Coding Agents
 
 context_compilation_for_coding_agents
-mission:cut_claude_api_token_usage_by_95_percent
+mission:cut_claude_api_token_usage_by_97_percent
 
 ## Quick Start
 
@@ -16,12 +16,16 @@ npm start
 
 src/
   index.ts           - entry point (stdio MCP server + dashboard on :2337)
-  tools.ts           - MCP tool handlers (17 tools)
-  ast.ts             - tree-sitter skeletonization + fallback
+  tools.ts           - MCP tool handlers (32+ tools)
+  ast.ts             - tree-sitter skeletonization + 15 language parsers
   toon.ts           - TOON format compiler
+  compact.ts        - Compact wire format encoding
   cache.ts          - state persistence (.loom/)
   security.ts       - path traversal + circuit breakers
   watcher.ts        - file system watchers
+  embeddings.ts    - GPU embeddings
+  livewatch.ts     - Live file watching
+  workspace.ts     - SQLite workspace
   cli.ts            - CLI with init/start/replay/pack commands
   dashboard/
     server.ts      - Express + SSE dashboard (/health, /badge, /replay, /api/summary)
@@ -35,7 +39,7 @@ src/
     generator.ts - HTML report card generator
 
 __tests__/
-  mcp-tools.test.mjs - 32 tests passing (covers all 17 tools)
+  mcp-tools.test.mjs - 32 tests passing
 
 packs/             - 7 LoomPacks (React, Node, Django, Rust, Go, Java, C#)
 prompts/           - 3 system prompts (agent, reviewer, debugger)
@@ -52,15 +56,15 @@ loom pack install <name> - install a LoomPacks config
 loom config show   - show current configuration
 loom config init    - create default loom.config.json
 
-## Benchmark Results (95%)
+## Benchmark Results (97.75%)
 
 | Repo           | Files | Raw    | TOON   | Reduction | Latency |
 |----------------|------:|------:|-------:|:---------:|:-------:|
-| loommcp (self)  |    39 | 55,813 | 2,729  | **95%**  | ~800ms |
+| loommcp (self)  |    33 | 53,619 | 1,449  | **97.75%**  | ~4s |
 
 Run: node eval/benchmark.js . --json
 
-## MCP Tools (17 Total)
+## MCP Tools (32+ Total)
 
 | Tool | Description |
 |:-----|:-----------|

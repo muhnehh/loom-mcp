@@ -4,6 +4,14 @@ import Python from 'tree-sitter-python';
 import Go from 'tree-sitter-go';
 import Rust from 'tree-sitter-rust';
 import Java from 'tree-sitter-java';
+import Ruby from 'tree-sitter-ruby';
+import PHP from 'tree-sitter-php';
+import Swift from 'tree-sitter-swift';
+import Kotlin from 'tree-sitter-kotlin';
+import Dart from 'tree-sitter-dart';
+import C from 'tree-sitter-c';
+import CPP from 'tree-sitter-cpp';
+import Bash from 'tree-sitter-bash';
 import { readFileSync, appendFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { ASTNode, FileSkeleton } from './toon.js';
@@ -25,6 +33,14 @@ const jsLang = (TypeScript as any).javascript || TypeScript;
 const goLang = (Go as any).go || Go;
 const rustLang = (Rust as any).rust || Rust;
 const javaLang = (Java as any).java || Java;
+const rubyLang = (Ruby as any).ruby || Ruby;
+const phpLang = (PHP as any).php || PHP;
+const swiftLang = (Swift as any).swift || Swift;
+const kotlinLang = (Kotlin as any).kotlin || Kotlin;
+const dartLang = (Dart as any).dart || Dart;
+const cLang = (C as any).c || C;
+const cppLang = (CPP as any).cpp || CPP;
+const bashLang = (Bash as any).bash || Bash;
 
 const langMap: Record<string, any> = {
   ts: tsLang,
@@ -36,6 +52,21 @@ const langMap: Record<string, any> = {
   rs: rustLang,
   java: javaLang,
   cs: javaLang,
+  rb: rubyLang,
+  php: phpLang,
+  swift: swiftLang,
+  kt: kotlinLang,
+  kts: kotlinLang,
+  dart: dartLang,
+  c: cLang,
+  h: cLang,
+  cpp: cppLang,
+  cc: cppLang,
+  hpp: cppLang,
+  hh: cppLang,
+  hxx: cppLang,
+  sh: bashLang,
+  bash: bashLang,
 };
 
 export function skeletonizeFile(filePath: string): FileSkeleton {

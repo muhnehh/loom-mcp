@@ -10,6 +10,14 @@ const tree_sitter_python_1 = __importDefault(require("tree-sitter-python"));
 const tree_sitter_go_1 = __importDefault(require("tree-sitter-go"));
 const tree_sitter_rust_1 = __importDefault(require("tree-sitter-rust"));
 const tree_sitter_java_1 = __importDefault(require("tree-sitter-java"));
+const tree_sitter_ruby_1 = __importDefault(require("tree-sitter-ruby"));
+const tree_sitter_php_1 = __importDefault(require("tree-sitter-php"));
+const tree_sitter_swift_1 = __importDefault(require("tree-sitter-swift"));
+const tree_sitter_kotlin_1 = __importDefault(require("tree-sitter-kotlin"));
+const tree_sitter_dart_1 = __importDefault(require("tree-sitter-dart"));
+const tree_sitter_c_1 = __importDefault(require("tree-sitter-c"));
+const tree_sitter_cpp_1 = __importDefault(require("tree-sitter-cpp"));
+const tree_sitter_bash_1 = __importDefault(require("tree-sitter-bash"));
 const fs_1 = require("fs");
 const path_1 = require("path");
 const parsers = {};
@@ -28,6 +36,14 @@ const jsLang = tree_sitter_typescript_1.default.javascript || tree_sitter_typesc
 const goLang = tree_sitter_go_1.default.go || tree_sitter_go_1.default;
 const rustLang = tree_sitter_rust_1.default.rust || tree_sitter_rust_1.default;
 const javaLang = tree_sitter_java_1.default.java || tree_sitter_java_1.default;
+const rubyLang = tree_sitter_ruby_1.default.ruby || tree_sitter_ruby_1.default;
+const phpLang = tree_sitter_php_1.default.php || tree_sitter_php_1.default;
+const swiftLang = tree_sitter_swift_1.default.swift || tree_sitter_swift_1.default;
+const kotlinLang = tree_sitter_kotlin_1.default.kotlin || tree_sitter_kotlin_1.default;
+const dartLang = tree_sitter_dart_1.default.dart || tree_sitter_dart_1.default;
+const cLang = tree_sitter_c_1.default.c || tree_sitter_c_1.default;
+const cppLang = tree_sitter_cpp_1.default.cpp || tree_sitter_cpp_1.default;
+const bashLang = tree_sitter_bash_1.default.bash || tree_sitter_bash_1.default;
 const langMap = {
     ts: tsLang,
     tsx: tsLang,
@@ -38,6 +54,21 @@ const langMap = {
     rs: rustLang,
     java: javaLang,
     cs: javaLang,
+    rb: rubyLang,
+    php: phpLang,
+    swift: swiftLang,
+    kt: kotlinLang,
+    kts: kotlinLang,
+    dart: dartLang,
+    c: cLang,
+    h: cLang,
+    cpp: cppLang,
+    cc: cppLang,
+    hpp: cppLang,
+    hh: cppLang,
+    hxx: cppLang,
+    sh: bashLang,
+    bash: bashLang,
 };
 function skeletonizeFile(filePath) {
     const ext = filePath.split('.').pop()?.toLowerCase() || '';
