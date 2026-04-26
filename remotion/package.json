@@ -1,0 +1,24 @@
+{
+  "name": "remotion",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "preview": "npx remotion preview src/index.ts",
+    "render": "npx remotion render src/index.ts LoomMCPDemo out/LoomMCP-Demo.mp4 --codec=h264 --crf=16",
+    "render-fast": "npx remotion render src/index.ts LoomMCPDemo out/LoomMCP-Demo-preview.mp4 --codec=h264 --crf=28 --width=1280 --height=720"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@remotion/cli": "^4.0.451",
+    "@remotion/renderer": "^4.0.451",
+    "@types/react": "^19.2.14",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "remotion": "^4.0.451",
+    "typescript": "^6.0.3"
+  }
+}
