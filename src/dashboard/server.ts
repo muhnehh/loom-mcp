@@ -547,12 +547,7 @@ export function startDashboard(port: number = PORT) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
-    if (url === '/') {
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(getDashboardHTML());
-      return;
-    }
-    
+    // API Endpoints
     if (url === '/health') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'ok', timestamp: Date.now() }));
@@ -562,12 +557,6 @@ export function startDashboard(port: number = PORT) {
     if (url === '/badge.svg') {
       res.writeHead(200, { 'Content-Type': 'image/svg+xml' });
       res.end(getBadgeSVG());
-      return;
-    }
-    
-    if (url === '/replay') {
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(getReplayHTML());
       return;
     }
     
@@ -621,7 +610,44 @@ export function startDashboard(port: number = PORT) {
       res.end(JSON.stringify({ toolCalls: toolCalls.length }));
       return;
     }
+
+    // Static File Serving
+    const dashboardOutDir = join(process.cwd(), 'dashboard', 'out');
+    let filePath = join(dashboardOutDir, url === '/' ? 'index.html' : url);
     
+    // Handle Next.js routes (clean URLs)
+    if (!existsSync(filePath) && !url.includes('.')) {
+      const htmlPath = filePath + '.html';
+      if (existsSync(htmlPath)) {
+        filePath = htmlPath;
+      }
+    }
+
+    if (existsSync(filePath) && statSync(filePath).isFile()) {
+      const ext = filePath.split('.').pop();
+      const contentTypes: Record<string, string> = {
+        'html': 'text/html',
+        'js': 'application/javascript',
+        'css': 'text/css',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'svg': 'image/svg+xml',
+        'json': 'application/json',
+        'txt': 'text/plain'
+      };
+      
+      res.writeHead(200, { 'Content-Type': contentTypes[ext || ''] || 'application/octet-stream' });
+      createReadStream(filePath).pipe(res);
+      return;
+    }
+    
+    // Fallback to legacy dashboard for /
+    if (url === '/') {
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(getDashboardHTML());
+      return;
+    }
+
     // 404
     res.writeHead(404);
     res.end('Not Found');
