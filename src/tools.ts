@@ -15,7 +15,6 @@ import { trackToolCall } from './dashboard/server.js';
 import { initGPUEmbeddings, getEmbedding, semanticSearchGPU, getDeviceType, isGPUAvailable } from './embeddings.js';
 import { SQLiteWorkspace } from './workspace.js';
 import { LiveWatcher } from './livewatch.js';
-import { Gateway } from './gateway.js';
 
 const WORKSPACE_ROOT = process.cwd();
 const cache = new LoomCache('.loom');
@@ -27,7 +26,6 @@ const recorder = new SessionRecorder('.loom/sessions');
 const metrics = new MetricsCollector('.loom/metrics');
 const sqliteWorkspace = new SQLiteWorkspace('.loom');
 let liveWatcher = new LiveWatcher();
-const gateway = new Gateway('.loom/webhooks.json');
 
 let gpuInitialized = false;
 let focusedFilesCount = 0;
@@ -804,33 +802,6 @@ function createLoomServer(): Server {
               repo: { type: 'string', default: 'main' }
             },
             required: []
-          }
-        },
-        // Gateway (Slack/Discord)
-        {
-          name: 'loom_gateway_notify',
-          description: 'Send Slack/Discord notification.',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              title: { type: 'string' },
-              message: { type: 'string' },
-              type: { type: 'string', enum: ['info', 'warning', 'error', 'success'], default: 'info' }
-            },
-            required: ['title', 'message']
-          }
-        },
-        {
-          name: 'loom_gateway_config',
-          description: 'Configure Slack/Discord webhooks.',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              platform: { type: 'string', enum: ['slack', 'discord'] },
-              url: { type: 'string' },
-              channel: { type: 'string' }
-            },
-            required: ['platform', 'url']
           }
         }
       ]
@@ -1686,32 +1657,6 @@ function createLoomServer(): Server {
         const repo = (args.repo as string) || 'main';
         sqliteWorkspace.clearRepo(repo);
         return { content: [{ type: 'text', text: `cleared:${repo}` }] };
-      }
-
-      // ========== GATEWAY (SLACK/DISCORD) ==========
-      if (name === 'loom_gateway_notify') {
-        const title = args.title as string;
-        const message = args.message as string;
-        const type = (args.type as string) || 'info';
-        
-        await gateway.notify({ title, message, type: type as any });
-        
-        const configured = gateway.isConfigured();
-        return { content: [{ type: 'text', text: `notified:${title}\nslack:${configured.slack}\ndiscord:${configured.discord}` }] };
-      }
-
-      if (name === 'loom_gateway_config') {
-        const platform = args.platform as string;
-        const url = args.url as string;
-        const channel = args.channel as string;
-        
-        if (platform === 'slack') {
-          gateway.setSlackWebhook(url, channel);
-        } else {
-          gateway.setDiscordWebhook(url);
-        }
-        
-        return { content: [{ type: 'text', text: `configured:${platform}` }] };
       }
 
       return { content: [{ type: 'text', text: 'ERROR:unknown_tool' }] };
