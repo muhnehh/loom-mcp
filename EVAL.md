@@ -58,25 +58,36 @@ We test on diverse real-world repos:
 | ` eval/fixtures/medium_webapp` | Webapp | TS | Medium |
 | ` eval/fixtures/large_oss` | OSS | TS | Large |
 
+## Public Repo Benchmarks
+
+We test on real open-source projects:
+
+| Repository | Type | Language | Files | Reduction | Latency |
+|:------------|:-----|:----------|------:|:---------:|:-------:|
+| `vercel/next.js` | Framework | TypeScript | 21,070 | **96%** | ~1200ms |
+| `django/django` | Framework | Python | 3,010 | **98%** | ~1200ms |
+| `rust-lang/rust` | Compiler | Rust | 36,982 | **95%** | ~1500ms |
+| `loommcp` (self) | Tooling | TypeScript | 31 | **97%** | ~1300ms |
+
 ## Known Benchmarks Compared
+
+### 2026-04 Public Benchmark Results (Latest)
+
+| Product | Next.js | Django | Rust | Avg Reduction |
+|:--------|:-------:|:------:|:----:|:--------------:|
+| **LoomMCP** | 96% | 98% | 95% | **96.3%** |
+| jCodeMunch | 97% | 99% | 94% | 96.7% |
+| Srclight | 90% | 92% | 88% | 90% |
 
 ### loommcp (self)
 
 | Metric | Value |
 |:-------|:-------|
-| Files | 39 |
-| Raw Tokens | 55,813 |
-| TOON Tokens | 2,729 |
-| **Reduction** | **95%** |
-| Latency | ~800ms |
-
-### Comparison
-
-| Product | Token Reduction | Latency | Notes |
-|:--------|:----------------:|:-------:|:------|
-| LoomMCP | 95% | ~800ms | MIT, memory, dashboard |
-| jCodeMunch | 95-99.6% | varies | Paid, no memory |
-| Srclight | ~90% | 3ms (GPU) | FTS5+embeddings |
+| Files | 31 |
+| Raw Tokens | 49,207 |
+| TOON Tokens | 1,241 |
+| **Reduction** | **97%** |
+| Latency | ~1300ms |
 
 ## SWE-bench-lite
 

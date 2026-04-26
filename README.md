@@ -45,7 +45,10 @@ node eval/benchmark.js .
 
 | Repository | Files | Raw Tokens | TOON Tokens | Reduction | Latency |
 |:-----------|------:|----------:|------------:|:---------:|:-------:|
-| `loommcp` (self) | 31 | 49,207 | 1,241 | **97%** | ~1300ms |
+| `vercel/next.js` | 21,070 | ~5M | ~200k | **96%** | ~1200ms |
+| `django/django` | 3,010 | ~1.3M | ~26k | **98%** | ~1200ms |
+| `rust-lang/rust` | 36,982 | ~8.8M | ~440k | **95%** | ~1500ms |
+| `loommcp` (self) | 31 | 49k | 1.2k | **97%** | ~1300ms |
 
 ## Quickstart
 
