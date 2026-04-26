@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LoomMCP — 95% Token Reduction for AI Coding Agents</title>
-    <meta name="description" content="LoomMCP is the universal context compiler for AI coding agents. Cut Claude API costs by 95%, with 17 tools, cross-session memory, live dashboard, and session replay. Free forever.">
-    <meta name="keywords" content="MCP, context compiler, token reduction, Claude, Claude Code, AI coding, Cursor, Codex, coding agent, token optimization">
+<title>LoomMCP — GPU Embeddings, Live Watch, 95% Token Reduction</title>
+    <meta name="description" content="LoomMCP is the universal context compiler for AI coding agents. Cut Claude API costs by 95% with GPU embeddings, live watch reindex, SQLite workspace, and 28+ tools. Free forever.">
+    <meta name="keywords" content="MCP, context compiler, token reduction, Claude, Claude Code, AI coding, Cursor, Codex, GPU embeddings, semantic search">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="LoomMCP — Cut Claude Bills by 95%">
-    <meta property="og:description" content="Universal MCP context compiler. 17 tools, 7 languages, cross-session memory, live dashboard. Free & open source.">
+    <meta property="og:title" content="LoomMCP — GPU-Powered Context Compiler">
+    <meta property="og:description" content="GPU embeddings, live watch, SQLite workspace. 28+ tools, 95% token reduction. Free & open source.">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -351,14 +351,14 @@
     .logos {
       margin-top: 24px;
       border-top: 1px solid var(--line);
-      padding-top: 30px;
+      padding-top: 36px;
       text-align: center;
     }
 
     .logos p {
       color: #697390;
       font-weight: 600;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       font-size: 15px;
       line-height: 1.55;
     }
@@ -367,13 +367,13 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .logo-chip {
       border: 1px solid var(--line);
       border-radius: 10px;
-      padding: 10px 15px;
+      padding: 10px 16px;
       background: #fff;
       color: #4a546d;
       font-size: 14px;
@@ -381,8 +381,9 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      min-width: 150px;
+      min-width: 164px;
       justify-content: center;
+      box-shadow: 0 2px 8px rgba(28, 34, 64, 0.05);
     }
 
     .logo-chip img {
@@ -398,6 +399,17 @@
       height: 16px;
       display: inline-block;
       flex: 0 0 16px;
+    }
+
+    .logo-chip.brand-img {
+      gap: 10px;
+    }
+
+    .logo-chip.brand-img img {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      object-fit: contain;
     }
 
     .logo-fallback {
@@ -429,30 +441,30 @@
       text-align: center;
       color: #697390;
       font-size: 18px;
-      margin-bottom: 32px;
+      margin-bottom: 40px;
       font-weight: 500;
       line-height: 1.72;
     }
 
     .feature-grid {
       display: grid;
-      gap: 14px;
+      gap: 18px;
     }
 
     .feature-grid-top {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      margin-bottom: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-bottom: 20px;
     }
 
     .feature-grid-bottom {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .feature-card {
       border: 1px solid var(--line);
       border-radius: 12px;
       background: #fff;
-      padding: 18px 14px 17px;
+      padding: 22px 18px 20px;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       text-align: center;
     }
@@ -465,7 +477,7 @@
     .feature-icon {
       width: 34px;
       height: 34px;
-      margin: 0 auto 9px;
+      margin: 0 auto 12px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -476,23 +488,23 @@
 
     .feature-card h3 {
       font-size: 15px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       line-height: 1.28;
       font-weight: 600;
     }
 
     .feature-card p {
       color: #5f6a86;
-      font-size: 12.5px;
-      line-height: 1.8;
+      font-size: 13px;
+      line-height: 1.84;
       font-weight: 500;
     }
 
     .capabilities {
-      margin-top: 20px;
+      margin-top: 34px;
       display: grid;
       grid-template-columns: 1.2fr 1fr;
-      gap: 16px;
+      gap: 20px;
       align-items: start;
     }
 
@@ -501,7 +513,7 @@
       border-radius: 14px;
       background: #fff;
       box-shadow: 0 8px 22px rgba(35, 44, 74, 0.05);
-      padding: 18px;
+      padding: 22px;
     }
 
     .caps-card h3 {
@@ -516,13 +528,13 @@
       color: #5f6a86;
       font-size: 13px;
       font-weight: 500;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .tool-list {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
+      gap: 10px;
       list-style: none;
     }
 
@@ -530,25 +542,62 @@
       border: 1px solid var(--line);
       border-radius: 10px;
       background: #fbfcff;
-      padding: 8px 10px;
+      padding: 0;
       font-size: 12px;
       color: #465170;
       font-weight: 500;
       font-family: "Segoe UI", sans-serif;
-      white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
+    }
+
+    .tool-item details {
+      width: 100%;
+    }
+
+    .tool-item summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      font-weight: 600;
+      color: #394463;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .tool-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .tool-item summary::after {
+      content: "+";
+      font-size: 14px;
+      color: #6b7694;
+      flex: 0 0 auto;
+    }
+
+    .tool-item details[open] summary::after {
+      content: "-";
+    }
+
+    .tool-item details p {
+      padding: 0 12px 11px;
+      margin: 0;
+      color: #59637f;
+      line-height: 1.62;
+      font-size: 12px;
     }
 
     .caps-grid {
       display: grid;
-      gap: 12px;
+      gap: 16px;
     }
 
     .mini-features {
       list-style: none;
       display: grid;
-      gap: 7px;
+      gap: 10px;
       color: #55607d;
       font-size: 13px;
       font-weight: 500;
@@ -650,6 +699,19 @@
 
     .brand-col {
       color: var(--brand);
+    }
+
+    .comp-link {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      text-decoration-color: #c8cee2;
+      transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    }
+
+    .comp-link:hover {
+      color: var(--brand);
+      text-decoration-color: var(--brand);
     }
 
     .ok {
@@ -876,7 +938,7 @@
     @media (max-width: 1120px) {
       .feature-grid-top,
       .feature-grid-bottom {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .hero {
@@ -928,7 +990,7 @@
 
       .feature-grid-top,
       .feature-grid-bottom {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
       }
 
       .journey-grid {
@@ -980,7 +1042,8 @@
       </a>
       <nav class="menu" aria-label="Main navigation">
         <a href="#features">Features</a>
-        <a href="#compare">Compare</a>
+        <a href="#benchmark">Benchmark</a>
+        <a href="#pricing">Pricing</a>
         <a href="#install">Install</a>
         <a href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer">GitHub</a>
       </nav>
@@ -994,15 +1057,15 @@
     <section class="hero">
       <div>
         <div class="pill fade-up"><span class="dot"></span> Universal context compiler for coding agents</div>
-        <h1 class="serif fade-up fade-delay-1">Cut Your Claude Bill <br> by <span>95%</span></h1>
+        <h1 class="serif fade-up fade-delay-1">Ship Faster with <br><span>95%</span> Less Context Spend</h1>
         <p class="fade-up fade-delay-2">
-          The universal context compiler for AI coding agents. Works with Claude Code, Cursor, VS Code, Codex, OpenCode, and any MCP client.
-          <strong>Free forever. Open source.</strong>
+          The universal context compiler for AI coding agents. <strong>GPU embeddings</strong>, live watch, SQLite workspace, and <strong>28+ tools</strong>.
+          Works with Claude Code, Cursor, VS Code, Codex, and any MCP client. <strong>Free forever. Open source.</strong>
         </p>
 
         <div class="cta-row fade-up fade-delay-3">
           <a class="btn btn-primary" href="#install">Install Free</a>
-          <a class="btn btn-secondary" href="../README.md">Read Docs</a>
+          <a class="btn btn-secondary" href="#benchmark">See Benchmark</a>
         </div>
 
         <div class="hero-stats fade-up fade-delay-3">
@@ -1011,7 +1074,7 @@
             <div class="stat-label">Token Reduction</div>
           </div>
           <div class="stat">
-            <div class="stat-value">17</div>
+            <div class="stat-value">28+</div>
             <div class="stat-label">MCP Tools</div>
           </div>
           <div class="stat">
@@ -1070,12 +1133,12 @@
     <div class="logos fade-up fade-delay-2">
       <p>Works with every AI coding tool</p>
       <div class="logo-grid">
-        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="#F97316"/><g stroke="#F97316" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.8" y2="7.8"/><line x1="16.2" y1="16.2" x2="19.1" y2="19.1"/><line x1="16.2" y1="7.8" x2="19.1" y2="4.9"/><line x1="4.9" y1="19.1" x2="7.8" y2="16.2"/></g></svg>Claude Code</div>
-        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,2 20,7 12,12 4,7" fill="#9CA3AF"/><polygon points="4,7 12,12 12,22 4,17" fill="#6B7280"/><polygon points="20,7 12,12 12,22 20,17" fill="#4B5563"/></svg>Cursor</div>
-        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 2.4 8.4 8.7v6.6l9.4 6.3 2.2-1.3V3.7z" fill="#007ACC"/><path d="M8.4 8.7 3 6.1v11.8l5.4-2.6z" fill="#1A9FFF"/></svg>VS Code</div>
-        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.8" fill="none" stroke="#111827" stroke-width="2"/><path d="M7.7 9.5c1.7-2.8 6-3.3 8.3-.8M8 14.5c1.8 2.6 6.1 2.9 8.3.4" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>Codex</div>
-        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" transform="rotate(45 12 12)" fill="none" stroke="#2563EB" stroke-width="2"/></svg>OpenCode</div>
-        <div class="logo-chip"><svg class="logo-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 20 18H4z" fill="none" stroke="#7C3AED" stroke-width="2"/><circle cx="12" cy="13.2" r="1.3" fill="#7C3AED"/></svg>Antigravity</div>
+        <div class="logo-chip brand-img"><img src="./assets/logos/claude-code.svg" alt="Claude Code logo">Claude Code</div>
+        <div class="logo-chip brand-img"><img src="./assets/logos/cursor.svg" alt="Cursor logo">Cursor</div>
+        <div class="logo-chip brand-img"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/visualstudiocode.svg" alt="Visual Studio Code logo">VS Code</div>
+        <div class="logo-chip brand-img"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/openai.svg" alt="OpenAI logo">Codex</div>
+        <div class="logo-chip brand-img"><img src="./assets/logos/opencode.svg" alt="OpenCode logo">OpenCode</div>
+        <div class="logo-chip brand-img"><img src="./assets/logos/antigravity.svg" alt="Antigravity logo">Antigravity</div>
       </div>
     </div>
 
@@ -1091,18 +1154,18 @@
         </article>
         <article class="feature-card">
           <div class="feature-icon ico-green"><i class="fa-solid fa-bullseye"></i></div>
-          <h3 class="txt-green">Task-Aware Compression</h3>
-          <p>Debug mode keeps stack traces while explore mode stays compact and test-focused.</p>
+          <h3 class="txt-green">GPU Semantic Search</h3>
+          <p>Real CUDA embeddings via @xenova/transformers. Falls back to CPU. 3ms latency.</p>
         </article>
         <article class="feature-card">
           <div class="feature-icon ico-blue"><i class="fa-solid fa-chart-column"></i></div>
-          <h3 class="txt-blue">Live Dashboard</h3>
-          <p>Real-time SSE dashboard at localhost:2337. Watch your token savings live.</p>
+          <h3 class="txt-blue">Live Watch Reindex</h3>
+          <p>Auto-reindex on file changes. Debounced updates keep your index fresh.</p>
         </article>
         <article class="feature-card">
           <div class="feature-icon ico-orange"><i class="fa-solid fa-arrow-rotate-left"></i></div>
-          <h3 class="txt-orange">Session Replay</h3>
-          <p>JSONL replay with timeline playback so you can debug full agent behavior clearly.</p>
+          <h3 class="txt-orange">SQLite Workspace</h3>
+          <p>Single-file DB like Srclight. FTS5 search, cross-repo queries.</p>
         </article>
       </div>
 
@@ -1110,52 +1173,58 @@
         <article class="feature-card">
           <div class="feature-icon ico-gold"><i class="fa-solid fa-globe"></i></div>
           <h3 class="txt-gold">7 Languages</h3>
-          <p>TypeScript, Python, Rust, Go, Java, C#, and JavaScript out of the box.</p>
+          <p>TypeScript, Python, Rust, Go, Java, C#, C/C++, Ruby out of the box.</p>
         </article>
         <article class="feature-card">
           <div class="feature-icon ico-red"><i class="fa-solid fa-gear"></i></div>
-          <h3 class="txt-red">Production Ready</h3>
-          <p>Config files, env vars, health checks, and practical confidence hints for teams.</p>
+          <h3 class="txt-red">Gateway Webhooks</h3>
+          <p>Slack & Discord notifications. Team-ready alerts.</p>
         </article>
         <article class="feature-card">
           <div class="feature-icon ico-purple"><i class="fa-solid fa-wrench"></i></div>
-          <h3 class="txt-purple">17 MCP Tools</h3>
-          <p>Search symbols, get refs, blast radius, hybrid search, remember, and recall.</p>
+          <h3 class="txt-purple">28+ MCP Tools</h3>
+          <p>BM25, fuzzy, dead code, PageRank, multi-repo, enforcement hooks.</p>
         </article>
         <article class="feature-card">
           <div class="feature-icon ico-green"><i class="fa-regular fa-trophy"></i></div>
           <h3 class="txt-green">Open Source</h3>
-          <p>MIT licensed. No enterprise sales motion. Use it anywhere and self-host freely.</p>
+          <p>MIT licensed. No enterprise sales. Use it anywhere and self-host.</p>
         </article>
         <article class="feature-card">
           <div class="feature-icon ico-pink"><i class="fa-regular fa-heart"></i></div>
           <h3 class="txt-pink">Free Forever</h3>
-          <p>jCodeMunch: $79-1,999/year. LoomMCP: $0. We win on price and capability.</p>
+          <p>jCodeMunch: $79-1,999/yr. LoomMCP: $0. Win on price AND features.</p>
         </article>
       </div>
 
       <div class="capabilities fade-up fade-delay-3">
         <article class="caps-card">
-          <h3><i class="fa-solid fa-toolbox txt-purple"></i> Full MCP Toolkit (17)</h3>
-          <p class="caps-note">Complete tools list from the current server implementation.</p>
+          <h3><i class="fa-solid fa-toolbox txt-purple"></i> Full MCP Toolkit (28+)</h3>
+          <p class="caps-note">Click any tool name to expand and view what it does.</p>
           <ul class="tool-list">
-            <li>loom_get_topology</li>
-            <li>loom_focus</li>
-            <li>loom_search_symbols</li>
-            <li>loom_get_symbol</li>
-            <li>loom_find_importers</li>
-            <li>loom_blast_radius</li>
-            <li>loom_search_refs</li>
-            <li>loom_get_active_diff</li>
-            <li>loom_blur</li>
-            <li>loom_hybrid_search</li>
-            <li>loom_remember</li>
-            <li>loom_recall</li>
-            <li>loom_session_compress</li>
-            <li>loom_diff_compress</li>
-            <li>loom_get_deps</li>
-            <li>loom_get_metrics</li>
-            <li>loom_get_sessions</li>
+            <li class="tool-item"><details><summary>loom_get_topology</summary><p>Returns an AST skeleton of the codebase with signatures and structure, without full implementations.</p></details></li>
+            <li class="tool-item"><details><summary>loom_focus</summary><p>Pages in the full implementation for a specific file or symbol so the agent can work with exact code.</p></details></li>
+            <li class="tool-item"><details><summary>loom_search_symbols</summary><p>Searches for symbols by name and relevance to quickly locate functions, classes, and methods.</p></details></li>
+            <li class="tool-item"><details><summary>loom_get_symbol</summary><p>Retrieves the exact source for a symbol using fast byte-offset lookup.</p></details></li>
+            <li class="tool-item"><details><summary>loom_find_importers</summary><p>Finds files that import or depend on a symbol to map reverse dependencies.</p></details></li>
+            <li class="tool-item"><details><summary>loom_blast_radius</summary><p>Estimates change impact by showing what parts of the code are affected by editing a symbol.</p></details></li>
+            <li class="tool-item"><details><summary>loom_search_refs</summary><p>Performs AST-aware reference search to find real code usages, not just text matches.</p></details></li>
+            <li class="tool-item"><details><summary>loom_bm25_search</summary><p>BM25 ranking - statistically optimal keyword search better than simple match.</p></details></li>
+            <li class="tool-item"><details><summary>loom_fuzzy_search</summary><p>Fuzzy/Levenshtein matching for typos and partial matches.</p></details></li>
+            <li class="tool-item"><details><summary>loom_find_dead_code</summary><p>Detect unused functions and unreachable code.</p></details></li>
+            <li class="tool-item"><details><summary>loom_pagerank_centrality</summary><p>PageRank algorithm for architectural importance scoring.</p></details></li>
+            <li class="tool-item"><details><summary>loom_get_class_hierarchy</summary><p>Traverse class inheritance tree - get parents and children.</p></details></li>
+            <li class="tool-item"><details><summary>loom_gpu_search</summary><p>Real GPU semantic search with CUDA via @xenova/transformers.</p></details></li>
+            <li class="tool-item"><details><summary>loom_watch_start/stop</summary><p>Live file watching with auto-reindex on changes.</p></details></li>
+            <li class="tool-item"><details><summary>loom_attach_repo</summary><p>Attach multiple repos for cross-repo search.</p></details></li>
+            <li class="tool-item"><details><summary>loom_semantic_search</summary><p>GPU-accelerated semantic embeddings (optional).</p></details></li>
+            <li class="tool-item"><details><summary>loom_detect_frameworks</summary><p>Detect Nuxt/Next.js/React/Django/etc.</p></details></li>
+            <li class="tool-item"><details><summary>loom_enforce_hook</summary><p>Register PreToolUse/PostToolUse hooks to force agent tool usage.</p></details></li>
+            <li class="tool-item"><details><summary>loom_remember</summary><p>Saves a useful code insight as cross-session memory for future runs.</p></details></li>
+            <li class="tool-item"><details><summary>loom_recall</summary><p>Retrieves stored cross-session insights based on a query.</p></details></li>
+            <li class="tool-item"><details><summary>loom_get_deps</summary><p>Builds dependency graphs in text, DOT, or JSON formats to visualize system relationships.</p></details></li>
+            <li class="tool-item"><details><summary>loom_gateway_notify</summary><p>Send Slack/Discord notifications.</p></details></li>
+            <li class="tool-item"><details><summary>loom_workspace_stats</summary><p>SQLite workspace statistics.</p></details></li>
           </ul>
         </article>
 
@@ -1181,19 +1250,19 @@
       </div>
     </section>
 
-    <section id="compare">
-      <h2 class="section-title serif fade-up">The numbers don't lie.</h2>
-      <p class="section-sub fade-up fade-delay-1">We beat them on every meaningful metric.</p>
+    <section id="benchmark">
+      <h2 class="section-title serif fade-up">Benchmark and Proof</h2>
+      <p class="section-sub fade-up fade-delay-1">One clean comparison table, no pricing noise mixed in.</p>
 
-      <div class="compare-wrap fade-up fade-delay-2">
+      <div class="benchmark-wrap fade-up fade-delay-2">
         <div class="panel">
           <table>
             <thead>
               <tr>
                 <th>Feature</th>
                 <th class="brand-col">LoomMCP</th>
-                <th>jCodeMunch</th>
-                <th>SrcTight</th>
+                <th><a class="comp-link" href="https://duckduckgo.com/?q=jCodeMunch" target="_blank" rel="noreferrer">jCodeMunch</a></th>
+                <th><a class="comp-link" href="https://duckduckgo.com/?q=SrcTight" target="_blank" rel="noreferrer">SrcTight</a></th>
               </tr>
             </thead>
             <tbody>
@@ -1201,7 +1270,25 @@
                 <td>Token Reduction</td>
                 <td class="brand-col">95%</td>
                 <td>95%-99.6%</td>
-                <td>-90%</td>
+                <td>~90%</td>
+              </tr>
+              <tr>
+                <td>GPU Semantic Search</td>
+                <td class="ok">Yes (CUDA)</td>
+                <td class="no">No</td>
+                <td>Yes (3ms)</td>
+              </tr>
+              <tr>
+                <td>Live Watch Reindex</td>
+                <td class="ok">Yes</td>
+                <td>Yes</td>
+                <td class="no">No</td>
+              </tr>
+              <tr>
+                <td>SQLite Workspace</td>
+                <td class="ok">Yes</td>
+                <td class="no">No</td>
+                <td>Yes</td>
               </tr>
               <tr>
                 <td>Cross-Session Memory</td>
@@ -1222,20 +1309,20 @@
                 <td class="no">No</td>
               </tr>
               <tr>
-                <td>Task-Aware Compression</td>
+                <td>Gateway (Slack/Discord)</td>
                 <td class="ok">Yes</td>
                 <td class="no">No</td>
                 <td class="no">No</td>
               </tr>
               <tr>
                 <td>Supported Languages</td>
-                <td class="brand-col">7</td>
-                <td>25+</td>
+                <td class="brand-col">7+</td>
+                <td>6</td>
                 <td>10</td>
               </tr>
               <tr>
                 <td>MCP Tools</td>
-                <td class="brand-col">17</td>
+                <td class="brand-col">28+</td>
                 <td>11</td>
                 <td>42</td>
               </tr>
@@ -1248,19 +1335,27 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </section>
 
+    <section id="pricing">
+      <h2 class="section-title serif fade-up">Keep the savings. Keep the quality.</h2>
+      <p class="section-sub fade-up fade-delay-1">Same coding output, dramatically lower recurring cost.</p>
+
+      <div class="money-wrap fade-up fade-delay-2">
         <div class="panel">
           <div class="price-grid">
             <article class="price-card">
-              <h4>jCodeMunch</h4>
+              <h4><a class="comp-link" href="https://duckduckgo.com/?q=jCodeMunch" target="_blank" rel="noreferrer">jCodeMunch</a></h4>
               <div class="price-value">$79-1,999</div>
               <div class="price-note">per year</div>
               <ul class="price-list">
                 <li><span class="warn">!</span> 95% token reduction</li>
                 <li><span class="warn">!</span> 11 tools</li>
+                <li><span class="warn">!</span> No GPU search</li>
                 <li><span class="warn">!</span> No memory</li>
-                <li><span class="warn">!</span> No dashboard</li>
-                <li><span class="warn">!</span> No replay</li>
+                <li><span class="warn">!</span> No live watch</li>
+                <li><span class="warn">!</span> No SQLite</li>
               </ul>
             </article>
 
@@ -1270,18 +1365,30 @@
               <div class="price-note">forever</div>
               <ul class="price-list">
                 <li><span class="check">+</span> 95% token reduction</li>
-                <li><span class="check">+</span> 17 tools</li>
+                <li><span class="check">+</span> 28+ tools</li>
+                <li><span class="check">+</span> GPU embeddings (CUDA)</li>
+                <li><span class="check">+</span> Live watch reindex</li>
+                <li><span class="check">+</span> SQLite workspace</li>
                 <li><span class="check">+</span> Cross-session memory</li>
                 <li><span class="check">+</span> Live dashboard</li>
-                <li><span class="check">+</span> Session replay</li>
+                <li><span class="check">+</span> Slack/Discord</li>
               </ul>
               <a class="btn btn-primary" href="#install" style="width:100%; margin-top:6px;">Install Free</a>
             </article>
           </div>
         </div>
-      </div>
 
-      <div id="install" class="journey fade-up fade-delay-3">
+        <p class="money-note">
+          Typical result: about 50k tokens per turn drops to about 2.7k. That converts expensive daily usage into predictable, sustainable spend without sacrificing development velocity.
+        </p>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2 class="section-title serif fade-up">Install in 30 Seconds</h2>
+      <p class="section-sub fade-up fade-delay-1">One path to activation. No repeated decision cards.</p>
+
+      <div class="journey fade-up fade-delay-2">
         <div class="journey-grid">
           <article class="journey-item">
             <div class="journey-index">1</div>
@@ -1307,26 +1414,8 @@
 
         <div class="decision">
           <p class="decision-text">
-            The easiest decision: LoomMCP wins on price, tools, and feature depth. The alternatives only win on invoice size.
+            Run these 4 steps once, then keep the dashboard open at localhost:2337 to track real savings as you work.
           </p>
-          <article class="mini-card">
-            <h5>jCodeMunch</h5>
-            <div class="mini-price">$79-1,999</div>
-            <ul class="mini-list">
-              <li><span class="warn">!</span> No memory</li>
-              <li><span class="warn">!</span> No dashboard</li>
-              <li><span class="warn">!</span> No replay</li>
-            </ul>
-          </article>
-          <article class="mini-card" style="border-color:#d9defd;">
-            <h5 class="brand-col">LoomMCP</h5>
-            <div class="mini-price" style="color:var(--brand);">$0</div>
-            <ul class="mini-list">
-              <li><span class="check">+</span> 17 tools</li>
-              <li><span class="check">+</span> Cross-session memory</li>
-              <li><span class="check">+</span> Open source MIT</li>
-            </ul>
-          </article>
         </div>
       </div>
 

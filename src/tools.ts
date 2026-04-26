@@ -12,6 +12,10 @@ import { SessionRecorder } from './replay/recorder.js';
 import { buildDependencyGraph, getGraphStats, renderGraphDOT } from './adapters/graph.js';
 import { MetricsCollector } from './adapters/metrics.js';
 import { trackToolCall } from './dashboard/server.js';
+import { initGPUEmbeddings, getEmbedding, semanticSearchGPU, getDeviceType, isGPUAvailable } from './embeddings.js';
+import { SQLiteWorkspace } from './workspace.js';
+import { LiveWatcher } from './livewatch.js';
+import { Gateway } from './gateway.js';
 
 const WORKSPACE_ROOT = process.cwd();
 const cache = new LoomCache('.loom');
@@ -21,7 +25,11 @@ const circuitBreaker = new CircuitBreaker({ focusBudget: 20, topologyCalls: 100,
 const watcher = new LoomWatcher();
 const recorder = new SessionRecorder('.loom/sessions');
 const metrics = new MetricsCollector('.loom/metrics');
+const sqliteWorkspace = new SQLiteWorkspace('.loom');
+let liveWatcher = new LiveWatcher();
+const gateway = new Gateway('.loom/webhooks.json');
 
+let gpuInitialized = false;
 let focusedFilesCount = 0;
 let focusedFiles: string[] = [];
 
@@ -729,6 +737,100 @@ function createLoomServer(): Server {
               agent: { type: 'string', description: 'Agent name' }
             },
             required: []
+          }
+        },
+        // GPU embeddings (real CUDA support)
+        {
+          name: 'loom_gpu_search',
+          description: 'Real GPU semantic search with CUDA/CPU fallback. Uses @xenova/transformers.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              query: { type: 'string', description: 'Natural language query' },
+              documents: { type: 'array', items: { type: 'string' }, description: 'Documents to search' },
+              limit: { type: 'number', default: 5 },
+              use_gpu: { type: 'boolean', default: true }
+            },
+            required: ['query', 'documents']
+          }
+        },
+        {
+          name: 'loom_gpu_status',
+          description: 'Check GPU availability and status.',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+          }
+        },
+        // Live watch (auto reindex)
+        {
+          name: 'loom_watch_start',
+          description: 'Start live file watching with auto-reindex on changes.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              path: { type: 'string', default: '.' },
+              debounce_ms: { type: 'number', default: 500 }
+            },
+            required: []
+          }
+        },
+        {
+          name: 'loom_watch_stop',
+          description: 'Stop live file watching.',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+          }
+        },
+        // SQLite workspace
+        {
+          name: 'loom_workspace_stats',
+          description: 'Get SQLite workspace statistics.',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+          }
+        },
+        {
+          name: 'loom_workspace_clear',
+          description: 'Clear workspace cache.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              repo: { type: 'string', default: 'main' }
+            },
+            required: []
+          }
+        },
+        // Gateway (Slack/Discord)
+        {
+          name: 'loom_gateway_notify',
+          description: 'Send Slack/Discord notification.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' },
+              message: { type: 'string' },
+              type: { type: 'string', enum: ['info', 'warning', 'error', 'success'], default: 'info' }
+            },
+            required: ['title', 'message']
+          }
+        },
+        {
+          name: 'loom_gateway_config',
+          description: 'Configure Slack/Discord webhooks.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              platform: { type: 'string', enum: ['slack', 'discord'] },
+              url: { type: 'string' },
+              channel: { type: 'string' }
+            },
+            required: ['platform', 'url']
           }
         }
       ]
@@ -1527,6 +1629,89 @@ function createLoomServer(): Server {
         }
         
         return { content: [{ type: 'text', text: `supported_agents:${Object.keys(agentInfo).join(',')}\n\n${Object.entries(agentInfo).map(([a, i]) => `${a}: ${i.supported ? '✓' : '✗'} (${i.transport.join(',')})`).join('\n')}` }] };
+      }
+
+      // ========== GPU EMBEDDINGS (REAL) ==========
+      if (name === 'loom_gpu_search') {
+        const query = args.query as string;
+        const documents = args.documents as string[];
+        const limit = (args.limit as number) || 5;
+        const use_gpu = args.use_gpu !== false;
+        
+        if (!gpuInitialized) {
+          await initGPUEmbeddings(use_gpu);
+          gpuInitialized = true;
+        }
+        
+        const results = await semanticSearchGPU(query, documents, limit);
+        const latency_ms = Date.now() - startTime;
+        
+        return { content: [{ type: 'text', text: `query:${query}\ndevice:${getDeviceType()}\nresults:${results.length}\nlatency_ms:${latency_ms}\nconfidence:high\nmethodology:@xenova/transformers with ${getDeviceType()} backend\n\n${results.map(r => `${r.text.substring(0, 60)}... (score: ${r.score.toFixed(4)})`).join('\n')}` }] };
+      }
+
+      if (name === 'loom_gpu_status') {
+        return { content: [{ type: 'text', text: `device:${getDeviceType()}\ngpu_available:${isGPUAvailable()}\ninitialized:${gpuInitialized}` }] };
+      }
+
+      // ========== LIVE WATCH ==========
+      if (name === 'loom_watch_start') {
+        const path = (args.path as string) || '.';
+        const debounceMs = (args.debounce_ms as number) || 500;
+        
+        const newWatcher = new LiveWatcher({ debounceMs });
+        
+        newWatcher.onReindex((filePath) => {
+          try {
+            skeletonizeFile(resolve(WORKSPACE_ROOT, filePath));
+          } catch {}
+        });
+        
+        newWatcher.watchDirectory(resolve(WORKSPACE_ROOT, path));
+        
+        return { content: [{ type: 'text', text: `watching:${path}\ndebounce_ms:${debounceMs}\nstatus:active` }] };
+      }
+
+      if (name === 'loom_watch_stop') {
+        liveWatcher.stopWatching();
+        return { content: [{ type: 'text', text: `status:stopped` }] };
+      }
+
+      // ========== SQLITE WORKSPACE ==========
+      if (name === 'loom_workspace_stats') {
+        const stats = sqliteWorkspace.getStats();
+        return { content: [{ type: 'text', text: `symbols:${stats.symbols}\nrepos:${stats.repos}\ndb_size_kb:${stats.size_kb}` }] };
+      }
+
+      if (name === 'loom_workspace_clear') {
+        const repo = (args.repo as string) || 'main';
+        sqliteWorkspace.clearRepo(repo);
+        return { content: [{ type: 'text', text: `cleared:${repo}` }] };
+      }
+
+      // ========== GATEWAY (SLACK/DISCORD) ==========
+      if (name === 'loom_gateway_notify') {
+        const title = args.title as string;
+        const message = args.message as string;
+        const type = (args.type as string) || 'info';
+        
+        await gateway.notify({ title, message, type: type as any });
+        
+        const configured = gateway.isConfigured();
+        return { content: [{ type: 'text', text: `notified:${title}\nslack:${configured.slack}\ndiscord:${configured.discord}` }] };
+      }
+
+      if (name === 'loom_gateway_config') {
+        const platform = args.platform as string;
+        const url = args.url as string;
+        const channel = args.channel as string;
+        
+        if (platform === 'slack') {
+          gateway.setSlackWebhook(url, channel);
+        } else {
+          gateway.setDiscordWebhook(url);
+        }
+        
+        return { content: [{ type: 'text', text: `configured:${platform}` }] };
       }
 
       return { content: [{ type: 'text', text: 'ERROR:unknown_tool' }] };

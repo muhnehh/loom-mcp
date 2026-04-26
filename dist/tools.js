@@ -15,6 +15,10 @@ const watcher_js_1 = require("./watcher.js");
 const recorder_js_1 = require("./replay/recorder.js");
 const graph_js_1 = require("./adapters/graph.js");
 const metrics_js_1 = require("./adapters/metrics.js");
+const embeddings_js_1 = require("./embeddings.js");
+const workspace_js_1 = require("./workspace.js");
+const livewatch_js_1 = require("./livewatch.js");
+const gateway_js_1 = require("./gateway.js");
 const WORKSPACE_ROOT = process.cwd();
 const cache = new cache_js_1.LoomCache('.loom');
 exports.cache = cache;
@@ -28,6 +32,10 @@ const watcher = new watcher_js_1.LoomWatcher();
 exports.watcher = watcher;
 const recorder = new recorder_js_1.SessionRecorder('.loom/sessions');
 const metrics = new metrics_js_1.MetricsCollector('.loom/metrics');
+const sqliteWorkspace = new workspace_js_1.SQLiteWorkspace('.loom');
+let liveWatcher = new livewatch_js_1.LiveWatcher();
+const gateway = new gateway_js_1.Gateway('.loom/webhooks.json');
+let gpuInitialized = false;
 let focusedFilesCount = 0;
 let focusedFiles = [];
 // Multi-repo workspace support
@@ -658,6 +666,100 @@ function createLoomServer() {
                             agent: { type: 'string', description: 'Agent name' }
                         },
                         required: []
+                    }
+                },
+                // GPU embeddings (real CUDA support)
+                {
+                    name: 'loom_gpu_search',
+                    description: 'Real GPU semantic search with CUDA/CPU fallback. Uses @xenova/transformers.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            query: { type: 'string', description: 'Natural language query' },
+                            documents: { type: 'array', items: { type: 'string' }, description: 'Documents to search' },
+                            limit: { type: 'number', default: 5 },
+                            use_gpu: { type: 'boolean', default: true }
+                        },
+                        required: ['query', 'documents']
+                    }
+                },
+                {
+                    name: 'loom_gpu_status',
+                    description: 'Check GPU availability and status.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {},
+                        required: []
+                    }
+                },
+                // Live watch (auto reindex)
+                {
+                    name: 'loom_watch_start',
+                    description: 'Start live file watching with auto-reindex on changes.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            path: { type: 'string', default: '.' },
+                            debounce_ms: { type: 'number', default: 500 }
+                        },
+                        required: []
+                    }
+                },
+                {
+                    name: 'loom_watch_stop',
+                    description: 'Stop live file watching.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {},
+                        required: []
+                    }
+                },
+                // SQLite workspace
+                {
+                    name: 'loom_workspace_stats',
+                    description: 'Get SQLite workspace statistics.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {},
+                        required: []
+                    }
+                },
+                {
+                    name: 'loom_workspace_clear',
+                    description: 'Clear workspace cache.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            repo: { type: 'string', default: 'main' }
+                        },
+                        required: []
+                    }
+                },
+                // Gateway (Slack/Discord)
+                {
+                    name: 'loom_gateway_notify',
+                    description: 'Send Slack/Discord notification.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            title: { type: 'string' },
+                            message: { type: 'string' },
+                            type: { type: 'string', enum: ['info', 'warning', 'error', 'success'], default: 'info' }
+                        },
+                        required: ['title', 'message']
+                    }
+                },
+                {
+                    name: 'loom_gateway_config',
+                    description: 'Configure Slack/Discord webhooks.',
+                    inputSchema: {
+                        type: 'object',
+                        properties: {
+                            platform: { type: 'string', enum: ['slack', 'discord'] },
+                            url: { type: 'string' },
+                            channel: { type: 'string' }
+                        },
+                        required: ['platform', 'url']
                     }
                 }
             ]
@@ -1336,6 +1438,72 @@ function createLoomServer() {
                     return { content: [{ type: 'text', text: `ERROR:unknown_agent\n${agent}` }] };
                 }
                 return { content: [{ type: 'text', text: `supported_agents:${Object.keys(agentInfo).join(',')}\n\n${Object.entries(agentInfo).map(([a, i]) => `${a}: ${i.supported ? '✓' : '✗'} (${i.transport.join(',')})`).join('\n')}` }] };
+            }
+            // ========== GPU EMBEDDINGS (REAL) ==========
+            if (name === 'loom_gpu_search') {
+                const query = args.query;
+                const documents = args.documents;
+                const limit = args.limit || 5;
+                const use_gpu = args.use_gpu !== false;
+                if (!gpuInitialized) {
+                    await (0, embeddings_js_1.initGPUEmbeddings)(use_gpu);
+                    gpuInitialized = true;
+                }
+                const results = await (0, embeddings_js_1.semanticSearchGPU)(query, documents, limit);
+                const latency_ms = Date.now() - startTime;
+                return { content: [{ type: 'text', text: `query:${query}\ndevice:${(0, embeddings_js_1.getDeviceType)()}\nresults:${results.length}\nlatency_ms:${latency_ms}\nconfidence:high\nmethodology:@xenova/transformers with ${(0, embeddings_js_1.getDeviceType)()} backend\n\n${results.map(r => `${r.text.substring(0, 60)}... (score: ${r.score.toFixed(4)})`).join('\n')}` }] };
+            }
+            if (name === 'loom_gpu_status') {
+                return { content: [{ type: 'text', text: `device:${(0, embeddings_js_1.getDeviceType)()}\ngpu_available:${(0, embeddings_js_1.isGPUAvailable)()}\ninitialized:${gpuInitialized}` }] };
+            }
+            // ========== LIVE WATCH ==========
+            if (name === 'loom_watch_start') {
+                const path = args.path || '.';
+                const debounceMs = args.debounce_ms || 500;
+                const newWatcher = new livewatch_js_1.LiveWatcher({ debounceMs });
+                newWatcher.onReindex((filePath) => {
+                    try {
+                        (0, ast_js_1.skeletonizeFile)((0, path_1.resolve)(WORKSPACE_ROOT, filePath));
+                    }
+                    catch { }
+                });
+                newWatcher.watchDirectory((0, path_1.resolve)(WORKSPACE_ROOT, path));
+                return { content: [{ type: 'text', text: `watching:${path}\ndebounce_ms:${debounceMs}\nstatus:active` }] };
+            }
+            if (name === 'loom_watch_stop') {
+                liveWatcher.stopWatching();
+                return { content: [{ type: 'text', text: `status:stopped` }] };
+            }
+            // ========== SQLITE WORKSPACE ==========
+            if (name === 'loom_workspace_stats') {
+                const stats = sqliteWorkspace.getStats();
+                return { content: [{ type: 'text', text: `symbols:${stats.symbols}\nrepos:${stats.repos}\ndb_size_kb:${stats.size_kb}` }] };
+            }
+            if (name === 'loom_workspace_clear') {
+                const repo = args.repo || 'main';
+                sqliteWorkspace.clearRepo(repo);
+                return { content: [{ type: 'text', text: `cleared:${repo}` }] };
+            }
+            // ========== GATEWAY (SLACK/DISCORD) ==========
+            if (name === 'loom_gateway_notify') {
+                const title = args.title;
+                const message = args.message;
+                const type = args.type || 'info';
+                await gateway.notify({ title, message, type: type });
+                const configured = gateway.isConfigured();
+                return { content: [{ type: 'text', text: `notified:${title}\nslack:${configured.slack}\ndiscord:${configured.discord}` }] };
+            }
+            if (name === 'loom_gateway_config') {
+                const platform = args.platform;
+                const url = args.url;
+                const channel = args.channel;
+                if (platform === 'slack') {
+                    gateway.setSlackWebhook(url, channel);
+                }
+                else {
+                    gateway.setDiscordWebhook(url);
+                }
+                return { content: [{ type: 'text', text: `configured:${platform}` }] };
             }
             return { content: [{ type: 'text', text: 'ERROR:unknown_tool' }] };
         }
