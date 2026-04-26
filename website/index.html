@@ -970,15 +970,16 @@
 
     <section id="benchmarks">
       <div class="eyebrow">Benchmark results</div>
-      <h2>Proven in real-world codebases.</h2>
+      <h2>Proven with tiktoken (cl100k_base).</h2>
+      <p class="section-sub">Measured using the same methodology as jCodeMunch — tiktoken cl100k_base encoding.</p>
       <div class="bench-table">
         <table>
           <thead>
             <tr>
               <th>Repository</th>
               <th>Files</th>
-              <th>Index Time</th>
-              <th>Tokens Saved</th>
+              <th>Raw Tokens</th>
+              <th>TOON Tokens</th>
               <th>Reduction</th>
             </tr>
           </thead>
@@ -986,35 +987,38 @@
             <tr>
               <td>loommcp (self)</td>
               <td>33</td>
-              <td>1.55s</td>
-              <td>53,402</td>
+              <td>54,932</td>
+              <td>1,456</td>
               <td class="reduce">97%</td>
             </tr>
             <tr>
               <td>eval/fixtures/large_oss</td>
               <td>4</td>
-              <td>4.89s</td>
-              <td>6,305</td>
+              <td>6,413</td>
+              <td>108</td>
               <td class="reduce">98%</td>
             </tr>
             <tr>
               <td>eval/fixtures/medium_webapp</td>
               <td>3</td>
-              <td>0.77s</td>
-              <td>3,249</td>
+              <td>3,318</td>
+              <td>69</td>
               <td class="reduce">98%</td>
             </tr>
             <tr>
               <td>eval/fixtures/small_api</td>
               <td>3</td>
-              <td>0.97s</td>
-              <td>990</td>
+              <td>1,013</td>
+              <td>23</td>
               <td class="reduce">98%</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p class="bench-avg">Average token reduction: 97.75%</p>
+      <p class="bench-avg">Average token reduction: <strong>97%</strong> (tiktoken cl100k_base)</p>
+      <p style="margin-top: 16px; color: var(--text-soft); font-size: 13px;">
+        Run: <code>npm run build && node eval/benchmark.js . --json</code>
+      </p>
     </section>
 
     <section>
