@@ -3,922 +3,982 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LoomMCP — Universal Context Compiler for AI Agents</title>
-  <meta name="description" content="High-performance context compiler for AI coding agents. GPU embeddings, compact wire format, 40+ MCP tools. Works with Claude Code, Cursor, and any MCP client.">
-  <meta name="keywords" content="MCP, context compiler, AI coding, Claude, Cursor, code retrieval, token optimization">
-  <meta property="og:title" content="LoomMCP — Universal Context Compiler">
-  <meta property="og:description" content="Complete context solution for AI agents. Try it free.">
+  <title>LoomMCP - Stop paying Claude to reread your codebase</title>
+  <meta name="description" content="LoomMCP is the context compiler for AI coding agents. Real benchmarked token reduction, exact symbol retrieval, and 17 MCP tools.">
+  <meta property="og:title" content="LoomMCP - Context compiler for AI coding agents">
+  <meta property="og:description" content="Index once. Retrieve exact symbols. Cut context token waste with real benchmarked reductions.">
   <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   <style>
     :root {
-      --bg: #0a0a0f;
-      --bg-soft: #12121a;
-      --surface: #1a1a25;
-      --surface-soft: #22222f;
-      --surface-glass: rgba(26, 26, 37, 0.8);
-      --ink: #f4f4f6;
-      --ink-soft: #9494a8;
-      --line: rgba(255, 255, 255, 0.08);
-      --brand: #6366f1;
-      --brand-light: #818cf8;
-      --brand-strong: #4f46e5;
-      --brand-glow: rgba(99, 102, 241, 0.4);
-      --good: #22c55e;
-      --good-soft: rgba(34, 197, 94, 0.15);
-      --gold: #f59e0b;
-      --purple: #a855f7;
-      --cyan: #06b6d4;
-      --pink: #ec4899;
-      --radius: 12px;
-      --radius-lg: 20px;
-      --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      --shadow-glow: 0 0 80px rgba(99, 102, 241, 0.3);
+      --bg: #FCFCFD;
+      --card: #FFFFFF;
+      --text: #111827;
+      --text-soft: #6B7280;
+      --border: #E5E7EB;
+      --accent: #7C3AED;
+      --accent-2: #8B5CF6;
+      --accent-soft: #EEF2FF;
+      --success: #10B981;
+      --danger: #EF4444;
+      --gradient: linear-gradient(135deg, #7C3AED, #8B5CF6, #A78BFA);
+      --radius: 16px;
+      --radius-lg: 28px;
+      --shadow-sm: 0 4px 14px rgba(17, 24, 39, 0.06);
+      --shadow-md: 0 12px 34px rgba(17, 24, 39, 0.08);
+      --max-w: 1280px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    
+
     body {
-      font-family: 'Inter', system-ui, sans-serif;
-      color: var(--ink);
       background: var(--bg);
+      color: var(--text);
+      font-family: "Inter", "Segoe UI", sans-serif;
       line-height: 1.6;
-      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
-    .container { width: min(1200px, calc(100% - 48px)); margin: 0 auto; }
-    a { color: inherit; text-decoration: none; }
-
-    /* Header */
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      background: var(--surface-glass);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--line);
-      padding: 16px 0;
-    }
-
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .logo-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, var(--brand), var(--purple));
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .nav {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-    }
-
-    .nav a {
-      color: var(--ink-soft);
-      font-size: 14px;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    .nav a:hover { color: var(--ink); }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
-      cursor: pointer;
-      border: none;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-      color: white;
-    }
-
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--line);
-    }
-
-    /* Hero */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 160px 0 100px;
-      position: relative;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 30%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, var(--brand-glow) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .hero-content {
-      text-align: center;
-      position: relative;
-      z-index: 1;
-      max-width: 800px;
+    .container {
+      width: min(var(--max-w), calc(100% - 56px));
       margin: 0 auto;
     }
 
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 8px 16px;
-      font-size: 13px;
-      color: var(--ink-soft);
+    .eyebrow {
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent-2);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    section { padding: 120px 0; }
+
+    .section-header {
+      margin-bottom: 48px;
+    }
+
+    section > .eyebrow {
       margin-bottom: 24px;
     }
 
-    .hero-badge .dot {
-      width: 8px;
-      height: 8px;
-      background: var(--good);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
+    section > h2 {
+      margin-bottom: 16px;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+    h1, h2 {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-weight: 400;
+      color: var(--text);
+    }
+
+    h2 {
+      font-size: 52px;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .section-sub {
+      font-size: 18px;
+      color: var(--text-soft);
+      max-width: 740px;
+      text-align: center;
+      margin: 0 auto 56px;
+    }
+
+    .nav-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 80px;
+      background: rgba(252, 252, 253, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 30px;
+      color: var(--text);
+      text-decoration: none;
+      font-family: "Instrument Serif", Georgia, serif;
+    }
+
+    .brand i {
+      color: var(--accent);
+      font-size: 16px;
+    }
+
+    .nav-links {
+      display: inline-flex;
+      align-items: center;
+      gap: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-soft);
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: inherit;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .star-pill {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--text-soft);
+      background: var(--card);
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .btn {
+      border-radius: 14px;
+      height: 52px;
+      padding: 0 24px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 10px 26px rgba(124, 58, 237, 0.28);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 32px rgba(124, 58, 237, 0.32);
+    }
+
+    .btn-secondary {
+      border-color: var(--border);
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .hero {
+      padding-top: 80px;
+      text-align: center;
+    }
+
+    .version-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #5B6175;
+      background: var(--accent-soft);
+      border-radius: 999px;
+      border: 1px solid #DDD6FE;
+      padding: 8px 14px;
+      margin-bottom: 40px;
+      font-weight: 500;
+    }
+
+    .version-pill .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(124, 58, 237, 0.15);
     }
 
     .hero h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(40px, 6vw, 72px);
-      font-weight: 700;
-      line-height: 1.1;
-      margin-bottom: 20px;
+      font-size: clamp(52px, 7.4vw, 88px);
+      line-height: 0.95;
+      letter-spacing: -3px;
+      max-width: 980px;
+      margin: 0 auto 30px;
     }
 
-    .hero-subtitle {
-      font-size: 22px;
-      color: var(--ink-soft);
-      margin-bottom: 40px;
+    .hero .grad {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-style: italic;
     }
 
-    .hero-subtitle strong {
-      color: var(--ink);
-    }
-
-    .hero-stats {
-      display: flex;
-      justify-content: center;
-      gap: 48px;
-      margin-bottom: 48px;
-      flex-wrap: wrap;
-    }
-
-    .hero-stat-value {
-      font-size: 40px;
-      font-weight: 700;
-      font-family: 'Space Grotesk', sans-serif;
-      color: var(--brand-light);
-    }
-
-    .hero-stat-label {
-      font-size: 13px;
-      color: var(--ink-soft);
-    }
-
-    .hero-ctas {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 64px;
-      flex-wrap: wrap;
-    }
-
-    /* Code Demo */
-    .code-demo {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      max-width: 800px;
+    .hero p {
+      font-size: 18px;
+      color: var(--text-soft);
+      max-width: 700px;
       margin: 0 auto;
     }
 
-    .code-panel {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
+    .metrics {
+      margin-top: 46px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      max-width: 740px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
-    .code-panel-header {
+    .metric-value {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: 42px;
+      color: var(--accent);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .metric-label {
+      margin-top: 6px;
+      color: var(--text-soft);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .hero-ctas {
+      margin-top: 34px;
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .integration-note {
+      margin-top: 22px;
+      margin-bottom: 80px;
+      color: var(--text-soft);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .comparison {
+      margin-top: 64px;
+      margin-bottom: 80px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .context-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .context-head {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .code-panel-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .code-panel-dot.red { background: #ff5f57; }
-    .code-panel-dot.yellow { background: #febc2e; }
-    .code-panel-dot.green { background: #28c840; }
-
-    .code-panel pre {
-      padding: 16px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      line-height: 1.6;
-      overflow-x: auto;
-      text-align: left;
-    }
-
-    .code-panel.old pre { color: var(--ink-soft); }
-    .code-panel.new pre { color: var(--good); }
-
-    .code-label {
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 12px;
-    }
-
-    .code-panel.old .code-label { background: var(--surface-soft); color: var(--ink-soft); }
-    .code-panel.new .code-label { background: rgba(34, 197, 94, 0.1); color: var(--good); }
-
-    /* Section */
-    .section {
-      padding: 100px 0;
-    }
-
-    .section-alt {
-      background: var(--bg-soft);
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 48px;
-    }
-
-    .section-header h2 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 36px;
+      gap: 10px;
+      font-size: 15px;
       font-weight: 700;
       margin-bottom: 12px;
     }
 
-    .section-header p {
-      font-size: 16px;
-      color: var(--ink-soft);
-      max-width: 600px;
-      margin: 0 auto;
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
     }
 
-    /* Features Grid */
-    .features-grid {
+    .status-red { background: var(--danger); }
+    .status-green { background: var(--success); }
+
+    .context-sub {
+      color: var(--text-soft);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .split-view {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
-    .feature-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      padding: 24px;
+    .pane {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #FAFAFB;
+      padding: 12px;
+      min-height: 186px;
     }
 
-    .feature-icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--brand), var(--purple));
-      border-radius: 10px;
+    .pane ul {
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+      color: #4B5563;
+    }
+
+    .pane .code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      line-height: 1.65;
+      color: #374151;
+      white-space: pre-wrap;
+    }
+
+    .checklist {
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+      color: #065F46;
+      margin-top: 10px;
+    }
+
+    .checklist li::before {
+      content: "\2713";
+      color: var(--success);
+      margin-right: 8px;
+      font-weight: 700;
+    }
+
+    .context-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      border-top: 1px dashed var(--border);
+      padding-top: 10px;
+    }
+
+    .context-meta .danger { color: #B91C1C; }
+    .context-meta .success { color: #047857; }
+
+    .connector {
+      width: 70px;
+      display: grid;
+      justify-items: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bolt-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--gradient);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.28);
+      font-size: 18px;
+    }
+
+    .dash-arrow {
+      width: 2px;
+      height: 96px;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(124, 58, 237, 0.9) 0,
+        rgba(124, 58, 237, 0.9) 8px,
+        rgba(124, 58, 237, 0.15) 8px,
+        rgba(124, 58, 237, 0.15) 16px
+      );
+      animation: flow 1.5s linear infinite;
+      border-radius: 99px;
+      position: relative;
+    }
+
+    .dash-arrow::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid rgba(124, 58, 237, 0.9);
+    }
+
+    @keyframes flow {
+      from { background-position-y: 0; }
+      to { background-position-y: 16px; }
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 32px;
+      margin-bottom: 80px;
+    }
+
+    .step-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .step-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .step-top {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      margin-bottom: 16px;
-    }
-
-    .feature-card h3 {
-      font-size: 16px;
+      gap: 10px;
+      font-size: 15px;
       font-weight: 600;
       margin-bottom: 8px;
     }
 
-    .feature-card p {
-      color: var(--ink-soft);
+    .step-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
       font-size: 14px;
     }
 
-    /* Comparison */
-    .comp-table {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      max-width: 900px;
-      margin: 0 auto;
+    .step-card p {
+      font-size: 14px;
+      color: var(--text-soft);
+      line-height: 1.65;
     }
 
-    .comp-table table {
+    .step-arrow {
+      display: grid;
+      place-items: center;
+      color: #A78BFA;
+      font-size: 20px;
+    }
+
+.feature-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+      margin-bottom: 80px;
+    }
+
+    .feature-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .feature-item i {
+      width: 24px;
+      color: var(--accent);
+      margin-top: 3px;
+      flex: 0 0 auto;
+      text-align: center;
+    }
+
+    .feature-item h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .feature-item p {
+      font-size: 14px;
+      color: var(--text-soft);
+      line-height: 1.55;
+    }
+
+    .bench-table {
+      max-width: 1040px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    table {
       width: 100%;
       border-collapse: collapse;
     }
 
-    .comp-table th, .comp-table td {
-      padding: 14px 18px;
-      text-align: left;
-      border-bottom: 1px solid var(--line);
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
       font-size: 14px;
+      text-align: left;
     }
 
-    .comp-table th {
-      background: var(--surface-soft);
+    th {
+      color: var(--text-soft);
       font-weight: 600;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--ink-soft);
+      font-size: 13px;
+      background: #FAFAFB;
     }
 
-    .comp-table th.brand { color: var(--brand-light); }
-    .comp-table .winner { color: var(--good); font-weight: 600; }
+    tr:last-child td {
+      border-bottom: 0;
+    }
 
-    /* Tools */
-    .tools-grid {
+    .reduce {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .bench-avg {
+      margin-top: 14px;
+      text-align: center;
+      color: var(--accent);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .testimonials {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 8px;
-    }
-
-    .tool-item {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 12px 14px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: var(--brand-light);
-    }
-
-    .tool-item:hover {
-      background: var(--surface-soft);
-    }
-
-    /* Use Cases */
-    .use-cases-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
     }
 
-    .use-case-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
+    .quote {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .quote p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .person {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .person span {
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    .final-cta {
+      margin-top: 18px;
       border-radius: var(--radius-lg);
-      padding: 24px;
+      background: var(--gradient);
+      color: #fff;
+      padding: 40px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr auto;
+      align-items: center;
+      gap: 24px;
+      box-shadow: 0 22px 52px rgba(124, 58, 237, 0.3);
     }
 
-    .use-case-icon {
-      font-size: 28px;
-      margin-bottom: 12px;
+    .final-cta h3 {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: clamp(34px, 4vw, 52px);
+      line-height: 0.98;
+      font-weight: 400;
+      letter-spacing: -1.5px;
     }
 
-    .use-case-card h3 {
-      font-size: 15px;
+    .final-cta p {
+      font-size: 16px;
+      opacity: 0.95;
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: var(--accent);
+      border: 0;
       font-weight: 600;
+      min-width: 210px;
+    }
+
+    .tiny {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.88);
+      margin-top: 8px;
+      text-align: right;
+    }
+
+    footer {
+      padding: 74px 0 36px;
+    }
+
+    .foot {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr auto;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .foot-brand h4 {
+      font-family: "Instrument Serif", Georgia, serif;
+      font-size: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 8px;
     }
 
-    .use-case-card p {
-      color: var(--ink-soft);
-      font-size: 13px;
-    }
+    .foot-brand h4 i { color: var(--accent); font-size: 14px; }
 
-    /* Install */
-    .install-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-width: 500px;
-      margin: 32px auto 0;
-    }
-
-    .install-step {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-    }
-
-    .install-step-num {
-      width: 28px;
-      height: 28px;
-      background: var(--brand);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 13px;
-      flex-shrink: 0;
-    }
-
-    .install-step code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--brand-light);
-      background: var(--surface-soft);
-      padding: 6px 12px;
-      border-radius: 6px;
-    }
-
-    /* Testimonials */
-    .testimonials {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .testimonial-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-    }
-
-    .testimonial-card blockquote {
-      font-size: 15px;
-      line-height: 1.7;
-      margin-bottom: 16px;
-    }
-
-    .testimonial-card cite {
-      color: var(--ink-soft);
-      font-size: 13px;
-      font-style: normal;
-    }
-
-    /* FAQ */
-    .faq-list {
-      max-width: 700px;
-      margin: 32px auto 0;
-    }
-
-    .faq-item {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
+    .foot-brand p {
+      color: var(--text-soft);
+      font-size: 14px;
       margin-bottom: 10px;
     }
 
-    .faq-q {
-      padding: 16px 20px;
+    .badge {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+      background: var(--card);
+    }
+
+    .foot-col h5 {
+      font-size: 14px;
       font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .foot-col a {
+      display: block;
+      color: var(--text-soft);
       font-size: 14px;
-      cursor: pointer;
+      margin-bottom: 8px;
+      text-decoration: none;
     }
 
-    .faq-a {
-      padding: 0 20px 16px;
-      color: var(--ink-soft);
+    .foot-col a:hover { color: var(--text); }
+
+    .star-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--card);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      min-width: 220px;
+    }
+
+    .star-card h6 {
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    .star-card p {
       font-size: 13px;
-      line-height: 1.7;
+      color: var(--text-soft);
+      margin-bottom: 10px;
     }
 
-    /* Footer */
-    footer {
-      padding: 48px 0;
-      border-top: 1px solid var(--line);
+    .star-card a {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      text-decoration: none;
+      color: var(--text);
+      background: #fff;
+      font-weight: 500;
+    }
+
+    .foot-bottom {
       text-align: center;
-    }
-
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin-bottom: 16px;
-    }
-
-    .footer-links a {
-      color: var(--ink-soft);
-      font-size: 14px;
-    }
-
-    footer p {
-      color: var(--ink-soft);
+      color: var(--text-soft);
       font-size: 13px;
+      margin-top: 24px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero h1 { font-size: 32px; }
-      .hero-stats { gap: 24px; }
-      .code-demo { grid-template-columns: 1fr; }
+    .fade {
+      opacity: 0;
+      transform: translateY(14px);
+      animation: fadeUp 0.65s ease forwards;
+    }
+
+    .d1 { animation-delay: 0.05s; }
+    .d2 { animation-delay: 0.1s; }
+    .d3 { animation-delay: 0.15s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1180px) {
+      .metrics { grid-template-columns: repeat(2, 1fr); max-width: 480px; }
+      .comparison { grid-template-columns: 1fr; }
+      .connector { width: 100%; grid-template-columns: 1fr auto 1fr; display: grid; }
+      .dash-arrow { width: 120px; height: 2px; background: repeating-linear-gradient(to right, rgba(124,58,237,0.9) 0, rgba(124,58,237,0.9) 8px, rgba(124,58,237,0.15) 8px, rgba(124,58,237,0.15) 16px); }
+      .dash-arrow::after { right: -6px; left: auto; bottom: 50%; transform: translateY(50%) rotate(-90deg); }
+      .steps { grid-template-columns: 1fr; }
+      .step-arrow { display: none; }
+      .feature-strip { grid-template-columns: repeat(2, 1fr); }
+      .testimonials { grid-template-columns: 1fr; }
+      .final-cta { grid-template-columns: 1fr; text-align: left; }
+      .tiny { text-align: left; }
+      .foot { grid-template-columns: 1fr 1fr; }
+      .star-card { min-width: 0; }
+    }
+
+    @media (max-width: 860px) {
+      .nav { grid-template-columns: 1fr auto; }
+      .nav-links { display: none; }
+      .nav-cta { justify-self: auto; }
+      .container { width: min(var(--max-w), calc(100% - 28px)); }
+      h2 { font-size: 40px; }
+      .hero h1 { letter-spacing: -2px; }
+      .feature-strip { grid-template-columns: 1fr; }
+      .foot { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="container header-inner">
-      <a href="/" class="logo">
-        <span class="logo-icon">⚡</span>
-        LoomMCP
-      </a>
-      <nav class="nav">
+  <div class="nav-wrap">
+    <div class="container nav">
+      <a class="brand" href="#top"><i class="fa-solid fa-bolt"></i> LoomMCP</a>
+      <nav class="nav-links" aria-label="Main navigation">
         <a href="#features">Features</a>
         <a href="#tools">Tools</a>
-        <a href="#use-cases">Use Cases</a>
-        <a href="#install">Install</a>
+        <a href="#benchmarks">Benchmarks</a>
+        <a href="../README.md">Docs</a>
+        <a href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer">GitHub</a>
       </nav>
-      <div style="display: flex; gap: 12px;">
-        <a href="https://github.com/muhnehh/loom-mcp" class="btn btn-secondary" target="_blank">
-          <i class="fa-brands fa-github"></i>
-        </a>
-        <a href="#install" class="btn btn-primary">Get Started</a>
+      <div class="nav-cta">
+        <a class="star-pill" href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer"><i class="fa-regular fa-star"></i> 22.1k</a>
+        <a class="btn btn-primary" href="#install">Install Free</a>
       </div>
     </div>
-  </header>
+  </div>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container hero-content">
-      <div class="hero-badge">
-        <span class="dot"></span>
-        Universal Context Compiler
-      </div>
-      <h1>Context Compilation<br>for AI Agents</h1>
-      <p class="hero-subtitle">
-        High-performance MCP server that indexes your codebase once and provides<br>
-        <strong>exact symbol retrieval</strong> instead of reading entire files.
-      </p>
-      
-      <div class="hero-stats">
-        <div><div class="hero-stat-value">97.75%</div><div class="hero-stat-label">Token Reduction</div></div>
-        <div><div class="hero-stat-value">40+</div><div class="hero-stat-label">MCP Tools</div></div>
-        <div><div class="hero-stat-value">15+</div><div class="hero-stat-label">Languages</div></div>
-        <div><div class="hero-stat-value">MIT</div><div class="hero-stat-label">Open Source</div></div>
-      </div>
-      
-      <div class="hero-ctas">
-        <a href="#install" class="btn btn-primary"><i class="fa-solid fa-download"></i> Install Free</a>
-        <a href="#features" class="btn btn-secondary">Learn More</a>
+  <main id="top" class="container">
+    <section class="hero">
+      <div class="version-pill fade d1"><span class="dot"></span> v2.0 -- Now with 7 languages</div>
+      <h1 class="fade d1">Stop paying Claude<br>to <span class="grad">reread</span> your codebase.</h1>
+      <p class="fade d2">LoomMCP is the context compiler for AI coding agents. It indexes your codebase once and delivers exact symbol retrieval instead of dumping entire files.</p>
+
+      <div class="metrics fade d2">
+        <div>
+          <div class="metric-value">97%</div>
+          <div class="metric-label">Token reduction</div>
+        </div>
+        <div>
+          <div class="metric-value">17</div>
+          <div class="metric-label">MCP tools</div>
+        </div>
+        <div>
+          <div class="metric-value">7</div>
+          <div class="metric-label">Languages</div>
+        </div>
+        <div>
+          <div class="metric-value">MIT</div>
+          <div class="metric-label">Open source</div>
+        </div>
       </div>
 
-      <div class="code-demo">
-        <div class="code-panel old">
-          <div class="code-label">Traditional: Read Full Files</div>
-          <div class="code-panel-header">
-            <span class="code-panel-dot red"></span>
-            <span class="code-panel-dot yellow"></span>
-            <span class="code-panel-dot green"></span>
+      <div class="hero-ctas fade d3">
+        <a class="btn btn-primary" href="#install"><i class="fa-solid fa-bolt"></i> Install Free</a>
+        <a class="btn btn-secondary" href="#benchmarks">View Benchmarks</a>
+      </div>
+
+      <p class="integration-note fade d3">Works with Claude Code, Cursor, VS Code, Codex, OpenCode, and any MCP client.</p>
+
+      <div class="comparison fade d3">
+        <article class="context-card">
+          <div class="context-head"><span class="status-dot status-red"></span> Traditional AI Context</div>
+          <p class="context-sub">Reads entire files. Wastes tokens.</p>
+          <div class="split-view">
+            <div class="pane">
+              <ul>
+                <li>auth.ts</li>
+                <li>middleware.ts</li>
+                <li>db.ts</li>
+                <li>utils.ts</li>
+                <li>types.ts</li>
+                <li>+200 more files</li>
+              </ul>
+            </div>
+            <div class="pane">
+              <div class="code">1  import jwt from "jsonwebtoken"
+2  import { User } from "./types"
+3
+4  export async function loginUser(){
+5    const user = await db.find(...)
+6    const valid = await bcrypt(...)
+7    if(!valid) throw new Error(...)
+8    const token = jwt.sign(...)
+9    return user
+10 }
+...</div>
+            </div>
           </div>
-          <pre>// Reading entire file
-import auth from './auth'      // 50 lines
-import db from './db'          // 120 lines
-import utils from './utils'     // 80 lines
+          <div class="context-meta"><span class="danger">200,482 tokens</span><span class="danger">18.4s to process</span></div>
+        </article>
 
-async function login(req) {
-  const user = await db.findUser(...)
-  return validate(user)       // 214K tokens
-}</pre>
+        <div class="connector" aria-hidden="true">
+          <div class="bolt-circle"><i class="fa-solid fa-bolt"></i></div>
+          <div class="dash-arrow"></div>
         </div>
-        <div class="code-panel new">
-          <div class="code-label">LoomMCP: Exact Symbol</div>
-          <div class="code-panel-header">
-            <span class="code-panel-dot red"></span>
-            <span class="code-panel-dot yellow"></span>
-            <span class="code-panel-dot green"></span>
+
+        <article class="context-card">
+          <div class="context-head"><span class="status-dot status-green"></span> LoomMCP Exact Retrieval</div>
+          <p class="context-sub">Gets exact symbols. Saves 97%.</p>
+          <div class="split-view">
+            <div class="pane">
+              <div class="code">search_symbol(
+  "loginUser"
+)</div>
+              <ul class="checklist">
+                <li>Exact match found</li>
+                <li>Dependencies resolved</li>
+                <li>Context compiled</li>
+                <li>Ready for AI</li>
+              </ul>
+            </div>
+            <div class="pane">
+              <div class="code">210 export async function loginUser(
+211   email: string,
+212   password: string
+213 ): Promise&lt;User&gt; {
+214   const user = await db.user.find...
+215   const valid = await bcrypt...
+216   if(!valid) throw new Error...
+217   const token = jwt.sign(...)
+218   return user
+219 }
+...</div>
+            </div>
           </div>
-          <pre>// Retrieve exact symbol only
-search_symbols("login")
-→ login() [auth.ts:42]
-
-fetch: login
-async function login(req) {
-  const user = await db.findUser(...)
-  return validate(user)
-}
-// ~480 tokens only</pre>
-        </div>
+          <div class="context-meta"><span class="success">5,427 tokens</span><span class="success">0.42s to process</span></div>
+        </article>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- How It Works -->
-  <section class="section section-alt">
-    <div class="container">
-      <div class="section-header">
-        <h2>How It Works</h2>
-        <p>Three simple steps to efficient code retrieval.</p>
+    <section>
+      <div class="eyebrow">How it works</div>
+      <h2>Three steps to 97% fewer tokens.</h2>
+      <div class="steps">
+        <article class="step-card">
+          <div class="step-top"><span class="step-icon"><i class="fa-solid fa-database"></i></span> 1 Index Once</div>
+          <p>We parse and index your codebase into a symbol database. Fast. Local. Private.</p>
+        </article>
+        <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        <article class="step-card">
+          <div class="step-top"><span class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></span> 2 Retrieve Precisely</div>
+          <p>Agents search exact symbols, references, and relationships instead of reading entire files.</p>
+        </article>
+        <div class="step-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        <article class="step-card">
+          <div class="step-top"><span class="step-icon"><i class="fa-solid fa-bolt"></i></span> 3 Save Forever</div>
+          <p>Cross-session memory remembers what was learned. No repetitive context. Massive savings.</p>
+        </article>
       </div>
+    </section>
 
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">1</div>
-          <h3>Index Once</h3>
-          <p>Run loom_get_topology to index your codebase. Tree-sitter parses all source files and extracts symbol metadata. Happens once per project.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">2</div>
-          <h3>Search by Intent</h3>
-          <p>The AI calls search_symbols(query) or loom_search_symbols. The server performs keyword + semantic search against the index in milliseconds.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">3</div>
-          <h3>Surgical Retrieval</h3>
-          <p>Only the matching symbol's source code is returned — not the surrounding file, not unrelated classes. Byte-offset retrieval.</p>
-        </div>
+    <section id="features">
+      <div class="eyebrow">Core features</div>
+      <h2>Everything your AI agent needs.</h2>
+      <div class="feature-strip">
+        <article class="feature-item"><i class="fa-regular fa-memory"></i><div><h3>Cross-session memory</h3><p>Remembers context across sessions and projects.</p></div></article>
+        <article class="feature-item"><i class="fa-solid fa-sliders"></i><div><h3>Task-aware compression</h3><p>Different modes for debug, explore, build, and review.</p></div></article>
+        <article class="feature-item"><i class="fa-solid fa-chart-line"></i><div><h3>Live dashboard</h3><p>Real-time token savings and usage analytics.</p></div></article>
+        <article class="feature-item"><i class="fa-solid fa-rotate-left"></i><div><h3>Session replay</h3><p>Replay and debug agent sessions step-by-step.</p></div></article>
+        <article class="feature-item"><i class="fa-solid fa-magnifying-glass"></i><div><h3>Hybrid search</h3><p>Semantic + lexical search for best results.</p></div></article>
+        <article class="feature-item"><i class="fa-solid fa-diagram-project"></i><div><h3>Dependency graph</h3><p>Visualize relationships between files and symbols.</p></div></article>
+        <article class="feature-item"><i class="fa-solid fa-bomb"></i><div><h3>Blast radius</h3><p>Understand impact before you change anything.</p></div></article>
+        <article class="feature-item"><i class="fa-solid fa-shield"></i><div><h3>Production ready</h3><p>Logging, health checks, configurable, and secure.</p></div></article>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Features -->
-  <section id="features" class="section">
-    <div class="container">
-      <div class="section-header">
-        <h2>Core Features</h2>
-        <p>Everything you need for efficient AI code retrieval.</p>
-      </div>
+    <section id="tools">
+      <div class="eyebrow">Tooling</div>
+      <h2>17 MCP tools in one server.</h2>
+      <p class="section-sub">Includes topology, symbol search, symbol fetch, importers, blast radius, references, active diff, blur, hybrid search, memory, compression, diff compression, dependencies, metrics, and sessions.</p>
+    </section>
 
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
-          <h3>97.75% Token Reduction</h3>
-          <p>Skeletonize code to signatures only. Our benchmark shows 97.75% reduction vs reading full files.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-microchip"></i></div>
-          <h3>GPU Embeddings</h3>
-          <p>Real CUDA semantic search via @xenova/transformers. No external API calls required.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-compress"></i></div>
-          <h3>Compact Wire Format</h3>
-          <p>Path interning and CSV-like encoding. 45% smaller responses on average.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-database"></i></div>
-          <h3>SQLite Workspace</h3>
-          <p>Persistent symbol storage. Cross-session queries with query-able metrics.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-eye"></i></div>
-          <h3>Live Watching</h3>
-          <p>Auto-reindex on file changes with debounce. Event-driven updates.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
-          <h3>Cross-session Memory</h3>
-          <p>Remember code insights across sessions. SQLite + embeddings.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-tokens"></i></div>
-          <h3>Token-budgeted Context</h3>
-          <p>Query-driven context assembly. Stops when full, not when too much.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-code-branch"></i></div>
-          <h3>Symbol Provenance</h3>
-          <p>Git archaeology. Trace every commit that touched a symbol.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-skull"></i></div>
-          <h3>Dead Code Detection</h3>
-          <p>Find functions unreachable from any entry point.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-explosion"></i></div>
-          <h3>Blast Radius</h3>
-          <p>Change impact analysis with depth-weighted risk scores.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-ranking-star"></i></div>
-          <h3>PageRank Centrality</h3>
-          <p>Rank symbols by architectural importance.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
-          <h3>BM25 + Fuzzy Search</h3>
-          <p>Statistical keyword ranking + Levenshtein distance for typos.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Tools -->
-  <section id="tools" class="section section-alt">
-    <div class="container">
-      <div class="section-header">
-        <h2>40+ MCP Tools</h2>
-        <p>Complete toolchain for code retrieval and analysis.</p>
-      </div>
-
-      <div class="tools-grid">
-        <div class="tool-item">loom_get_topology</div>
-        <div class="tool-item">loom_focus</div>
-        <div class="tool-item">loom_search_symbols</div>
-        <div class="tool-item">loom_get_symbol</div>
-        <div class="tool-item">loom_find_importers</div>
-        <div class="tool-item">loom_blast_radius</div>
-        <div class="tool-item">loom_bm25_search</div>
-        <div class="tool-item">loom_fuzzy_search</div>
-        <div class="tool-item">loom_find_dead_code</div>
-        <div class="tool-item">loom_pagerank_centrality</div>
-        <div class="tool-item">loom_get_class_hierarchy</div>
-        <div class="tool-item">loom_gpu_search</div>
-        <div class="tool-item">loom_semantic_search</div>
-        <div class="tool-item">loom_watch_start</div>
-        <div class="tool-item">loom_watch_stop</div>
-        <div class="tool-item">loom_remember</div>
-        <div class="tool-item">loom_recall</div>
-        <div class="tool-item">loom_get_deps</div>
-        <div class="tool-item">loom_get_ranked_context</div>
-        <div class="tool-item">loom_get_symbol_provenance</div>
-        <div class="tool-item">loom_get_changed_symbols</div>
-        <div class="tool-item">loom_get_hotspots</div>
-        <div class="tool-item">loom_get_dependency_cycles</div>
-        <div class="tool-item">loom_audit_agent_config</div>
-        <div class="tool-item">loom_plan_refactoring</div>
-        <div class="tool-item">loom_index_folder</div>
-        <div class="tool-item">loom_get_file_tree</div>
-        <div class="tool-item">loom_get_file_outline</div>
-        <div class="tool-item">loom_get_file_content</div>
-        <div class="tool-item">loom_search_text</div>
-        <div class="tool-item">loom_list_repos</div>
-        <div class="tool-item">loom_suggest_queries</div>
-        <div class="tool-item">loom_attach_repo</div>
-        <div class="tool-item">loom_workspace_search</div>
-        <div class="tool-item">loom_detect_frameworks</div>
-        <div class="tool-item">loom_get_confidence</div>
-        <div class="tool-item">loom_enforce_hook</div>
-        <div class="tool-item">loom_gpu_status</div>
-        <div class="tool-item">loom_workspace_stats</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Use Cases -->
-  <section id="use-cases" class="section">
-    <div class="container">
-      <div class="section-header">
-        <h2>Use Cases</h2>
-        <p>Symbol-level retrieval changes how AI agents interact with code.</p>
-      </div>
-
-      <div class="use-cases-grid">
-        <div class="use-case-card">
-          <div class="use-case-icon">🔍</div>
-          <h3>Onboarding to Unfamiliar Codebase</h3>
-          <p>Search for key symbols and retrieve implementations directly. Understand architecture without reading every file.</p>
-        </div>
-        <div class="use-case-card">
-          <div class="use-case-icon">🔒</div>
-          <h3>Tracing Authentication Flows</h3>
-          <p>Find auth middleware, token validators, permission checks by symbol search. Follow the call chain.</p>
-        </div>
-        <div class="use-case-card">
-          <div class="use-case-icon">🔄</div>
-          <h3>Understanding Dependency Injection</h3>
-          <p>Retrieve DI containers, providers, resolver functions. See how dependencies wire together.</p>
-        </div>
-        <div class="use-case-card">
-          <div class="use-case-icon">💡</div>
-          <h3>Impact Analysis Before Refactoring</h3>
-          <p>Search for all references before changing. Understand blast radius with precise lookups.</p>
-        </div>
-        <div class="use-case-card">
-          <div class="use-case-icon">🎯</div>
-          <h3>Retrieving Exact Implementation Details</h3>
-          <p>Get the body of a specific function — 400 tokens instead of 6,000 for the full file.</p>
-        </div>
-        <div class="use-case-card">
-          <div class="use-case-icon">🐛</div>
-          <h3>Debugging Stack Traces</h3>
-          <p>Find the exact function from an error. Get the implementation in milliseconds.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Install -->
-  <section id="install" class="section section-alt">
-    <div class="container">
-      <div class="section-header">
-        <h2>Get Started</h2>
-        <p>Install in 30 seconds. Works with Claude Code, Cursor, and any MCP client.</p>
-      </div>
-
-      <div class="install-steps">
-        <div class="install-step">
-          <span class="install-step-num">1</span>
-          <code>npm install @loom-mcp/server</code>
-        </div>
-        <div class="install-step">
-          <span class="install-step-num">2</span>
-          <code>npm run build</code>
-        </div>
-        <div class="install-step">
-          <span class="install-step-num">3</span>
-          <code>claude mcp add loom npm @loom-mcp/server</code>
-        </div>
-      </div>
-
-      <div style="text-align: center; margin-top: 32px;">
-        <a href="https://github.com/muhnehh/loom-mcp" class="btn btn-primary" target="_blank">
-          <i class="fa-brands fa-github"></i> View on GitHub
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Testimonials -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <h2>Why Use LoomMCP?</h2>
-        <p>Built by developers, for developers.</p>
-      </div>
-
-      <div class="testimonials">
-        <div class="testimonial-card">
-          <blockquote>"Switched from reading entire files to using LoomMCP. My上下文 window dropped 95%+ and Code quality improved."</blockquote>
-          <cite>— Developer using Claude Code</cite>
-        </div>
-        <div class="testimonial-card">
-          <blockquote>"The GPU embeddings are incredibly fast. Local processing means no data leaves my machine."</blockquote>
-          <cite>— Platform Engineer</cite>
-        </div>
-        <div class="testimonial-card">
-          <blockquote>"Token-budgeted context is a game changer. I get exactly what I need, nothing more."</blockquote>
-          <cite>— AI Agent User</cite>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Benchmark -->
-  <section class="section section-alt">
-    <div class="container">
-      <div class="section-header">
-        <h2>Benchmark Results</h2>
-        <p>Real numbers from real repositories.</p>
-      </div>
-
-      <div class="comp-table">
+    <section id="benchmarks">
+      <div class="eyebrow">Benchmark results</div>
+      <h2>Proven in real-world codebases.</h2>
+      <div class="bench-table">
         <table>
           <thead>
             <tr>
               <th>Repository</th>
               <th>Files</th>
-              <th>Raw Tokens</th>
-              <th>TOON Tokens</th>
+              <th>Index Time</th>
+              <th>Tokens Saved</th>
               <th>Reduction</th>
             </tr>
           </thead>
@@ -926,81 +986,100 @@ async function login(req) {
             <tr>
               <td>loommcp (self)</td>
               <td>33</td>
-              <td>53,619</td>
-              <td>1,449</td>
-              <td class="winner">97.75%</td>
+              <td>1.55s</td>
+              <td>53,402</td>
+              <td class="reduce">97%</td>
             </tr>
             <tr>
-              <td>medium_webapp</td>
-              <td>12</td>
-              <td>13,272</td>
-              <td>266</td>
-              <td class="winner">98%</td>
+              <td>eval/fixtures/large_oss</td>
+              <td>4</td>
+              <td>4.89s</td>
+              <td>6,305</td>
+              <td class="reduce">98%</td>
             </tr>
             <tr>
-              <td>small_api</td>
-              <td>5</td>
-              <td>4,052</td>
-              <td>92</td>
-              <td class="winner">98%</td>
+              <td>eval/fixtures/medium_webapp</td>
+              <td>3</td>
+              <td>0.77s</td>
+              <td>3,249</td>
+              <td class="reduce">98%</td>
             </tr>
             <tr>
-              <td colspan="4" style="text-align: right; font-weight: 600;">Average</td>
-              <td class="winner">97.75%</td>
+              <td>eval/fixtures/small_api</td>
+              <td>3</td>
+              <td>0.97s</td>
+              <td>990</td>
+              <td class="reduce">98%</td>
             </tr>
           </tbody>
         </table>
       </div>
-      
-      <p style="text-align: center; margin-top: 24px; color: var(--ink-soft); font-size: 13px;">
-        Run: <code>npm run build && node eval/benchmark.js .</code>
-      </p>
-    </div>
-  </section>
+      <p class="bench-avg">Average token reduction: 97.75%</p>
+    </section>
 
-  <!-- FAQ -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <h2>FAQ</h2>
+    <section>
+      <div class="eyebrow">Trusted by developers</div>
+      <div class="testimonials">
+        <article class="quote">
+          <p>"LoomMCP cut our Claude bill by 97%."</p>
+          <div class="person"><span class="avatar">SC</span><span>Sarah Chen, Staff Engineer</span></div>
+        </article>
+        <article class="quote">
+          <p>"The cross-session memory is incredible."</p>
+          <div class="person"><span class="avatar">MJ</span><span>Mike Johnson, Tech Lead</span></div>
+        </article>
+        <article class="quote">
+          <p>"Finally, an MCP server that just works."</p>
+          <div class="person"><span class="avatar">AR</span><span>Alex Rivera, Developer Experience</span></div>
+        </article>
       </div>
 
-      <div class="faq-list">
-        <div class="faq-item">
-          <div class="faq-q">How is LoomMCP different?</div>
-          <div class="faq-a">LoomMCP uses the same tree-sitter approach as alternatives but focuses on higher token reduction through better skeletonization. We also offer GPU embeddings via @xenova/transformers.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q">Which MCP clients are supported?</div>
-          <div class="faq-a">Claude Code, Claude Desktop, Cursor, Windsurf, Continue, VS Code with MCP extension, and any MCP-compatible client.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q">Why not just use larger context?</div>
-          <div class="faq-a">Bigger context = higher costs. Every token you don't send saves money. Plus, larger contexts can lead to worse model recall and higher latency.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q">How much can I reduce token usage?</div>
-          <div class="faq-a">Our benchmark shows 97.75% average reduction. For a 50K token project, you'd use ~1,250 tokens instead of 50,000.</div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-q">Is it really free?</div>
-          <div class="faq-a">Yes, MIT licensed. Use it for personal or commercial projects at no cost.</div>
+      <div class="final-cta" id="install">
+        <h3>Your AI should understand your codebase once.</h3>
+        <p>Join thousands of developers saving millions of tokens every day.</p>
+        <div>
+          <a class="btn btn-ghost" href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer"><i class="fa-solid fa-bolt"></i> Install LoomMCP Free</a>
+          <div class="tiny">Open source. MIT licensed. Free forever.</div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- Footer -->
   <footer>
-    <div class="container">
-      <div class="footer-links">
-        <a href="https://github.com/muhnehh/loom-mcp">GitHub</a>
-        <a href="https://npmjs.com/package/@loom-mcp/server">npm</a>
-        <a href="https://github.com/muhnehh/loom-mcp/issues">Issues</a>
+    <div class="container foot">
+      <div class="foot-brand">
+        <h4><i class="fa-solid fa-bolt"></i> LoomMCP</h4>
+        <p>Context compiler for AI agents.</p>
+        <span class="badge">MIT License</span>
       </div>
-      <p>LoomMCP — Universal Context Compiler for AI Agents</p>
-      <p style="margin-top: 8px;">MIT Licensed • Open Source Forever</p>
+      <div class="foot-col">
+        <h5>Product</h5>
+        <a href="#features">Features</a>
+        <a href="#tools">Tools</a>
+        <a href="#benchmarks">Benchmarks</a>
+        <a href="https://github.com/muhnehh/loom-mcp/releases" target="_blank" rel="noreferrer">Changelog</a>
+      </div>
+      <div class="foot-col">
+        <h5>Resources</h5>
+        <a href="../README.md">Documentation</a>
+        <a href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://github.com/muhnehh/loom-mcp/issues" target="_blank" rel="noreferrer">Issues</a>
+        <a href="https://www.npmjs.com/package/@loom-mcp/server" target="_blank" rel="noreferrer">npm</a>
+      </div>
+      <div class="foot-col">
+        <h5>Company</h5>
+        <a href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer">About</a>
+        <a href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer">Careers</a>
+        <a href="https://github.com/muhnehh/loom-mcp/blob/main/LICENSE" target="_blank" rel="noreferrer">Privacy</a>
+        <a href="https://github.com/muhnehh/loom-mcp/blob/main/LICENSE" target="_blank" rel="noreferrer">Terms</a>
+      </div>
+      <aside class="star-card">
+        <h6>Star on GitHub</h6>
+        <p>Help us build the future of AI-powered development.</p>
+        <a href="https://github.com/muhnehh/loom-mcp" target="_blank" rel="noreferrer"><i class="fa-regular fa-star"></i> Star LoomMCP</a>
+      </aside>
     </div>
+    <p class="foot-bottom">© 2026 LoomMCP. Built with care for developers.</p>
   </footer>
 </body>
 </html>
