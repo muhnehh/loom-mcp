@@ -10,7 +10,7 @@ import {
   useVideoConfig,
 } from "remotion";
 
-// ─── Timing (frames @ 30fps) ───────────────────────────────────────────────
+// ─── Timing (frames @ 30fps) — total 5154 = 2:51.8 matching voiceover ──────
 const T = {
   hook:        { in: 0,    out: 360  }, // 0:00–0:12
   problem:     { in: 360,  out: 1140 }, // 0:12–0:38
@@ -18,8 +18,8 @@ const T = {
   intro:       { in: 1740, out: 2340 }, // 0:58–1:18
   howItWorks:  { in: 2340, out: 3360 }, // 1:18–1:52
   dashboard:   { in: 3360, out: 4140 }, // 1:52–2:18
-  results:     { in: 4140, out: 4740 }, // 2:18–2:38
-  outro:       { in: 4740, out: 5400 }, // 2:38–3:00
+  results:     { in: 4140, out: 4680 }, // 2:18–2:36
+  outro:       { in: 4680, out: 5154 }, // 2:36–2:51.8
 };
 
 // ─── Design tokens ─────────────────────────────────────────────────────────
@@ -751,6 +751,9 @@ export const LoomVideo = () => {
 
   return (
     <AbsoluteFill style={{ background: "#0A0A0F", fontFamily: FONT }}>
+      {/* Voiceover audio track */}
+      <Audio src={staticFile("voiceover.mp3")} volume={1} />
+
       {isIn(T.hook)       && <SceneHook />}
       {isIn(T.problem)    && <SceneProblem />}
       {isIn(T.existing)   && <SceneExisting />}

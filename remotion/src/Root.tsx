@@ -7,7 +7,7 @@ export const RemotionRoot = () => (
     <Composition
       id="LoomMCPDemo"
       component={LoomVideo}
-      durationInFrames={5400} // 3 min @ 30fps
+      durationInFrames={5154} // 2:51.78 matches voiceover
       fps={30}
       width={1920}
       height={1080}

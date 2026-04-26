@@ -1,3 +1,5 @@
 node_modules/
 out/
 .remotion/
+out/
+public/voiceover.wav
