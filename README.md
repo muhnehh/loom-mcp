@@ -1,6 +1,6 @@
 # LoomMCP
 
-<img src="loom-mcp-logo.png" alt="LoomMCP" width="700">
+<img src="loom.png" alt="LoomMCP" width="700">
 
 > The universal context compiler for AI coding agents. **97.75% token reduction**, GPU embeddings, compact wire format. Free forever — no enterprise license required.
 
