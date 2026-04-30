@@ -8,6 +8,20 @@
 
 ---
 
+## 🎥 Demo
+
+See LoomMCP compress a real-world codebase in seconds:
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=z1gBFO4jdbI">
+    <img src="https://img.youtube.com/vi/z1gBFO4jdbI/maxresdefault.jpg" width="800" />
+  </a>
+</p>
+
+<p align="center"><b>Watch LoomMCP in action</b></p>
+
+---
+
 ### Structured code retrieval for serious AI agents
 
 ![License](https://img.shields.io/badge/license-MIT-green)
