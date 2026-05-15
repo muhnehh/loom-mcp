@@ -8,9 +8,12 @@ We welcome contributions! Here's how to get started.
 git clone https://github.com/muhnehh/loom-mcp.git
 cd loom-mcp
 npm install --legacy-peer-deps
-npm run build
+npm run build      # required: dist/ is gitignored and must be built locally
 npm run test
 ```
+
+The compiled output in `dist/` is intentionally not committed; it is produced
+by `tsc` from `src/` and shipped to npm via `prepublishOnly`.
 
 ## Project Structure
 

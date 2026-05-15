@@ -36,7 +36,8 @@
     "dev": "tsc && node dist/index.js",
     "test": "node --test __tests__/*.test.mjs",
     "benchmark": "node eval/benchmark.js .",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.1.0",
